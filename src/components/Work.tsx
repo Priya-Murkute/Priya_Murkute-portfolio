@@ -38,12 +38,15 @@ export default function Work() {
             <InView
               key={item.id}
               once
+              className={
+                index === 0 || index === work.length - 1 ? "sm:col-span-2" : undefined
+              }
               viewOptions={{ margin: "-10% 0px" }}
               variants={{
-                hidden: { opacity: 0, y: 24 },
-                visible: { opacity: 1, y: 0 },
+                hidden: { opacity: 0, y: 32, filter: "blur(8px)" },
+                visible: { opacity: 1, y: 0, filter: "blur(0px)" },
               }}
-              transition={{ duration: 0.5, delay: (index % 2) * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.65, delay: Math.min(index, 4) * 0.07, ease: [0.22, 1, 0.36, 1] }}
             >
               <WorkCard item={item} />
             </InView>

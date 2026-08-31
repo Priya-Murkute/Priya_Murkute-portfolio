@@ -1,10 +1,12 @@
 import { useMotionValueEvent, useScroll } from "motion/react";
 import { useState } from "react";
 import { ScrollProgress } from "@/components/motion-primitives/scroll-progress";
+import MobileNav from "@/components/MobileNav";
 import { cn } from "@/lib/utils";
 
-const links = [
+export const navLinks = [
   { href: "#work", label: "Work" },
+  { href: "#projects", label: "Projects" },
   { href: "#experience", label: "Experience" },
   { href: "#skills", label: "Skills" },
   { href: "#contact", label: "Contact" },
@@ -19,6 +21,7 @@ export default function NavBar({
 }) {
   const { scrollY } = useScroll();
   const [isLifted, setIsLifted] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (value) => setIsLifted(value > 24));
 
@@ -38,7 +41,7 @@ export default function NavBar({
 
           <div className="flex items-center gap-1">
             <ul className="hidden items-center gap-1 sm:flex">
-              {links.map((link) => (
+              {navLinks.map((link) => (
                 <li key={link.href}>
                   <a
                     href={link.href}
@@ -50,10 +53,32 @@ export default function NavBar({
               ))}
             </ul>
             <ThemeButton isDark={isDark} onToggle={onToggleTheme} />
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen(true)}
+              aria-label="Open menu"
+              className="ml-1 flex size-8 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-line-strong hover:text-ink sm:hidden"
+            >
+              <svg viewBox="0 0 16 16" className="size-3.5" fill="none" aria-hidden="true">
+                <path
+                  d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"
+                  stroke="currentColor"
+                  strokeWidth={1.4}
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
           </div>
         </nav>
       </div>
       <ScrollProgress className="absolute inset-x-0 top-full" />
+
+      <MobileNav
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        isDark={isDark}
+        onToggleTheme={onToggleTheme}
+      />
     </header>
   );
 }

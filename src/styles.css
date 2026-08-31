@@ -25,12 +25,13 @@
   --fail: #a63d3d;
   --fail-tint: #f6e7e5;
 
-  /* Haikei-style ambient washes */
-  --halo-sage: #cfe0d3;
-  --halo-mint: #dcebe1;
-  --halo-sky: #d6e2ee;
-  --halo-sand: #f1e8d7;
-  --halo-opacity: 0.55;
+  /* Haikei-style ambient washes — kept close to paper rather than a distinct
+     rainbow of hues, so the wash reads as soft light, not added color. */
+  --halo-sage: #ece8da;
+  --halo-mint: #efe9dd;
+  --halo-sky: #e6e6e2;
+  --halo-sand: #eee3d2;
+  --halo-opacity: 0.4;
   --grain-opacity: 0.035;
 }
 
@@ -86,9 +87,15 @@
   --text-eyebrow--line-height: 1.2;
   --text-eyebrow--letter-spacing: 0.16em;
 
-  --text-display: clamp(2.6rem, 7.2vw, 5rem);
+  --text-display: clamp(2.1rem, 5.8vw, 3.9rem);
   --text-display--line-height: 0.96;
   --text-display--letter-spacing: -0.035em;
+
+  /* Reserved for the hero's name — the one place a short line of text earns
+     going bigger than --text-display. */
+  --text-name: clamp(2.1rem, 5vw, 3.4rem);
+  --text-name--line-height: 1;
+  --text-name--letter-spacing: -0.025em;
 
   --text-title: clamp(1.75rem, 3.4vw, 2.5rem);
   --text-title--line-height: 1.06;
@@ -162,7 +169,7 @@
 
   .section {
     position: relative;
-    padding-block: clamp(4.5rem, 10vw, 8.5rem);
+    padding-block: clamp(3rem, 6.5vw, 6rem);
   }
 
   .eyebrow {
@@ -218,6 +225,53 @@
     height: 0.5rem;
     border-radius: 999px;
     flex: none;
+  }
+
+  /* A soft ambient bloom behind the primary action on hover — the manus.im-
+     style glow, kept to one accent so it reads as emphasis, not decoration. */
+  .glow-cta {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .glow-cta::before {
+    content: "";
+    position: absolute;
+    inset: -0.75rem;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(circle, var(--pass) 0%, transparent 70%);
+    opacity: 0;
+    filter: blur(18px);
+    transition: opacity 300ms var(--ease-calm);
+  }
+
+  .glow-cta:hover::before {
+    opacity: 0.32;
+  }
+
+  .dark .glow-cta:hover::before {
+    opacity: 0.42;
+  }
+
+  /* A faint top sheen on glass surfaces, layered over the existing blur/border
+     pill treatment for a slightly more glassy read. */
+  .pill-sheen {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .pill-sheen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(to bottom, color-mix(in srgb, white 22%, transparent), transparent 60%);
+  }
+
+  .dark .pill-sheen::before {
+    background: linear-gradient(to bottom, color-mix(in srgb, white 10%, transparent), transparent 60%);
   }
 }
 

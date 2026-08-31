@@ -1,22 +1,28 @@
 import { profile } from "@/data/resume";
 import { TextEffect } from "@/components/motion-primitives/text-effect";
 import { InView } from "@/components/motion-primitives/in-view";
+import PetalScatter from "@/components/PetalScatter";
 
 const channels = [
   { label: "Email", value: profile.email, href: `mailto:${profile.email}` },
-  { label: "Phone", value: profile.phone, href: `tel:${profile.phone.replace(/\s+/g, "")}` },
+  { label: "GitHub", value: "Priya-Murkute", href: profile.github },
   { label: "LinkedIn", value: "priya-murkute-oct7", href: profile.linkedin },
 ];
 
-export default function Contact() {
+export default function Contact({ isDark }: { isDark: boolean }) {
   return (
-    <section id="contact" className="section">
-      <div className="shell">
+    <section id="contact" className="section relative overflow-hidden">
+      <PetalScatter isDark={isDark} />
+
+      <div className="shell relative">
         <InView
           once
           viewOptions={{ margin: "-15% 0px" }}
-          variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          variants={{
+            hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
+            visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+          }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
           <p className="eyebrow">Contact</p>
 
@@ -49,7 +55,7 @@ export default function Contact() {
           <a
             href={`${import.meta.env.BASE_URL}${profile.cvPath}`}
             download
-            className="mt-10 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-px"
+            className="glow-cta mt-10 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-px"
           >
             Download CV
             <svg viewBox="0 0 16 16" className="size-3.5" fill="none" aria-hidden="true">

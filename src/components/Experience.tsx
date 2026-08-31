@@ -8,13 +8,16 @@ export default function Experience() {
         <p className="eyebrow">Experience</p>
 
         <div className="mt-10 space-y-px">
-          {experience.map((role) => (
+          {experience.map((role, index) => (
             <InView
               key={`${role.organisation}-${role.period}`}
               once
               viewOptions={{ margin: "-12% 0px" }}
-              variants={{ hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0 } }}
-              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              variants={{
+                hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
+                visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+              }}
+              transition={{ duration: 0.65, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
             >
               <article className="grid gap-6 border-t border-line py-10 lg:grid-cols-12 lg:gap-10">
                 <div className="lg:col-span-4">

@@ -20,8 +20,11 @@ export default function Skills() {
               key={group.label}
               once
               viewOptions={{ margin: "-8% 0px" }}
-              variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 } }}
-              transition={{ duration: 0.45, delay: index * 0.04, ease: [0.22, 1, 0.36, 1] }}
+              variants={{
+                hidden: { opacity: 0, y: 20, filter: "blur(6px)" },
+                visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+              }}
+              transition={{ duration: 0.55, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="grid gap-4 border-t border-line py-6 sm:grid-cols-12 sm:gap-8">
                 <dt className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-faint sm:col-span-4 sm:pt-1">

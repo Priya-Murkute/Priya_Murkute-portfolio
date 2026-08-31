@@ -4,6 +4,7 @@ import Hero from "@/components/Hero";
 import Stats from "@/components/Stats";
 import About from "@/components/About";
 import Work from "@/components/Work";
+import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import Skills from "@/components/Skills";
 import Contact from "@/components/Contact";
@@ -31,13 +32,14 @@ export default function App() {
       </a>
       <NavBar isDark={isDark} onToggleTheme={() => setIsDark((value) => !value)} />
       <main>
-        <Hero />
+        <Hero isDark={isDark} />
         <Stats />
         <About />
         <Work />
+        <Projects />
         <Experience />
         <Skills />
-        <Contact />
+        <Contact isDark={isDark} />
       </main>
       <Footer />
     </>

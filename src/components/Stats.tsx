@@ -20,8 +20,11 @@ export default function Stats() {
         <InView
           once
           viewOptions={{ margin: "-15% 0px" }}
-          variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          variants={{
+            hidden: { opacity: 0, y: 22, filter: "blur(6px)" },
+            visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+          }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
           <dl className="grid gap-px sm:grid-cols-3">
             {stats.map((stat) => (

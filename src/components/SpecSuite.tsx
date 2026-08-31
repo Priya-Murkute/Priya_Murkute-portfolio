@@ -43,6 +43,7 @@ export default function SpecSuite() {
         ))}
       </ul>
       <div className="mt-6 flex items-center gap-3 border-t border-line pt-4 font-mono text-xs">
+        <CoverageRing passed={passed} total={assertions.length} />
         <motion.span
           animate={{ opacity: complete ? 1 : 0.45 }}
           className={complete ? "text-pass" : "text-faint"}
@@ -55,6 +56,48 @@ export default function SpecSuite() {
         <span className="text-faint">3 years</span>
       </div>
     </div>
+  );
+}
+
+/**
+ * A small radial readout of the same tick-over state — the ring closes as
+ * assertions pass, so the count above isn't the only signal of progress.
+ */
+function CoverageRing({ passed, total }: { passed: number; total: number }) {
+  const size = 18;
+  const strokeWidth = 2.5;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const fraction = total > 0 ? passed / total : 0;
+
+  return (
+    <svg
+      viewBox={`0 0 ${size} ${size}`}
+      className="size-[1.125rem] flex-none -rotate-90"
+      aria-hidden="true"
+    >
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="var(--line-strong)"
+        strokeWidth={strokeWidth}
+      />
+      <motion.circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="var(--pass)"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        initial={false}
+        animate={{ strokeDashoffset: circumference * (1 - fraction) }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      />
+    </svg>
   );
 }
 

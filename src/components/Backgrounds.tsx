@@ -1,16 +1,26 @@
 import { useId } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 /**
  * Haikei-style background assets, written by hand so they read from the theme
  * tokens instead of being exported as flat SVG files. Every one of them is
- * decorative — they are all aria-hidden and none carry information.
+ * decorative — they are all aria-hidden and none carry information. Each one
+ * drifts continuously and slowly; `prefers-reduced-motion` freezes them.
  */
 
-/** Haikei "blurry gradient": a few wide ellipses pushed through a heavy blur. */
+/** Haikei "blurry gradient": a few wide ellipses pushed through a heavy blur, drifting. */
 export function BlurryGradient({ className }: { className?: string }) {
   const id = useId();
   const blur = `blur-${id}`;
+  const animate = !(useReducedMotion() ?? false);
+
+  const blobs = [
+    { cx: 170, cy: 150, rx: 300, ry: 210, fill: "var(--halo-mint)", dx: 26, dy: 16, duration: 22 },
+    { cx: 760, cy: 120, rx: 260, ry: 190, fill: "var(--halo-sky)", dx: -22, dy: 20, duration: 26 },
+    { cx: 520, cy: 430, rx: 330, ry: 200, fill: "var(--halo-sage)", dx: 20, dy: -18, duration: 24 },
+    { cx: 900, cy: 520, rx: 240, ry: 170, fill: "var(--halo-sand)", dx: -18, dy: -14, duration: 20 },
+  ];
 
   return (
     <svg
@@ -26,10 +36,15 @@ export function BlurryGradient({ className }: { className?: string }) {
         </filter>
       </defs>
       <g filter={`url(#${blur})`}>
-        <ellipse cx="170" cy="150" rx="300" ry="210" fill="var(--halo-mint)" />
-        <ellipse cx="760" cy="120" rx="260" ry="190" fill="var(--halo-sky)" />
-        <ellipse cx="520" cy="430" rx="330" ry="200" fill="var(--halo-sage)" />
-        <ellipse cx="900" cy="520" rx="240" ry="170" fill="var(--halo-sand)" />
+        {blobs.map((blob, index) => (
+          <motion.g
+            key={index}
+            animate={animate ? { x: [0, blob.dx, 0], y: [0, blob.dy, 0] } : undefined}
+            transition={{ duration: blob.duration, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <ellipse cx={blob.cx} cy={blob.cy} rx={blob.rx} ry={blob.ry} fill={blob.fill} />
+          </motion.g>
+        ))}
       </g>
     </svg>
   );
@@ -40,8 +55,11 @@ const WAVE = "M0 96C160 40 320 152 480 96S800 24 960 96 1280 160 1440 96";
 /**
  * Haikei "layered waves", reduced to stroked contours. Filled bands would
  * dominate the page; hairlines read as a topographic seam between sections.
+ * Each contour drifts sideways at its own slow, offset pace.
  */
 export function LayeredWaves({ className }: { className?: string }) {
+  const animate = !(useReducedMotion() ?? false);
+
   return (
     <svg
       aria-hidden="true"
@@ -51,25 +69,33 @@ export function LayeredWaves({ className }: { className?: string }) {
       fill="none"
     >
       {[0, 16, 32, 48, 64].map((offset, index) => (
-        <path
-          key={offset}
-          d={WAVE}
-          transform={`translate(0 ${offset})`}
-          stroke="var(--line-strong)"
-          strokeWidth={1}
-          opacity={0.9 - index * 0.16}
-        />
+        <g key={offset} transform={`translate(0 ${offset})`}>
+          <motion.path
+            d={WAVE}
+            stroke="var(--line-strong)"
+            strokeWidth={1}
+            opacity={0.9 - index * 0.16}
+            animate={animate ? { x: [0, 18, 0] } : undefined}
+            transition={{
+              duration: 9 + index * 1.4,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: index * 0.3,
+            }}
+          />
+        </g>
       ))}
     </svg>
   );
 }
 
-/** Haikei "stacked waves": filled bands that settle the bottom of the page. */
+/** Haikei "stacked waves": filled bands that settle the bottom of the page, gently breathing. */
 export function StackedWaves({ className }: { className?: string }) {
+  const animate = !(useReducedMotion() ?? false);
   const layers = [
-    { offset: 0, fill: "var(--halo-mint)", opacity: 0.7 },
-    { offset: 34, fill: "var(--halo-sage)", opacity: 0.55 },
-    { offset: 68, fill: "var(--halo-sky)", opacity: 0.4 },
+    { offset: 0, fill: "var(--halo-mint)", opacity: 0.7, duration: 12 },
+    { offset: 34, fill: "var(--halo-sage)", opacity: 0.55, duration: 15 },
+    { offset: 68, fill: "var(--halo-sky)", opacity: 0.4, duration: 18 },
   ];
 
   return (
@@ -80,13 +106,15 @@ export function StackedWaves({ className }: { className?: string }) {
       preserveAspectRatio="none"
     >
       {layers.map((layer) => (
-        <path
-          key={layer.offset}
-          d={`${WAVE} L1440 220 L0 220 Z`}
-          transform={`translate(0 ${layer.offset})`}
-          fill={layer.fill}
-          opacity={layer.opacity}
-        />
+        <g key={layer.offset} transform={`translate(0 ${layer.offset})`}>
+          <motion.path
+            d={`${WAVE} L1440 220 L0 220 Z`}
+            fill={layer.fill}
+            opacity={layer.opacity}
+            animate={animate ? { x: [0, 14, 0] } : undefined}
+            transition={{ duration: layer.duration, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </g>
       ))}
     </svg>
   );

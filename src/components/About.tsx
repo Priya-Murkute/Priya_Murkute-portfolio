@@ -2,8 +2,8 @@ import { education, profile } from "@/data/resume";
 import { InView } from "@/components/motion-primitives/in-view";
 
 const reveal = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 28, filter: "blur(8px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)" },
 };
 
 export default function About() {
@@ -19,7 +19,7 @@ export default function About() {
           className="lg:col-span-8"
           variants={reveal}
           viewOptions={{ margin: "-15% 0px" }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
           <h2 className="text-title max-w-[24ch] font-display font-semibold">
             Testing is a design activity, not a phase at the end.
