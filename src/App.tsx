@@ -85,7 +85,7 @@ export default function App() {
           />
           <Routes>
             <Route path="/" element={<HomePage isDark={isDark} />} />
-            <Route path="/about-me" element={<AboutMe />} />
+            <Route path="/about-me" element={<AboutMe isDark={isDark} />} />
           </Routes>
           <Footer />
         </>

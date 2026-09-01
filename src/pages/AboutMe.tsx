@@ -1,5 +1,7 @@
 import { Fragment } from "react";
 import { motion } from "motion/react";
+import HeroScene from "@/components/HeroScene";
+import PetalScatter from "@/components/PetalScatter";
 import TravelScroll from "@/components/off-hours/TravelScroll";
 import Carousel3D from "@/components/off-hours/Carousel3D";
 import { cn } from "@/lib/utils";
@@ -46,10 +48,10 @@ const HOBBIES = [
   },
 ];
 
-export default function AboutMe() {
+export default function AboutMe({ isDark }: { isDark: boolean }) {
   return (
     <main>
-      <AboutMeHero />
+      <AboutMeHero isDark={isDark} />
 
       <section className="section">
         <div className="shell">
@@ -74,56 +76,67 @@ export default function AboutMe() {
         </div>
       </section>
 
-      <Closing />
+      <Closing isDark={isDark} />
     </main>
   );
 }
 
-function AboutMeHero() {
+function AboutMeHero({ isDark }: { isDark: boolean }) {
   return (
-    <header className="shell relative flex min-h-[100svh] flex-col justify-end pt-32 pb-20">
-      <motion.p
-        className="mb-5 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-pass"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      >
-        Priya Murkute · off hours
-      </motion.p>
-
-      <motion.h1
-        className="font-display text-[clamp(3rem,9vw,7.5rem)] leading-[1.04] font-light tracking-[-0.03em] text-ink"
-        initial={{ opacity: 0, y: 22 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
-      >
-        Explorer.
-        <br />
-        <em className="text-flaky">Artist.</em>
-        <br />
-        Constant
-        <br />
-        wanderer.
-      </motion.h1>
-
-      <motion.p
-        className="measure mt-7 max-w-[42ch] text-lead font-light text-muted"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-      >
-        There's a version of me that doesn't write test suites. This is her page.
-      </motion.p>
-
+    <header className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden pb-20">
       <motion.div
-        className="mt-10 flex items-center gap-3 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-faint"
+        className="absolute inset-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.55 }}
+        transition={{ duration: 1.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
       >
-        <span className="h-px w-10 bg-line-strong" aria-hidden="true" />
-        scroll to explore
+        <HeroScene isDark={isDark} />
       </motion.div>
+
+      <div className="shell relative z-10 pt-32">
+        <motion.p
+          className="mb-5 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-pass"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        >
+          Priya Murkute · off hours
+        </motion.p>
+
+        <motion.h1
+          className="font-display text-[clamp(3rem,9vw,7.5rem)] leading-[1.04] font-light tracking-[-0.03em] text-ink"
+          initial={{ opacity: 0, y: 22 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+        >
+          Explorer.
+          <br />
+          <em className="text-flaky">Artist.</em>
+          <br />
+          Constant
+          <br />
+          wanderer.
+        </motion.h1>
+
+        <motion.p
+          className="measure mt-7 max-w-[42ch] text-lead font-light text-muted"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
+        >
+          There's a version of me that doesn't write test suites. This is her page.
+        </motion.p>
+
+        <motion.div
+          className="mt-10 flex items-center gap-3 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-faint"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.55 }}
+        >
+          <span className="h-px w-10 bg-line-strong" aria-hidden="true" />
+          scroll to explore
+        </motion.div>
+      </div>
     </header>
   );
 }
@@ -185,10 +198,12 @@ function HobbiesGrid() {
   );
 }
 
-function Closing() {
+function Closing({ isDark }: { isDark: boolean }) {
   return (
-    <div className="section bg-sunk/60">
-      <div className="shell flex flex-col items-center gap-6 text-center">
+    <div className="section relative overflow-hidden bg-sunk/60">
+      <PetalScatter isDark={isDark} />
+
+      <div className="shell relative flex flex-col items-center gap-6 text-center">
         <blockquote className="max-w-[22ch] font-display text-[clamp(1.5rem,3.5vw,2.6rem)] leading-[1.25] font-light tracking-[-0.025em] text-ink">
           "I'm most <em className="text-pass">myself</em> between a sketch and a new city."
         </blockquote>

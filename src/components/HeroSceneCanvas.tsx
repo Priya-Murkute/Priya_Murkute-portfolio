@@ -27,11 +27,11 @@ import { cherryBlossomColor } from "@/lib/cherryBlossom";
  * are the single heaviest thing in this project's bundle, so nothing here
  * should be in the initial chunk.
  */
-const PETAL_COUNT = 70;
+const PETAL_COUNT = 150;
 const SPREAD_X = 9;
 const SPREAD_Z = 5;
-const TOP_Y = 6;
-const BOTTOM_Y = -6;
+const TOP_Y = 6.5;
+const BOTTOM_Y = -6.5;
 
 function petalColor(random: () => number, isDark: boolean) {
   return new Color(cherryBlossomColor(random(), isDark));
@@ -95,17 +95,17 @@ function makePetals(): PetalData[] {
     baseX: (random() - 0.5) * SPREAD_X,
     baseZ: (random() - 0.5) * SPREAD_Z,
     y: BOTTOM_Y + random() * (TOP_Y - BOTTOM_Y),
-    fallSpeed: 0.35 + random() * 0.55,
-    swayAmplitude: 0.5 + random() * 1.1,
+    fallSpeed: 0.32 + random() * 0.72,
+    swayAmplitude: 0.6 + random() * 1.6,
     swaySpeed: 0.3 + random() * 0.6,
     swayPhase: random() * Math.PI * 2,
     spinSpeed: [
-      (random() - 0.5) * 0.6,
-      (random() - 0.5) * 0.6,
-      (random() - 0.5) * 0.9,
+      (random() - 0.5) * 0.85,
+      (random() - 0.5) * 0.85,
+      (random() - 0.5) * 1.25,
     ],
     rotation: [random() * Math.PI, random() * Math.PI, random() * Math.PI],
-    scale: 0.22 + random() * 0.24,
+    scale: 0.13 + random() * 0.15,
   }));
 }
 
@@ -132,10 +132,17 @@ function Petals({ isDark, animate }: { isDark: boolean; animate: boolean }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [petals, isDark]);
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     const mesh = meshRef.current;
     if (!mesh || !animate) return;
     const step = Math.min(delta, 0.05);
+    const elapsed = state.clock.elapsedTime;
+
+    // A shared breeze on top of each petal's own sway — two sine waves at
+    // different speeds so it reads as gusting rather than a metronome, and
+    // it moves every petal together so the scene periodically feels like a
+    // gust passed through it, not just N independent particles.
+    const gust = Math.sin(elapsed * 0.15) * 0.9 + Math.sin(elapsed * 0.37 + 1.3) * 0.4;
 
     petals.forEach((petal, index) => {
       petal.y -= petal.fallSpeed * step;
@@ -146,9 +153,16 @@ function Petals({ isDark, animate }: { isDark: boolean; animate: boolean }) {
       petal.rotation[2] += petal.spinSpeed[2] * step;
 
       const sway = Math.sin(petal.y * petal.swaySpeed + petal.swayPhase) * petal.swayAmplitude;
+      // A quick flutter layered on the steady tumble, like a petal catching
+      // and losing the wind rather than spinning at one constant rate.
+      const flutter = Math.sin(elapsed * 2.4 + petal.swayPhase) * 0.15;
 
-      dummy.position.set(petal.baseX + sway, petal.y, petal.baseZ);
-      dummy.rotation.set(petal.rotation[0], petal.rotation[1], petal.rotation[2]);
+      dummy.position.set(petal.baseX + sway + gust, petal.y, petal.baseZ);
+      dummy.rotation.set(
+        petal.rotation[0] + flutter,
+        petal.rotation[1],
+        petal.rotation[2] + flutter * 0.6,
+      );
       dummy.scale.setScalar(petal.scale);
       dummy.updateMatrix();
       mesh.setMatrixAt(index, dummy.matrix);

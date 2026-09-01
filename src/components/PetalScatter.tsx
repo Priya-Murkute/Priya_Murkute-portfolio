@@ -26,10 +26,10 @@ type Petal = {
 
 function makePetals(isDark: boolean): Petal[] {
   const random = seededRandom(42);
-  return Array.from({ length: 28 }, () => ({
+  return Array.from({ length: 42 }, () => ({
     left: random() * 100,
     bottom: random() * 26,
-    size: 9 + random() * 15,
+    size: 6 + random() * 9,
     rotation: random() * 360,
     color: cherryBlossomColor(random(), isDark),
     swayDuration: 3 + random() * 2.5,
