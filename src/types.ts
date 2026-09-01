@@ -26,6 +26,9 @@ export interface WorkItem {
   /** The fuller story, shown when the card opens. */
   detail: string;
   metric?: Metric;
+  /** One clause tying the metric to how it was actually achieved, so the
+   * number reads as evidence rather than a bare claim. */
+  metricContext?: string;
   tools: string[];
   status: WorkStatus;
 }
@@ -53,6 +56,8 @@ export interface ExperienceItem {
   location: string;
   period: string;
   bullets: string[];
+  /** Short framing line for a role whose tenure needs context at a glance. */
+  note?: string;
 }
 
 export interface EducationItem {

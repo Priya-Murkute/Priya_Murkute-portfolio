@@ -129,6 +129,10 @@ function WorkCard({ item }: { item: WorkItem }) {
             ) : null}
           </MorphingDialogSubtitle>
 
+          {item.metricContext ? (
+            <p className="measure mt-3 text-sm leading-relaxed text-muted">{item.metricContext}</p>
+          ) : null}
+
           <MorphingDialogDescription className="mt-6">
             <p className="measure text-[0.9375rem] leading-relaxed text-muted">{item.detail}</p>
             <ul className="mt-7 flex flex-wrap gap-2 border-t border-line pt-5">

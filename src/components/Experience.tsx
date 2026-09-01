@@ -33,6 +33,10 @@ export default function Experience() {
                   </h3>
                   <p className="mt-1 text-sm text-muted">{role.organisation}</p>
 
+                  {role.note ? (
+                    <p className="measure mt-3 text-sm leading-relaxed text-faint">{role.note}</p>
+                  ) : null}
+
                   <ul className="measure mt-6 space-y-2.5">
                     {role.bullets.map((bullet) => (
                       <li key={bullet} className="flex gap-3 text-[0.9375rem] text-muted">

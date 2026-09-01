@@ -77,6 +77,10 @@ export const work: WorkItem[] = [
     detail:
       "The framework covered regression and functional suites for the product's core journeys. The work that made it stick wasn't the first version — it was the maintenance: keeping locators stable, keeping the suite fast enough to run every sprint, and keeping the failure output readable so a developer could act on a red build without asking me what it meant. It cut manual testing effort by half.",
     metric: { value: 50, prefix: "+", suffix: "%", label: "testing efficiency" },
+    // TODO(Priya): confirm this framing before merging — worded from the
+    // existing detail/tools above (TestNG suite, Jenkins), not a new claim.
+    metricContext:
+      "by building and maintaining the TestNG regression suite from scratch, kept fast and readable enough for the team to run every sprint",
     tools: ["Selenium WebDriver", "Java", "TestNG", "Jenkins"],
     status: "measured",
   },
@@ -90,6 +94,10 @@ export const work: WorkItem[] = [
     detail:
       "Most of the existing API tests asserted a 200 and moved on. I added the cases that actually break: malformed payloads, missing required fields, auth failures, and response schema drift between environments. Coverage went up 30%, and the useful part was where the new failures showed up — in the pipeline, on the branch that caused them.",
     metric: { value: 30, prefix: "+", suffix: "%", label: "API coverage" },
+    // TODO(Priya): confirm — worded from the existing detail (Rest Assured,
+    // contract/error-path cases surfacing "in the pipeline"), not a new claim.
+    metricContext:
+      "by extending Rest Assured coverage to contract and error-path cases, surfacing failures in the pipeline instead of a release candidate",
     tools: ["Rest Assured", "REST APIs", "JSON", "SQL"],
     status: "measured",
   },
@@ -103,6 +111,10 @@ export const work: WorkItem[] = [
     detail:
       "A reopened defect is a defect that was never understood. I ran root cause analysis on the repeat offenders, added the regression case that would have caught each one, and made retesting a step in the sprint rather than an afterthought. Recurring issues dropped 15%.",
     metric: { value: 15, prefix: "−", suffix: "%", label: "recurring defects" },
+    // TODO(Priya): confirm — worded from the existing detail (root cause
+    // analysis on repeat offenders, regression case per fix), not a new claim.
+    metricContext:
+      "by running root cause analysis on repeat offenders and adding the regression case that would have caught each one, quarter over quarter",
     tools: ["Jira", "Azure DevOps", "Root cause analysis"],
     status: "measured",
   },
@@ -150,6 +162,9 @@ export const experience: ExperienceItem[] = [
     organisation: "Testing Info",
     location: "London",
     period: "Feb 2023 — Sept 2023",
+    // TODO(Priya): confirm phrasing — dates line up with the MSc start
+    // below, but double-check "ahead of an MSc" reads right before merging.
+    note: "First UK-based SDET role, taken while preparing for postgraduate study — hands-on API automation ahead of starting an MSc in Computer Science at Queen Mary.",
     bullets: [
       "Created and executed test cases and scenarios for web applications",
       "Ran functional, regression and integration testing",
