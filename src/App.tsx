@@ -85,7 +85,11 @@ export default function App() {
           />
           <Routes>
             <Route path="/" element={<HomePage isDark={isDark} />} />
+            {/* /off-hours is an alias for the same page — the Hero's "about
+                me" link and this task's brief for an off-hours route both
+                point at the one page rather than being duplicated. */}
             <Route path="/about-me" element={<AboutMe isDark={isDark} />} />
+            <Route path="/off-hours" element={<AboutMe isDark={isDark} />} />
           </Routes>
           <Footer />
         </>

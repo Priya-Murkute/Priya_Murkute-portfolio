@@ -1,9 +1,20 @@
 import type { Artwork, TravelPhoto } from "@/types";
 
 /**
- * Off Hours placeholder content — every gradient stands in for a real photo
- * or scan. Swap `gradient` for a real image url (or keep it as a fallback)
- * when the real assets exist; nothing else in off-hours/ needs to change.
+ * Off Hours placeholder content — every `gradient` below stands in for a
+ * real photo or scan.
+ *
+ * HOW TO ADD YOUR IMAGES:
+ * 1. Drop image files into public/images/travel/ (for travelPhotos) and
+ *    public/images/art/ (for artworks).
+ * 2. Give each entry an `image` value pointing at the file, e.g.
+ *    image: "/images/travel/japan-2023.jpg" — TravelPhotoCard and the
+ *    Carousel3D card both need one line changing (the `background: photo.gradient`
+ *    / `art.gradient` style) to prefer `image` when it's set and fall back
+ *    to `gradient` otherwise, so entries can be swapped one at a time.
+ * 3. Add an `alt` string per entry describing the photo for screen readers.
+ * 4. Recommended source sizes: travel images 800×1100px, art carousel
+ *    images 900×1200px (both components crop to fit via bg-cover/bg-center).
  */
 
 export const travelPhotos: TravelPhoto[] = [
