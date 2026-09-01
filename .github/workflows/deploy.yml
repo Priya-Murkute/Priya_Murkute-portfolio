@@ -1,0 +1,43 @@
+name: Deploy to GitHub Pages
+
+# Alternative to Vercel — see README.md "Deploy" for when to use which.
+# Vercel deploys automatically on push once the repo is imported there and
+# needs no workflow file. Use this workflow only if you're serving the site
+# from https://<user>.github.io/priya-portfolio/ instead.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+        env:
+          GITHUB_PAGES: "true"
+
+      # GitHub Pages has no server-side rewrite, so a direct load of a
+      # client-side route (e.g. /off-hours) 404s. Serving index.html as the
+      # 404 page is the standard SPA workaround: the browser still gets a 200
+      # for "/", and any deep link falls through to this copy, which boots
+      # the app and lets react-router take over.
+      - run: cp dist/index.html dist/404.html
+
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist

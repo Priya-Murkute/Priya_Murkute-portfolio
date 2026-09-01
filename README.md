@@ -20,6 +20,35 @@ npm run typecheck   # tsc -b --force, no emit beyond build info
 npm run build       # static dist/, deployable anywhere
 ```
 
+## Deploy
+
+The build output is a static `dist/` folder, deployable anywhere. Two options
+are wired up:
+
+**Vercel (recommended — zero config)**
+1. Import the repo at [vercel.com/new](https://vercel.com/new).
+2. Framework preset: Vite. Leave build/output settings at their defaults
+   (`npm run build`, `dist`).
+3. `vercel.json` at the repo root handles the SPA rewrite so client-side
+   routes like `/about-me` and `/off-hours` don't 404 on a hard reload or
+   direct link.
+4. Every push to the connected branch deploys automatically — no workflow
+   file needed.
+
+**GitHub Pages**
+1. In the repo's Settings → Pages, set Source to "GitHub Actions".
+2. Push to `main` (or run the workflow manually from the Actions tab) —
+   `.github/workflows/deploy.yml` builds with `GITHUB_PAGES=true` and
+   publishes `dist/` to the `gh-pages` branch via `peaceiris/actions-gh-pages`.
+3. `vite.config.ts` reads that same env var to set `base: "/priya-portfolio/"`
+   (root `/` otherwise), and `main.tsx` passes it to the router as `basename`
+   so routes resolve under the `/priya-portfolio/` subpath GitHub Pages
+   serves from. The workflow also copies `index.html` to `404.html` so a
+   direct load of a route like `/off-hours` boots the app instead of 404ing.
+
+Use Vercel unless you specifically want the site on `github.io` — it needs no
+subpath handling and deploys are simpler to reason about.
+
 ## Where the content lives
 
 `src/data/resume.ts` is the single source of truth. Every word on the page
