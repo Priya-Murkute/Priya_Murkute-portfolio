@@ -297,66 +297,72 @@
     background: linear-gradient(to bottom, color-mix(in srgb, white 10%, transparent), transparent 60%);
   }
 
-  /* Haikei background drift — plain CSS keyframes rather than JS-driven
-     motion values, since these run continuously for the whole page
-     lifetime. The compositor can run these off the main thread;
-     --drift-x/--drift-y/animation-duration/animation-delay are set per
-     element via inline style for variety. prefers-reduced-motion below
-     freezes them automatically. */
-  @keyframes haikei-drift {
-    0%,
-    100% {
-      transform: translate(0, 0);
-    }
-    50% {
-      transform: translate(var(--drift-x, 16px), var(--drift-y, 12px));
-    }
-  }
-
   .haikei-drift {
     animation: haikei-drift var(--drift-duration, 20s) ease-in-out infinite;
     animation-delay: var(--drift-delay, 0s);
   }
 
-  /* GIF-style nudge for the "click here" affordance — a plain CSS loop
-     (not a motion value) so it runs for the page's whole lifetime off the
-     main thread, and so prefers-reduced-motion freezes it for free via the
-     global rule below. */
-  @keyframes arrow-nudge {
-    0%,
-    100% {
-      transform: translateX(0);
-    }
-    50% {
-      transform: translateX(5px);
-    }
-  }
-
   .arrow-nudge {
     animation: arrow-nudge 1.15s ease-in-out infinite;
   }
+}
 
-  /* Off Hours: dual-column travel scroller and the "currently" ticker —
-     plain CSS loops for the same reason as haikei-drift above (continuous,
-     whole-page-lifetime, and frozen for free under prefers-reduced-motion). */
-  /* The "up" column reuses this same keyframe with animation-direction:
-     reverse (see TravelScroll.tsx) instead of a second, mirrored keyframe. */
-  @keyframes travel-down {
-    from {
-      transform: translateY(0);
-    }
-    to {
-      transform: translateY(-50%);
-    }
+/* Custom @keyframes live at the top level, not nested inside @layer — Tailwind
+   v4's build (Lightning CSS) silently drops @keyframes nested inside @layer
+   components/utilities blocks, so every animation referencing one of these by
+   name (the classes above, plus the animate-[name_...] utilities in
+   TravelScroll.tsx and the About Me "currently" ticker) would otherwise
+   render as a no-op with no error. */
+
+/* Haikei background drift — plain CSS keyframes rather than JS-driven motion
+   values, since these run continuously for the whole page lifetime. The
+   compositor can run these off the main thread; --drift-x/--drift-y/
+   animation-duration/animation-delay are set per element via inline style
+   for variety. prefers-reduced-motion below freezes them automatically. */
+@keyframes haikei-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
   }
+  50% {
+    transform: translate(var(--drift-x, 16px), var(--drift-y, 12px));
+  }
+}
 
-  @keyframes ticker {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
+/* GIF-style nudge for the "click here" affordance — a plain CSS loop (not a
+   motion value) so it runs for the page's whole lifetime off the main
+   thread, and so prefers-reduced-motion freezes it for free via the global
+   rule below. */
+@keyframes arrow-nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+}
+
+/* Off Hours: dual-column travel scroller and the "currently" ticker — plain
+   CSS loops for the same reason as haikei-drift above (continuous,
+   whole-page-lifetime, and frozen for free under prefers-reduced-motion).
+   The "up" column reuses travel-down with animation-direction: reverse (see
+   TravelScroll.tsx) instead of a second, mirrored keyframe. */
+@keyframes travel-down {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }
 
