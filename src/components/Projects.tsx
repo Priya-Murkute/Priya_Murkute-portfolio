@@ -65,14 +65,14 @@ export default function Projects() {
       <LayeredWaves className="absolute inset-x-0 top-0 h-24 opacity-50" />
 
       <div className="shell relative">
-        <header className="flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <p className="eyebrow">From GitHub</p>
-            <h2 className="text-title mt-3 max-w-[26ch] font-display font-semibold">
-              Whatever's live on the repo right now.
-            </h2>
-          </div>
-          <p className="measure text-sm text-muted sm:max-w-xs">
+        <header className="mx-auto max-w-[42ch] text-center">
+          <p className="eyebrow" style={{ color: "var(--pass)" }}>
+            From GitHub
+          </p>
+          <h2 className="text-title mx-auto mt-3 max-w-[24ch] font-display font-semibold">
+            Whatever's live on the repo right now.
+          </h2>
+          <p className="measure mx-auto mt-4 text-sm text-muted">
             Pulled straight from{" "}
             <a
               href={profile.github}

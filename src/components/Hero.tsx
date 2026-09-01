@@ -1,8 +1,10 @@
 import { motion } from "motion/react";
+import { Link } from "react-router-dom";
 import { profile } from "@/data/resume";
 import { BlurryGradient } from "@/components/Backgrounds";
 import HeroScene from "@/components/HeroScene";
 import SpecSuite from "@/components/SpecSuite";
+import AboutMeLink from "@/components/AboutMeLink";
 import { TextEffect } from "@/components/motion-primitives/text-effect";
 import { AnimatedGroup } from "@/components/motion-primitives/animated-group";
 import { Magnetic } from "@/components/motion-primitives/magnetic";
@@ -40,16 +42,24 @@ export default function Hero({ isDark }: { isDark: boolean }) {
               ease: [0.22, 1, 0.36, 1],
             }}
           >
-            <TextEffect
-              as="h1"
-              per="word"
-              preset="fade-in-blur"
-              delay={0.15}
-              speedReveal={1.7}
-              className="text-name font-display font-semibold"
+            <Link
+              to="/about-me"
+              aria-label={`${profile.name} — read more about me`}
+              className="inline-block transition-opacity hover:opacity-80"
             >
-              {profile.name}
-            </TextEffect>
+              <TextEffect
+                as="h1"
+                per="word"
+                preset="fade-in-blur"
+                delay={0.15}
+                speedReveal={1.7}
+                className="text-name font-display font-semibold"
+              >
+                {profile.name}
+              </TextEffect>
+            </Link>
+
+            <AboutMeLink />
 
             <div className="flex flex-wrap items-center gap-3">
               <span className="eyebrow">

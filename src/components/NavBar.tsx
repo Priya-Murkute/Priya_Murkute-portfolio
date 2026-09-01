@@ -5,19 +5,26 @@ import MobileNav from "@/components/MobileNav";
 import { cn } from "@/lib/utils";
 
 export const navLinks = [
-  { href: "#work", label: "Work" },
-  { href: "#projects", label: "Projects" },
-  { href: "#experience", label: "Experience" },
-  { href: "#skills", label: "Skills" },
-  { href: "#contact", label: "Contact" },
+  { href: "/#work", label: "Work" },
+  { href: "/#projects", label: "Projects" },
+  { href: "/#experience", label: "Experience" },
+  { href: "/#skills", label: "Skills" },
+  { href: "/#contact", label: "Contact" },
 ];
 
 export default function NavBar({
   isDark,
   onToggleTheme,
+  showSectionLinks = true,
 }: {
   isDark: boolean;
   onToggleTheme: () => void;
+  /** The /#section links only resolve from "/" — from another route they force
+   * a hard reload, and the browser attempts the hash scroll before the target
+   * section has even mounted (it's still behind the preloader), so it silently
+   * lands on the hero instead. Pages that aren't "/" pass false so only the
+   * logo and theme toggle show, rather than exposing links that can't work. */
+  showSectionLinks?: boolean;
 }) {
   const { scrollY } = useScroll();
   const [isLifted, setIsLifted] = useState(false);
@@ -34,51 +41,57 @@ export default function NavBar({
         )}
       >
         <nav className="shell flex h-16 items-center justify-between gap-6">
-          <a href="#top" className="group flex items-baseline gap-2.5">
+          <a href="/#top" className="group flex items-baseline gap-2.5">
             <span className="font-mono text-[0.8125rem] tracking-tight text-pass">PM</span>
             <span className="text-sm font-medium tracking-tight">Priya Murkute</span>
           </a>
 
           <div className="flex items-center gap-1">
-            <ul className="hidden items-center gap-1 sm:flex">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className="rounded-full px-3 py-1.5 text-sm text-muted transition-colors hover:bg-sunk hover:text-ink"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            {showSectionLinks ? (
+              <ul className="hidden items-center gap-1 sm:flex">
+                {navLinks.map((link) => (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      className="rounded-full px-3 py-1.5 text-sm text-muted transition-colors hover:bg-sunk hover:text-ink"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
             <ThemeButton isDark={isDark} onToggle={onToggleTheme} />
-            <button
-              type="button"
-              onClick={() => setIsMenuOpen(true)}
-              aria-label="Open menu"
-              className="ml-1 flex size-8 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-line-strong hover:text-ink sm:hidden"
-            >
-              <svg viewBox="0 0 16 16" className="size-3.5" fill="none" aria-hidden="true">
-                <path
-                  d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"
-                  stroke="currentColor"
-                  strokeWidth={1.4}
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
+            {showSectionLinks ? (
+              <button
+                type="button"
+                onClick={() => setIsMenuOpen(true)}
+                aria-label="Open menu"
+                className="ml-1 flex size-8 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-line-strong hover:text-ink sm:hidden"
+              >
+                <svg viewBox="0 0 16 16" className="size-3.5" fill="none" aria-hidden="true">
+                  <path
+                    d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"
+                    stroke="currentColor"
+                    strokeWidth={1.4}
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+            ) : null}
           </div>
         </nav>
       </div>
       <ScrollProgress className="absolute inset-x-0 top-full" />
 
-      <MobileNav
-        isOpen={isMenuOpen}
-        onClose={() => setIsMenuOpen(false)}
-        isDark={isDark}
-        onToggleTheme={onToggleTheme}
-      />
+      {showSectionLinks ? (
+        <MobileNav
+          isOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
+          isDark={isDark}
+          onToggleTheme={onToggleTheme}
+        />
+      ) : null}
     </header>
   );
 }

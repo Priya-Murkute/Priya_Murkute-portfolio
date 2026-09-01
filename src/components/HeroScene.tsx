@@ -1,186 +1,13 @@
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, useState } from "react";
-import * as THREE from "three";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useReducedMotion } from "motion/react";
-import { cherryBlossomColor } from "@/lib/cherryBlossom";
 
 /**
- * The hero's background: cherry blossom petals drifting down through the
- * scene. One InstancedMesh, one useFrame loop — cheap regardless of petal
- * count since there's a single draw call.
- *
- * The material is unlit (MeshBasicMaterial, toneMapped off). Petals were
- * physically lit at first, but that made their color depend on which way
- * each one happened to be rotated relative to the lights — some read fine,
- * others read muddy/gray. Flat petals don't have that problem, and it also
- * matches the reference: a soft, evenly-colored falling-petals look, not
- * hard 3D shading.
+ * three + @react-three/fiber are the single heaviest dependency in this
+ * project — this lazy-loads the actual scene so that weight is fetched in
+ * its own chunk, off the critical path, instead of sitting in the main
+ * bundle every page load pays for.
  */
-const PETAL_COUNT = 70;
-const SPREAD_X = 9;
-const SPREAD_Z = 5;
-const TOP_Y = 6;
-const BOTTOM_Y = -6;
-
-function petalColor(random: () => number, isDark: boolean) {
-  return new THREE.Color(cherryBlossomColor(random(), isDark));
-}
-
-type PetalData = {
-  baseX: number;
-  baseZ: number;
-  y: number;
-  fallSpeed: number;
-  swayAmplitude: number;
-  swaySpeed: number;
-  swayPhase: number;
-  spinSpeed: [number, number, number];
-  rotation: [number, number, number];
-  scale: number;
-};
-
-function seededRandom(seed: number) {
-  let state = seed;
-  return () => {
-    state = (state * 1103515245 + 12345) & 0x7fffffff;
-    return state / 0x7fffffff;
-  };
-}
-
-/**
- * A real sakura petal is obovate — narrow at the base, rounding out wide,
- * with a shallow notch at the outer tip — not a plain teardrop. Built with
- * that notch, then given a gentle cupped curl (real petals aren't flat) by
- * displacing Z after the flat shape is triangulated.
- */
-function createPetalGeometry() {
-  const shape = new THREE.Shape();
-  shape.moveTo(0, 0);
-  shape.bezierCurveTo(0.05, 0.22, 0.44, 0.32, 0.46, 0.62);
-  shape.bezierCurveTo(0.47, 0.78, 0.32, 0.87, 0.16, 0.83);
-  shape.quadraticCurveTo(0.08, 0.9, 0, 0.8);
-  shape.quadraticCurveTo(-0.08, 0.9, -0.16, 0.83);
-  shape.bezierCurveTo(-0.32, 0.87, -0.47, 0.78, -0.46, 0.62);
-  shape.bezierCurveTo(-0.44, 0.32, -0.05, 0.22, 0, 0);
-
-  const geometry = new THREE.ShapeGeometry(shape, 12);
-  geometry.center();
-
-  const position = geometry.attributes.position;
-  for (let i = 0; i < position.count; i += 1) {
-    const x = position.getX(i);
-    const y = position.getY(i);
-    const curl = Math.cos(x * 1.8) * 0.05 * (y + 0.4);
-    position.setZ(i, curl);
-  }
-  position.needsUpdate = true;
-
-  return geometry;
-}
-
-function makePetals(): PetalData[] {
-  const random = seededRandom(11);
-  return Array.from({ length: PETAL_COUNT }, () => ({
-    baseX: (random() - 0.5) * SPREAD_X,
-    baseZ: (random() - 0.5) * SPREAD_Z,
-    y: BOTTOM_Y + random() * (TOP_Y - BOTTOM_Y),
-    fallSpeed: 0.35 + random() * 0.55,
-    swayAmplitude: 0.5 + random() * 1.1,
-    swaySpeed: 0.3 + random() * 0.6,
-    swayPhase: random() * Math.PI * 2,
-    spinSpeed: [
-      (random() - 0.5) * 0.6,
-      (random() - 0.5) * 0.6,
-      (random() - 0.5) * 0.9,
-    ],
-    rotation: [random() * Math.PI, random() * Math.PI, random() * Math.PI],
-    scale: 0.22 + random() * 0.24,
-  }));
-}
-
-function Petals({ isDark, animate }: { isDark: boolean; animate: boolean }) {
-  const meshRef = useRef<THREE.InstancedMesh>(null);
-  const petals = useMemo(() => makePetals(), []);
-  const geometry = useMemo(() => createPetalGeometry(), []);
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-
-  useEffect(() => {
-    const mesh = meshRef.current;
-    if (!mesh) return;
-    const random = seededRandom(isDark ? 29 : 13);
-    petals.forEach((petal, index) => {
-      dummy.position.set(petal.baseX, petal.y, petal.baseZ);
-      dummy.rotation.set(...petal.rotation);
-      dummy.scale.setScalar(petal.scale);
-      dummy.updateMatrix();
-      mesh.setMatrixAt(index, dummy.matrix);
-      mesh.setColorAt(index, petalColor(random, isDark));
-    });
-    mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [petals, isDark]);
-
-  useFrame((_, delta) => {
-    const mesh = meshRef.current;
-    if (!mesh || !animate) return;
-    const step = Math.min(delta, 0.05);
-
-    petals.forEach((petal, index) => {
-      petal.y -= petal.fallSpeed * step;
-      if (petal.y < BOTTOM_Y) petal.y = TOP_Y;
-
-      petal.rotation[0] += petal.spinSpeed[0] * step;
-      petal.rotation[1] += petal.spinSpeed[1] * step;
-      petal.rotation[2] += petal.spinSpeed[2] * step;
-
-      const sway = Math.sin(petal.y * petal.swaySpeed + petal.swayPhase) * petal.swayAmplitude;
-
-      dummy.position.set(petal.baseX + sway, petal.y, petal.baseZ);
-      dummy.rotation.set(petal.rotation[0], petal.rotation[1], petal.rotation[2]);
-      dummy.scale.setScalar(petal.scale);
-      dummy.updateMatrix();
-      mesh.setMatrixAt(index, dummy.matrix);
-    });
-
-    mesh.instanceMatrix.needsUpdate = true;
-  });
-
-  return (
-    <instancedMesh ref={meshRef} args={[geometry, undefined, PETAL_COUNT]}>
-      <meshBasicMaterial toneMapped={false} side={THREE.DoubleSide} transparent opacity={0.95} />
-    </instancedMesh>
-  );
-}
-
-function Scene({ isDark, animate }: { isDark: boolean; animate: boolean }) {
-  const groupRef = useRef<THREE.Group>(null);
-  const pointer = useRef({ x: 0, y: 0 });
-
-  useEffect(() => {
-    if (!animate) return;
-    const handlePointerMove = (event: PointerEvent) => {
-      pointer.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-      pointer.current.y = (event.clientY / window.innerHeight) * 2 - 1;
-    };
-    window.addEventListener("pointermove", handlePointerMove);
-    return () => window.removeEventListener("pointermove", handlePointerMove);
-  }, [animate]);
-
-  useFrame(() => {
-    if (!groupRef.current || !animate) return;
-    const targetX = pointer.current.y * 0.08;
-    const targetY = pointer.current.x * 0.12;
-    groupRef.current.rotation.x += (targetX - groupRef.current.rotation.x) * 0.02;
-    groupRef.current.rotation.y += (targetY - groupRef.current.rotation.y) * 0.02;
-  });
-
-  return (
-    <group ref={groupRef}>
-      <Petals isDark={isDark} animate={animate} />
-    </group>
-  );
-}
+const HeroSceneCanvas = lazy(() => import("@/components/HeroSceneCanvas"));
 
 function supportsWebGL() {
   try {
@@ -203,14 +30,9 @@ export default function HeroScene({ isDark }: { isDark: boolean }) {
 
   return (
     <div className="absolute inset-0" aria-hidden="true">
-      <Canvas
-        camera={{ position: [0, 0, 9], fov: 45 }}
-        dpr={[1, 1.5]}
-        gl={{ alpha: true, antialias: true }}
-        style={{ pointerEvents: "none" }}
-      >
-        <Scene isDark={isDark} animate={!prefersReducedMotion} />
-      </Canvas>
+      <Suspense fallback={null}>
+        <HeroSceneCanvas isDark={isDark} animate={!prefersReducedMotion} />
+      </Suspense>
     </div>
   );
 }

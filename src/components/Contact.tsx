@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import { profile } from "@/data/resume";
 import { TextEffect } from "@/components/motion-primitives/text-effect";
 import { InView } from "@/components/motion-primitives/in-view";
@@ -9,14 +10,20 @@ const channels = [
   { label: "LinkedIn", value: "priya-murkute-oct7", href: profile.linkedin },
 ];
 
+/**
+ * Two columns, echoing the Hero's own shape — a closing statement on the
+ * left, the contact channels as a distinct panel on the right, rather than
+ * one more centered stacked column like every other section.
+ */
 export default function Contact({ isDark }: { isDark: boolean }) {
   return (
     <section id="contact" className="section relative overflow-hidden">
       <PetalScatter isDark={isDark} />
 
-      <div className="shell relative">
+      <div className="shell relative grid items-start gap-12 lg:grid-cols-12 lg:gap-10">
         <InView
           once
+          className="lg:col-span-7"
           viewOptions={{ margin: "-15% 0px" }}
           variants={{
             hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
@@ -24,33 +31,19 @@ export default function Contact({ isDark }: { isDark: boolean }) {
           }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
-          <p className="eyebrow">Contact</p>
+          <p className="eyebrow" style={{ color: "var(--flaky)" }}>
+            Contact
+          </p>
 
           <TextEffect
             as="h2"
             per="word"
             preset="fade-in-blur"
             speedReveal={1.8}
-            className="text-title mt-4 max-w-[28ch] font-display font-semibold"
+            className="text-display mt-4 max-w-[16ch] font-display font-semibold"
           >
             Got a release coming that you would rather were boring?
           </TextEffect>
-
-          <div className="mt-12 grid gap-px sm:grid-cols-3">
-            {channels.map((channel) => (
-              <div key={channel.label} className="border-t border-line py-6 sm:pr-8">
-                <p className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-faint">
-                  {channel.label}
-                </p>
-                <a
-                  href={channel.href}
-                  className="mt-2 inline-block text-[0.9375rem] text-ink decoration-line-strong underline-offset-4 transition-colors hover:text-pass hover:underline"
-                >
-                  {channel.value}
-                </a>
-              </div>
-            ))}
-          </div>
 
           <a
             href={`${import.meta.env.BASE_URL}${profile.cvPath}`}
@@ -68,6 +61,27 @@ export default function Contact({ isDark }: { isDark: boolean }) {
             </svg>
           </a>
         </InView>
+
+        <motion.div
+          className="card lg:col-span-5"
+          initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, margin: "-15% 0px" }}
+          transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {channels.map((channel, index) => (
+            <a
+              key={channel.label}
+              href={channel.href}
+              className={`block px-6 py-5 transition-colors hover:bg-sunk ${index > 0 ? "border-t border-line" : ""}`}
+            >
+              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-faint">
+                {channel.label}
+              </p>
+              <p className="mt-1.5 text-[0.9375rem] text-ink">{channel.value}</p>
+            </a>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

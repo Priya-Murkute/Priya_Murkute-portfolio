@@ -317,6 +317,54 @@
     animation: haikei-drift var(--drift-duration, 20s) ease-in-out infinite;
     animation-delay: var(--drift-delay, 0s);
   }
+
+  /* GIF-style nudge for the "click here" affordance — a plain CSS loop
+     (not a motion value) so it runs for the page's whole lifetime off the
+     main thread, and so prefers-reduced-motion freezes it for free via the
+     global rule below. */
+  @keyframes arrow-nudge {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(5px);
+    }
+  }
+
+  .arrow-nudge {
+    animation: arrow-nudge 1.15s ease-in-out infinite;
+  }
+
+  /* Off Hours: dual-column travel scroller and the "currently" ticker —
+     plain CSS loops for the same reason as haikei-drift above (continuous,
+     whole-page-lifetime, and frozen for free under prefers-reduced-motion). */
+  @keyframes travel-down {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-50%);
+    }
+  }
+
+  @keyframes travel-up {
+    from {
+      transform: translateY(-50%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes ticker {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

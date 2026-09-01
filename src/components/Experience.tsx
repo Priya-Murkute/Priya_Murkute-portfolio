@@ -3,7 +3,7 @@ import { InView } from "@/components/motion-primitives/in-view";
 
 export default function Experience() {
   return (
-    <section id="experience" className="section bg-sunk/60">
+    <section id="experience" className="section">
       <div className="shell">
         <p className="eyebrow">Experience</p>
 

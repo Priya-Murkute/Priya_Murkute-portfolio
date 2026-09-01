@@ -11,7 +11,7 @@ export default function Footer() {
           {profile.name} · {profile.title} · {profile.location}
         </p>
         <a
-          href="#top"
+          href="/#top"
           className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-faint transition-colors hover:text-ink"
         >
           Back to top ↑

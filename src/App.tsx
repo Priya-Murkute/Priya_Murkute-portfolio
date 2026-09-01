@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, useReducedMotion } from "motion/react";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Preloader from "@/components/Preloader";
 import NavBar from "@/components/NavBar";
 import Hero from "@/components/Hero";
@@ -12,18 +13,54 @@ import Experience from "@/components/Experience";
 import Skills from "@/components/Skills";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import AboutMe from "@/pages/AboutMe";
+
+const THEME_STORAGE_KEY = "pm-theme";
+
+function getStoredTheme(): boolean {
+  try {
+    return localStorage.getItem(THEME_STORAGE_KEY) === "dark";
+  } catch {
+    return false;
+  }
+}
+
+function HomePage({ isDark }: { isDark: boolean }) {
+  return (
+    <main>
+      <Hero isDark={isDark} />
+      <Stats />
+      <About />
+      <Work />
+      <Projects />
+      <PullQuote />
+      <Experience />
+      <Skills />
+      <Contact isDark={isDark} />
+    </main>
+  );
+}
 
 export default function App() {
-  // Session-only, deliberately: no storage, so every visit opens light.
-  const [isDark, setIsDark] = useState(false);
+  // Persisted across page loads — including the hard reload that a plain
+  // `/#section` anchor triggers when navigating from another route back to
+  // "/" — so switching pages never silently reverts the theme.
+  const [isDark, setIsDark] = useState(getStoredTheme);
   const prefersReducedMotion = useReducedMotion() ?? false;
   const [isLoading, setIsLoading] = useState(!prefersReducedMotion);
+  const location = useLocation();
+  const isHome = location.pathname === "/";
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", isDark);
     document
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute("content", isDark ? "#0e1113" : "#fafaf7");
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, isDark ? "dark" : "light");
+    } catch {
+      // localStorage unavailable (private browsing, etc.) — theme just won't persist
+    }
   }, [isDark]);
 
   return (
@@ -36,23 +73,20 @@ export default function App() {
         <>
           <div className="grain" />
           <a
-            href="#work"
+            href="/#work"
             className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-60 focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-paper"
           >
             Skip to the work
           </a>
-          <NavBar isDark={isDark} onToggleTheme={() => setIsDark((value) => !value)} />
-          <main>
-            <Hero isDark={isDark} />
-            <Stats />
-            <About />
-            <Work />
-            <Projects />
-            <PullQuote />
-            <Experience />
-            <Skills />
-            <Contact isDark={isDark} />
-          </main>
+          <NavBar
+            isDark={isDark}
+            onToggleTheme={() => setIsDark((value) => !value)}
+            showSectionLinks={isHome}
+          />
+          <Routes>
+            <Route path="/" element={<HomePage isDark={isDark} />} />
+            <Route path="/about-me" element={<AboutMe />} />
+          </Routes>
           <Footer />
         </>
       )}

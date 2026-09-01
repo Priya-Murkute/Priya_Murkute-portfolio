@@ -1,19 +1,39 @@
-import { useId } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { useId, type CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 
 /**
  * Haikei-style background assets, written by hand so they read from the theme
  * tokens instead of being exported as flat SVG files. Every one of them is
- * decorative — they are all aria-hidden and none carry information. Each one
- * drifts continuously and slowly; `prefers-reduced-motion` freezes them.
+ * decorative — they are all aria-hidden and none carry information.
+ *
+ * Each one drifts continuously via the `.haikei-drift` CSS animation
+ * (styles.css) rather than a JS-driven motion value: these loops run for the
+ * entire page lifetime, so keeping them on the compositor thread instead of
+ * the main thread keeps them from competing with scroll handling and other
+ * animations. `prefers-reduced-motion` freezes them globally, already
+ * handled by the site-wide rule in styles.css.
  */
+
+type DriftVars = CSSProperties & {
+  "--drift-x"?: string;
+  "--drift-y"?: string;
+  "--drift-duration"?: string;
+  "--drift-delay"?: string;
+};
+
+function driftStyle(dx: number, dy: number, duration: number, delay = 0): DriftVars {
+  return {
+    "--drift-x": `${dx}px`,
+    "--drift-y": `${dy}px`,
+    "--drift-duration": `${duration}s`,
+    "--drift-delay": `${delay}s`,
+  };
+}
 
 /** Haikei "blurry gradient": a few wide ellipses pushed through a heavy blur, drifting. */
 export function BlurryGradient({ className }: { className?: string }) {
   const id = useId();
   const blur = `blur-${id}`;
-  const animate = !(useReducedMotion() ?? false);
 
   const blobs = [
     { cx: 170, cy: 150, rx: 300, ry: 210, fill: "var(--halo-mint)", dx: 26, dy: 16, duration: 22 },
@@ -37,13 +57,9 @@ export function BlurryGradient({ className }: { className?: string }) {
       </defs>
       <g filter={`url(#${blur})`}>
         {blobs.map((blob, index) => (
-          <motion.g
-            key={index}
-            animate={animate ? { x: [0, blob.dx, 0], y: [0, blob.dy, 0] } : undefined}
-            transition={{ duration: blob.duration, repeat: Infinity, ease: "easeInOut" }}
-          >
+          <g key={index} className="haikei-drift" style={driftStyle(blob.dx, blob.dy, blob.duration)}>
             <ellipse cx={blob.cx} cy={blob.cy} rx={blob.rx} ry={blob.ry} fill={blob.fill} />
-          </motion.g>
+          </g>
         ))}
       </g>
     </svg>
@@ -58,8 +74,6 @@ const WAVE = "M0 96C160 40 320 152 480 96S800 24 960 96 1280 160 1440 96";
  * Each contour drifts sideways at its own slow, offset pace.
  */
 export function LayeredWaves({ className }: { className?: string }) {
-  const animate = !(useReducedMotion() ?? false);
-
   return (
     <svg
       aria-hidden="true"
@@ -70,18 +84,13 @@ export function LayeredWaves({ className }: { className?: string }) {
     >
       {[0, 16, 32, 48, 64].map((offset, index) => (
         <g key={offset} transform={`translate(0 ${offset})`}>
-          <motion.path
+          <path
             d={WAVE}
+            className="haikei-drift"
+            style={driftStyle(18, 0, 9 + index * 1.4, index * 0.3)}
             stroke="var(--line-strong)"
             strokeWidth={1}
             opacity={0.9 - index * 0.16}
-            animate={animate ? { x: [0, 18, 0] } : undefined}
-            transition={{
-              duration: 9 + index * 1.4,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: index * 0.3,
-            }}
           />
         </g>
       ))}
@@ -91,7 +100,6 @@ export function LayeredWaves({ className }: { className?: string }) {
 
 /** Haikei "stacked waves": filled bands that settle the bottom of the page, gently breathing. */
 export function StackedWaves({ className }: { className?: string }) {
-  const animate = !(useReducedMotion() ?? false);
   const layers = [
     { offset: 0, fill: "var(--halo-mint)", opacity: 0.7, duration: 12 },
     { offset: 34, fill: "var(--halo-sage)", opacity: 0.55, duration: 15 },
@@ -107,12 +115,12 @@ export function StackedWaves({ className }: { className?: string }) {
     >
       {layers.map((layer) => (
         <g key={layer.offset} transform={`translate(0 ${layer.offset})`}>
-          <motion.path
+          <path
             d={`${WAVE} L1440 220 L0 220 Z`}
+            className="haikei-drift"
+            style={driftStyle(14, 0, layer.duration)}
             fill={layer.fill}
             opacity={layer.opacity}
-            animate={animate ? { x: [0, 14, 0] } : undefined}
-            transition={{ duration: layer.duration, repeat: Infinity, ease: "easeInOut" }}
           />
         </g>
       ))}

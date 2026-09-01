@@ -76,3 +76,24 @@ export interface Profile {
   summary: string;
   cvPath: string;
 }
+
+/** A photo in the Off Hours travel scroller. `column` and `height` drive the
+ * dual-column masonry layout; `gradient` stands in for a real photo. */
+export interface TravelPhoto {
+  id: string;
+  title: string;
+  location: string;
+  year: string;
+  gradient: string;
+  height: "tall" | "med" | "short";
+  column: "left" | "right";
+}
+
+/** A piece in the Off Hours 3D art carousel. */
+export interface Artwork {
+  id: string;
+  title: string;
+  medium: string;
+  year: string;
+  gradient: string;
+}
