@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
-import { profile } from "@/data/resume";
+import { profile, education } from "@/data/resume";
 import { BlurryGradient } from "@/components/Backgrounds";
 import HeroSceneBackdrop from "@/components/HeroSceneBackdrop";
 import SpecSuite from "@/components/SpecSuite";
@@ -51,6 +51,10 @@ export default function Hero({ isDark }: { isDark: boolean }) {
                 {profile.name}
               </TextEffect>
             </Link>
+
+            <p className="credential text-sm">
+              {education[0].qualification} · {education[0].institution}
+            </p>
 
             <AboutMeLink />
 

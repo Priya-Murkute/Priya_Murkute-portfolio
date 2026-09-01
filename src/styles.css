@@ -203,6 +203,14 @@
     color: var(--ink-faint);
   }
 
+  .credential {
+    font-family: var(--font-sans);
+    font-variant: small-caps;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    color: var(--pass);
+  }
+
   .measure {
     max-width: 60ch;
   }

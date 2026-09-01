@@ -21,7 +21,7 @@ export const profile: Profile = {
   github: "https://github.com/Priya-Murkute",
   linkedin: "https://www.linkedin.com/in/priya-murkute-oct7",
   summary:
-    "Three years of manual and automated testing in Agile teams, across test planning, test design, API testing and automation frameworks. I care most about the part people skip: making sure a defect that was fixed once stays fixed, and that the suite still tells the truth six sprints later.",
+    "Three years in enterprise QA at Wipro, then relocated to London for an MSc and UK-based SDET experience. Now building at the intersection of quality engineering and software development — writing tests, building tools, and caring about the whole system, not just the happy path.",
   cvPath: "Priya-Murkute-CV.pdf",
 };
 
