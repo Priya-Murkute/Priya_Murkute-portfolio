@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+import { AnimatePresence, useReducedMotion } from "motion/react";
+import Preloader from "@/components/Preloader";
 import NavBar from "@/components/NavBar";
 import Hero from "@/components/Hero";
 import Stats from "@/components/Stats";
 import About from "@/components/About";
 import Work from "@/components/Work";
 import Projects from "@/components/Projects";
+import PullQuote from "@/components/PullQuote";
 import Experience from "@/components/Experience";
 import Skills from "@/components/Skills";
 import Contact from "@/components/Contact";
@@ -13,6 +16,8 @@ import Footer from "@/components/Footer";
 export default function App() {
   // Session-only, deliberately: no storage, so every visit opens light.
   const [isDark, setIsDark] = useState(false);
+  const prefersReducedMotion = useReducedMotion() ?? false;
+  const [isLoading, setIsLoading] = useState(!prefersReducedMotion);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", isDark);
@@ -23,25 +28,34 @@ export default function App() {
 
   return (
     <>
-      <div className="grain" />
-      <a
-        href="#work"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-60 focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-paper"
-      >
-        Skip to the work
-      </a>
-      <NavBar isDark={isDark} onToggleTheme={() => setIsDark((value) => !value)} />
-      <main>
-        <Hero isDark={isDark} />
-        <Stats />
-        <About />
-        <Work />
-        <Projects />
-        <Experience />
-        <Skills />
-        <Contact isDark={isDark} />
-      </main>
-      <Footer />
+      <AnimatePresence>
+        {isLoading ? <Preloader key="preloader" onComplete={() => setIsLoading(false)} /> : null}
+      </AnimatePresence>
+
+      {isLoading ? null : (
+        <>
+          <div className="grain" />
+          <a
+            href="#work"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-60 focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-paper"
+          >
+            Skip to the work
+          </a>
+          <NavBar isDark={isDark} onToggleTheme={() => setIsDark((value) => !value)} />
+          <main>
+            <Hero isDark={isDark} />
+            <Stats />
+            <About />
+            <Work />
+            <Projects />
+            <PullQuote />
+            <Experience />
+            <Skills />
+            <Contact isDark={isDark} />
+          </main>
+          <Footer />
+        </>
+      )}
     </>
   );
 }

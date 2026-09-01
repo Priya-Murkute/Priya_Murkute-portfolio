@@ -6,7 +6,12 @@
 /* ---------------------------------------------------------------------------
    Palette — borrowed from the vocabulary of test results rather than from a
    generic portfolio palette. Ink and paper carry the page; pass / flaky / fail
-   are the only chromatic voices, and they always mean the same thing.
+   are the only voices that carry MEANING (they always signal the same thing).
+   --accent-* below are different: plain decorative variety with no semantic
+   weight, for places (like the Skills icons) that just need to not all be the
+   same color. Don't reuse --halo-* for that — those are deliberately kept
+   near-paper for background washes and read as invisible at foreground
+   (icon/text) contrast.
 --------------------------------------------------------------------------- */
 :root {
   --paper: #fafaf7;
@@ -33,6 +38,12 @@
   --halo-sand: #eee3d2;
   --halo-opacity: 0.4;
   --grain-opacity: 0.035;
+
+  /* Decorative-only accents — foreground contrast, unlike --halo-*. */
+  --accent-blue: #3f6f92;
+  --accent-teal: #2f8378;
+  --accent-violet: #6f5f96;
+  --accent-clay: #a8663f;
 }
 
 .dark {
@@ -58,6 +69,11 @@
   --halo-sand: #2a2417;
   --halo-opacity: 0.5;
   --grain-opacity: 0.055;
+
+  --accent-blue: #7fb0d9;
+  --accent-teal: #6cc9ba;
+  --accent-violet: #ab9bd9;
+  --accent-clay: #d99a78;
 }
 
 /* @theme inline keeps the utilities pointing at the live variables above, so a
@@ -103,6 +119,13 @@
 
   --text-lead: clamp(1.0625rem, 1.5vw, 1.25rem);
   --text-lead--line-height: 1.6;
+
+  /* The one full-bleed editorial statement between Projects and Experience —
+     bigger than a section heading, set for a multi-line quote rather than a
+     one-line title. */
+  --text-quote: clamp(1.75rem, 4.4vw, 3.1rem);
+  --text-quote--line-height: 1.18;
+  --text-quote--letter-spacing: -0.02em;
 
   --ease-calm: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -272,6 +295,27 @@
 
   .dark .pill-sheen::before {
     background: linear-gradient(to bottom, color-mix(in srgb, white 10%, transparent), transparent 60%);
+  }
+
+  /* Haikei background drift — plain CSS keyframes rather than JS-driven
+     motion values, since these run continuously for the whole page
+     lifetime. The compositor can run these off the main thread;
+     --drift-x/--drift-y/animation-duration/animation-delay are set per
+     element via inline style for variety. prefers-reduced-motion below
+     freezes them automatically. */
+  @keyframes haikei-drift {
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+    50% {
+      transform: translate(var(--drift-x, 16px), var(--drift-y, 12px));
+    }
+  }
+
+  .haikei-drift {
+    animation: haikei-drift var(--drift-duration, 20s) ease-in-out infinite;
+    animation-delay: var(--drift-delay, 0s);
   }
 }
 
