@@ -17,6 +17,10 @@ export default function Footer() {
           Back to top ↑
         </a>
       </div>
+
+      <p className="built-with shell relative pb-6 text-center font-mono text-[0.625rem]">
+        Designed and built by Priya Murkute · React, TypeScript, Framer Motion
+      </p>
     </footer>
   );
 }
