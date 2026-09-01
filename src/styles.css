@@ -339,21 +339,14 @@
   /* Off Hours: dual-column travel scroller and the "currently" ticker —
      plain CSS loops for the same reason as haikei-drift above (continuous,
      whole-page-lifetime, and frozen for free under prefers-reduced-motion). */
+  /* The "up" column reuses this same keyframe with animation-direction:
+     reverse (see TravelScroll.tsx) instead of a second, mirrored keyframe. */
   @keyframes travel-down {
     from {
       transform: translateY(0);
     }
     to {
       transform: translateY(-50%);
-    }
-  }
-
-  @keyframes travel-up {
-    from {
-      transform: translateY(-50%);
-    }
-    to {
-      transform: translateY(0);
     }
   }
 

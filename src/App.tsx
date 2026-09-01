@@ -27,7 +27,7 @@ function getStoredTheme(): boolean {
 
 function HomePage({ isDark }: { isDark: boolean }) {
   return (
-    <main>
+    <main id="main-content">
       <Hero isDark={isDark} />
       <Stats />
       <About />
@@ -73,10 +73,10 @@ export default function App() {
         <>
           <div className="grain" />
           <a
-            href="/#work"
+            href="#main-content"
             className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-60 focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-paper"
           >
-            Skip to the work
+            Skip to content
           </a>
           <NavBar
             isDark={isDark}

@@ -1,18 +1,10 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useMemo } from "react";
-import { cherryBlossomColor } from "@/lib/cherryBlossom";
+import { cherryBlossomColor, seededRandom } from "@/lib/cherryBlossom";
 
 /** Same notched sakura silhouette as the hero scene, flattened to an SVG path. */
 const PETAL_PATH =
   "M12 27C6 21 4 11 6 5C7 2.2 9.2 1 12 4.4C14.8 1 17 2.2 18 5C20 11 18 21 12 27Z";
-
-function seededRandom(seed: number) {
-  let state = seed;
-  return () => {
-    state = (state * 1103515245 + 12345) & 0x7fffffff;
-    return state / 0x7fffffff;
-  };
-}
 
 type Petal = {
   left: number;

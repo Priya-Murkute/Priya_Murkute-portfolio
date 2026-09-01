@@ -1,9 +1,11 @@
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { motion } from "motion/react";
 import { artworks } from "@/data/gallery";
 import { cn } from "@/lib/utils";
 
 const HOLD_MS = 650;
+/** Gap between one advance finishing and the ring starting to charge again, while still held. */
+const REPEAT_GAP_MS = 80;
 const SPRING = { type: "spring" as const, stiffness: 100, damping: 18 };
 
 const CARD_WIDTH = 200;
@@ -54,26 +56,21 @@ export default function Carousel3D() {
       return;
     }
 
-    let cancelled = false;
+    // A timer can't fire mid-flight once this cleanup runs, so clearing the
+    // pending one is enough to stop the chain — no separate "cancelled" flag needed.
     let timer: number;
 
     const cycle = () => {
       setCharging(true);
       timer = window.setTimeout(() => {
-        if (cancelled) return;
         setCurrent((c) => (zone === "l" ? (c - 1 + total) % total : (c + 1) % total));
         setCharging(false);
-        timer = window.setTimeout(() => {
-          if (!cancelled) cycle();
-        }, 80);
+        timer = window.setTimeout(cycle, REPEAT_GAP_MS);
       }, HOLD_MS);
     };
 
     cycle();
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
+    return () => window.clearTimeout(timer);
   }, [zone, total]);
 
   const armZone = (dir: "l" | "r") => setZone((prev) => (prev === dir ? prev : dir));
@@ -84,8 +81,18 @@ export default function Carousel3D() {
     setCurrent(((index % total) + total) % total);
   };
 
+  // Cached on enter/resize rather than re-read on every mousemove — the
+  // stage's position doesn't change mid-hover.
+  const stageRef = useRef<HTMLDivElement>(null);
+  const stageRect = useRef<DOMRect | null>(null);
+
+  const handleMouseEnter = () => {
+    stageRect.current = stageRef.current?.getBoundingClientRect() ?? null;
+  };
+
   const handleMouseMove = (event: MouseEvent<HTMLDivElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect();
+    const rect = stageRect.current;
+    if (!rect) return;
     const pct = (event.clientX - rect.left) / rect.width;
     if (pct < 0.36) armZone("l");
     else if (pct > 0.64) armZone("r");
@@ -97,9 +104,11 @@ export default function Carousel3D() {
   return (
     <div>
       <div
+        ref={stageRef}
         role="region"
         aria-label="Art carousel"
         className="relative flex h-[460px] items-center justify-center select-none [perspective:1100px] [perspective-origin:50%_40%]"
+        onMouseEnter={handleMouseEnter}
         onMouseMove={handleMouseMove}
         onMouseLeave={clearZone}
       >

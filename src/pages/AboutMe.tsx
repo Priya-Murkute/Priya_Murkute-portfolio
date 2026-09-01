@@ -1,80 +1,32 @@
-import { Fragment } from "react";
+import { Fragment, type ReactNode } from "react";
 import { motion } from "motion/react";
-import HeroScene from "@/components/HeroScene";
+import HeroSceneBackdrop from "@/components/HeroSceneBackdrop";
 import PetalScatter from "@/components/PetalScatter";
 import TravelScroll from "@/components/off-hours/TravelScroll";
 import Carousel3D from "@/components/off-hours/Carousel3D";
+import { hobbies, nowItems } from "@/data/offHours";
 import { cn } from "@/lib/utils";
 
-const NOW_ITEMS = [
-  { label: "Reading", value: "The Ministry for the Future" },
-  { label: "Listening", value: "Mitski · Be the Cowboy" },
-  { label: "Watching", value: "The Bear, Season 3" },
-  { label: "Sketching", value: "Botanical illustrations" },
-  { label: "Dreaming of", value: "Japan — next autumn" },
-  { label: "Eating", value: "Everything in Lisbon" },
-];
-
-const HOBBIES = [
-  {
-    icon: "✏️",
-    name: "Sketching",
-    desc: "Botanical drawings, portraits, whatever's in front of me. Pencil first, always.",
-  },
-  {
-    icon: "📷",
-    name: "Photography",
-    desc: "Chasing golden hour and rainy streets. Manual mode only.",
-  },
-  {
-    icon: "🌍",
-    name: "Travel",
-    desc: "New city, unfamiliar bowl of something — that's the formula.",
-  },
-  {
-    icon: "📖",
-    name: "Reading",
-    desc: "Literary fiction and the occasional rabbit hole I didn't expect to love.",
-  },
-  {
-    icon: "🍳",
-    name: "Cooking",
-    desc: "Slow weekend mornings, a new recipe, something that fills the flat with smell.",
-  },
-  {
-    icon: "🎵",
-    name: "Music",
-    desc: "Perpetually building a playlist for a road trip I haven't planned yet.",
-  },
-];
+const NOW_ITEMS_LOOP = [...nowItems, ...nowItems];
 
 export default function AboutMe({ isDark }: { isDark: boolean }) {
   return (
-    <main>
+    <main id="main-content">
       <AboutMeHero isDark={isDark} />
 
-      <section className="section">
-        <div className="shell">
-          <SectionHead title="Places I've been" chip="Travels" />
-          <TravelScroll />
-        </div>
-      </section>
+      <AboutSection title="Places I've been" chip="Travels" bordered={false}>
+        <TravelScroll />
+      </AboutSection>
 
       <CurrentlyTicker />
 
-      <section className="section border-t border-line">
-        <div className="shell">
-          <SectionHead title="Sketches & Art" chip="Studio" amber />
-          <Carousel3D />
-        </div>
-      </section>
+      <AboutSection title="Sketches & Art" chip="Studio" amber>
+        <Carousel3D />
+      </AboutSection>
 
-      <section className="section border-t border-line">
-        <div className="shell">
-          <SectionHead title="Things I love" chip="Hobbies" />
-          <HobbiesGrid />
-        </div>
-      </section>
+      <AboutSection title="Things I love" chip="Hobbies">
+        <HobbiesGrid />
+      </AboutSection>
 
       <Closing isDark={isDark} />
     </main>
@@ -84,18 +36,11 @@ export default function AboutMe({ isDark }: { isDark: boolean }) {
 function AboutMeHero({ isDark }: { isDark: boolean }) {
   return (
     <header className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden pb-20">
-      <motion.div
-        className="absolute inset-0"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <HeroScene isDark={isDark} />
-      </motion.div>
+      <HeroSceneBackdrop isDark={isDark} />
 
       <div className="shell relative z-10 pt-32">
         <motion.p
-          className="mb-5 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-pass"
+          className="eyebrow mb-5 text-pass"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
@@ -141,6 +86,30 @@ function AboutMeHero({ isDark }: { isDark: boolean }) {
   );
 }
 
+/** One section shell: heading + chip, optionally bordered from the section above. */
+function AboutSection({
+  title,
+  chip,
+  amber,
+  bordered = true,
+  children,
+}: {
+  title: string;
+  chip: string;
+  amber?: boolean;
+  bordered?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <section className={cn("section", bordered && "border-t border-line")}>
+      <div className="shell">
+        <SectionHead title={title} chip={chip} amber={amber} />
+        {children}
+      </div>
+    </section>
+  );
+}
+
 function SectionHead({ title, chip, amber }: { title: string; chip: string; amber?: boolean }) {
   return (
     <div className="mb-10 flex items-baseline gap-5">
@@ -158,12 +127,10 @@ function SectionHead({ title, chip, amber }: { title: string; chip: string; ambe
 }
 
 function CurrentlyTicker() {
-  const loop = [...NOW_ITEMS, ...NOW_ITEMS];
-
   return (
     <div className="group mt-20 overflow-hidden border-y border-line bg-sunk">
       <div className="flex w-max animate-[ticker_30s_linear_infinite] py-3.5 group-hover:[animation-play-state:paused]">
-        {loop.map((item, index) => (
+        {NOW_ITEMS_LOOP.map((item, index) => (
           <Fragment key={index}>
             <span className="flex shrink-0 items-center gap-2 px-10 text-[0.78rem] whitespace-nowrap text-muted">
               <strong className="font-mono text-[0.58rem] font-medium tracking-[0.1em] text-flaky uppercase">
@@ -182,7 +149,7 @@ function CurrentlyTicker() {
 function HobbiesGrid() {
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-px overflow-hidden rounded border border-line bg-line">
-      {HOBBIES.map((hobby) => (
+      {hobbies.map((hobby) => (
         <div key={hobby.name} className="group relative bg-surface p-8">
           <div className="pointer-events-none absolute inset-0 bg-sunk opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           <span className="relative mb-3.5 block w-fit text-[1.9rem] leading-none transition-transform duration-300 group-hover:-rotate-[4deg] group-hover:scale-110">

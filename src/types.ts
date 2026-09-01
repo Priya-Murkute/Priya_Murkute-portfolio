@@ -97,3 +97,16 @@ export interface Artwork {
   year: string;
   gradient: string;
 }
+
+/** One entry in the Off Hours "currently" ticker. */
+export interface NowItem {
+  label: string;
+  value: string;
+}
+
+/** One card in the Off Hours hobbies grid. */
+export interface Hobby {
+  icon: string;
+  name: string;
+  desc: string;
+}

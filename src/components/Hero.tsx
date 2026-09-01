@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import { profile } from "@/data/resume";
 import { BlurryGradient } from "@/components/Backgrounds";
-import HeroScene from "@/components/HeroScene";
+import HeroSceneBackdrop from "@/components/HeroSceneBackdrop";
 import SpecSuite from "@/components/SpecSuite";
 import AboutMeLink from "@/components/AboutMeLink";
 import { TextEffect } from "@/components/motion-primitives/text-effect";
@@ -21,14 +21,7 @@ export default function Hero({ isDark }: { isDark: boolean }) {
         <BlurryGradient />
       </motion.div>
 
-      <motion.div
-        className="absolute inset-0"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <HeroScene isDark={isDark} />
-      </motion.div>
+      <HeroSceneBackdrop isDark={isDark} />
 
       <div className="shell relative z-10 grid items-start gap-14 lg:grid-cols-12 lg:gap-10">
         <div className="lg:col-span-7">
@@ -87,7 +80,7 @@ export default function Hero({ isDark }: { isDark: boolean }) {
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <Magnetic intensity={0.25} range={110}>
                 <a
-                  href="#contact"
+                  href="/#contact"
                   className="glow-cta inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-px"
                 >
                   Get in touch

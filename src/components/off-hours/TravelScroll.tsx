@@ -15,15 +15,15 @@ const HEIGHT_CLASS: Record<TravelPhoto["height"], string> = {
   short: "h-[180px]",
 };
 
+const leftPhotos = travelPhotos.filter((photo) => photo.column === "left");
+const rightPhotos = travelPhotos.filter((photo) => photo.column === "right");
+
 /**
  * Two columns of travel photos, opposite directions, looping forever. Each
  * column's list is rendered twice back-to-back and the animation travels
  * exactly one list's height, so the seam is invisible.
  */
 export default function TravelScroll() {
-  const left = useMemo(() => travelPhotos.filter((photo) => photo.column === "left"), []);
-  const right = useMemo(() => travelPhotos.filter((photo) => photo.column === "right"), []);
-
   return (
     <InView
       once
@@ -35,23 +35,21 @@ export default function TravelScroll() {
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-paper to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-paper to-transparent" />
 
-      <TravelColumn photos={left} direction="down" />
-      <TravelColumn photos={right} direction="up" />
+      <TravelColumn photos={leftPhotos} direction="down" />
+      <TravelColumn photos={rightPhotos} direction="up" />
     </InView>
   );
 }
 
 function TravelColumn({ photos, direction }: { photos: TravelPhoto[]; direction: "down" | "up" }) {
-  const loop = [...photos, ...photos];
+  const loop = useMemo(() => [...photos, ...photos], [photos]);
 
   return (
     <div className="group relative overflow-hidden">
       <div
         className={cn(
-          "flex flex-col gap-2.5 will-change-transform group-hover:[animation-play-state:paused]",
-          direction === "down"
-            ? "animate-[travel-down_22s_linear_infinite]"
-            : "animate-[travel-up_22s_linear_infinite]",
+          "flex flex-col gap-2.5 will-change-transform animate-[travel-down_22s_linear_infinite] group-hover:[animation-play-state:paused]",
+          direction === "up" && "[animation-direction:reverse]",
         )}
       >
         {loop.map((photo, index) => (

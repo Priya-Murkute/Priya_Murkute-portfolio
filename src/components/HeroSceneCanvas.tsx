@@ -9,7 +9,7 @@ import {
   Shape,
   ShapeGeometry,
 } from "three";
-import { cherryBlossomColor } from "@/lib/cherryBlossom";
+import { cherryBlossomColor, seededRandom } from "@/lib/cherryBlossom";
 
 /**
  * The hero's background: cherry blossom petals drifting down through the
@@ -49,14 +49,6 @@ type PetalData = {
   rotation: [number, number, number];
   scale: number;
 };
-
-function seededRandom(seed: number) {
-  let state = seed;
-  return () => {
-    state = (state * 1103515245 + 12345) & 0x7fffffff;
-    return state / 0x7fffffff;
-  };
-}
 
 /**
  * A real sakura petal is obovate — narrow at the base, rounding out wide,

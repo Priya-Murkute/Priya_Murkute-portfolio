@@ -27,3 +27,14 @@ export function cherryBlossomColor(t: number, isDark: boolean): string {
   const [r2, g2, b2] = hexToRgb(toHex);
   return rgbToHex(r1 + (r2 - r1) * t, g1 + (g2 - g1) * t, b1 + (b2 - b1) * t);
 }
+
+/** A tiny deterministic PRNG so petal layouts are stable across renders instead
+ * of reshuffling every time — shared by the 3D hero petals and the flat
+ * scattered ones, which both need this and nothing fancier. */
+export function seededRandom(seed: number) {
+  let state = seed;
+  return () => {
+    state = (state * 1103515245 + 12345) & 0x7fffffff;
+    return state / 0x7fffffff;
+  };
+}
