@@ -203,14 +203,6 @@
     color: var(--ink-faint);
   }
 
-  .credential {
-    font-family: var(--font-sans);
-    font-variant: small-caps;
-    font-weight: 300;
-    letter-spacing: 0.02em;
-    color: var(--pass);
-  }
-
   .built-with {
     color: color-mix(in srgb, var(--ink) 40%, transparent);
     transition: color 200ms ease;
@@ -258,6 +250,45 @@
 
   .dark .grain {
     mix-blend-mode: screen;
+  }
+
+  /* Trails the real cursor rather than replacing it — the system pointer
+     stays visible and precise throughout. Blooms brighter over links and
+     buttons via .cursor-glow-hover (see CursorGlow.tsx). */
+  .cursor-glow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    pointer-events: none;
+    z-index: 45;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, color-mix(in srgb, var(--pass) 70%, transparent) 0%, transparent 72%);
+    opacity: 0;
+    filter: blur(2px);
+    transition:
+      opacity 260ms ease,
+      width 260ms var(--ease-calm),
+      height 260ms var(--ease-calm);
+    will-change: transform;
+  }
+
+  .cursor-glow-near {
+    opacity: 0.22;
+  }
+
+  .cursor-glow-hover {
+    opacity: 0.55;
+    width: 54px;
+    height: 54px;
+  }
+
+  @media (pointer: coarse) {
+    .cursor-glow {
+      display: none;
+    }
   }
 
   .status-dot {
@@ -328,7 +359,7 @@
    v4's build (Lightning CSS) silently drops @keyframes nested inside @layer
    components/utilities blocks, so every animation referencing one of these by
    name (the classes above, plus the animate-[name_...] utilities in
-   TravelScroll.tsx and the About Me "currently" ticker) would otherwise
+   MyInterests.tsx and the About Me "currently" ticker) would otherwise
    render as a no-op with no error. */
 
 /* Haikei background drift — plain CSS keyframes rather than JS-driven motion
@@ -360,12 +391,13 @@
   }
 }
 
-/* Off Hours: dual-column travel scroller and the "currently" ticker — plain
-   CSS loops for the same reason as haikei-drift above (continuous,
-   whole-page-lifetime, and frozen for free under prefers-reduced-motion).
-   The "up" column reuses travel-down with animation-direction: reverse (see
-   TravelScroll.tsx) instead of a second, mirrored keyframe. */
-@keyframes travel-down {
+/* Off Hours: the dual-column "My Interests" scroller and the "currently"
+   ticker — plain CSS loops for the same reason as haikei-drift above
+   (continuous, whole-page-lifetime, and frozen for free under
+   prefers-reduced-motion). The "up" column reuses interests-down with
+   animation-direction: reverse (see MyInterests.tsx) instead of a second,
+   mirrored keyframe. */
+@keyframes interests-down {
   from {
     transform: translateY(0);
   }

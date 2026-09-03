@@ -18,7 +18,7 @@ function supportsWebGL() {
   }
 }
 
-export default function HeroScene({ isDark }: { isDark: boolean }) {
+export default function HeroScene() {
   const prefersReducedMotion = useReducedMotion() ?? false;
   const [canRender, setCanRender] = useState(false);
 
@@ -31,7 +31,7 @@ export default function HeroScene({ isDark }: { isDark: boolean }) {
   return (
     <div className="absolute inset-0" aria-hidden="true">
       <Suspense fallback={null}>
-        <HeroSceneCanvas isDark={isDark} animate={!prefersReducedMotion} />
+        <HeroSceneCanvas animate={!prefersReducedMotion} />
       </Suspense>
     </div>
   );

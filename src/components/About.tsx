@@ -27,10 +27,11 @@ export default function About() {
 
           <div className="measure mt-7 space-y-5 text-lead text-muted">
             <p>
-              The cheapest defect is the one argued out of existence in refinement. So most of
-              my work sits earlier than people expect: reading acceptance criteria for the case
-              nobody wrote down, asking what happens when the payload arrives malformed, and
-              turning the answer into a test before the code exists.
+              Most of what I've automated has been for systems where a missed edge case is
+              expensive — banking platforms at Wipro, where I moved from writing individual test
+              cases to owning the frameworks a whole team relied on: Page Object structure so
+              nothing was a one-off script, API coverage wired into CI so failures showed up
+              before a release did.
             </p>
             <p>
               The rest is maintenance, which is where automation either earns its keep or quietly

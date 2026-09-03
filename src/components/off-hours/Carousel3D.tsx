@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { motion } from "motion/react";
-import { artworks } from "@/data/gallery";
+import { artworks, hasRealArtworks } from "@/data/artGallery";
 import { cn } from "@/lib/utils";
 
 const HOLD_MS = 650;
@@ -8,27 +8,38 @@ const HOLD_MS = 650;
 const REPEAT_GAP_MS = 80;
 const SPRING = { type: "spring" as const, stiffness: 100, damping: 18 };
 
-const CARD_WIDTH = 200;
-const CARD_HEIGHT = 280;
+/** Auto-discovered artworks don't always have a medium (only when the
+ * filename encodes one) — this drops the " · " rather than showing a blank. */
+function formatCaption(art: { medium?: string; year: string }) {
+  return art.medium ? `${art.medium} · ${art.year}` : art.year;
+}
+
+// 1.35x the original 200×280/1100px-perspective design, scaled uniformly (see
+// POSITIONS below) so the fan's proportions stay identical, just bigger.
+const CARD_WIDTH = 270;
+const CARD_HEIGHT = 378;
 
 /**
  * Card pose per offset from the active (0) position — index by clamped
  * offset + 2. `x` is the fan's horizontal spread, precomputed as if the
  * prototype's `rotateY(deg) translateZ(px)` orbit (rotate first, so the
  * translate rides along the tilted local Z axis and swings the card
- * sideways) had been applied, then projected through the stage's 1100px
- * perspective: x = translateZ*sin(rotateY) * (1100 / (1100 - translateZ*cos(rotateY))).
+ * sideways) had been applied, then projected through the stage's 1485px
+ * perspective: x = translateZ*sin(rotateY) * (1485 / (1485 - translateZ*cos(rotateY))).
  * Motion composes x/y/z as a plain additive offset applied after rotate/scale
  * (not before, the way raw CSS transform strings would), so the sideways
  * swing has to be supplied directly rather than emerging from rotateY +
- * translateZ order the way it does in the prototype's CSS.
+ * translateZ order the way it does in the prototype's CSS. `x` and
+ * `translateZ` are the original values × 1.35 (matching CARD_WIDTH/HEIGHT
+ * and the perspective below) — that scaling is what keeps the fan's
+ * geometry proportionally identical at the larger size, not a re-derivation.
  */
 const POSITIONS = [
-  { x: -55, rotateY: -62, translateZ: 60, scale: 0.52, opacity: 0.15, zIndex: 1 },
-  { x: -115, rotateY: -38, translateZ: 165, scale: 0.78, opacity: 0.55, zIndex: 2 },
-  { x: 0, rotateY: 0, translateZ: 320, scale: 1, opacity: 1, zIndex: 5 },
-  { x: 115, rotateY: 38, translateZ: 165, scale: 0.78, opacity: 0.55, zIndex: 2 },
-  { x: 55, rotateY: 62, translateZ: 60, scale: 0.52, opacity: 0.15, zIndex: 1 },
+  { x: -74, rotateY: -62, translateZ: 81, scale: 0.52, opacity: 0.15, zIndex: 1 },
+  { x: -155, rotateY: -38, translateZ: 223, scale: 0.78, opacity: 0.55, zIndex: 2 },
+  { x: 0, rotateY: 0, translateZ: 432, scale: 1, opacity: 1, zIndex: 5 },
+  { x: 155, rotateY: 38, translateZ: 223, scale: 0.78, opacity: 0.55, zIndex: 2 },
+  { x: 74, rotateY: 62, translateZ: 81, scale: 0.52, opacity: 0.15, zIndex: 1 },
 ] as const;
 
 function offsetOf(index: number, current: number, total: number) {
@@ -107,7 +118,7 @@ export default function Carousel3D() {
         ref={stageRef}
         role="region"
         aria-label="Art carousel"
-        className="relative flex h-[460px] items-center justify-center select-none [perspective:1100px] [perspective-origin:50%_40%]"
+        className="relative flex h-[620px] items-center justify-center select-none [perspective:1485px] [perspective-origin:50%_40%]"
         onMouseEnter={handleMouseEnter}
         onMouseMove={handleMouseMove}
         onMouseLeave={clearZone}
@@ -127,7 +138,7 @@ export default function Carousel3D() {
                 type="button"
                 aria-label={art.title}
                 aria-current={offset === 0}
-                className="absolute top-1/2 left-1/2 h-[280px] w-[200px] cursor-pointer overflow-hidden rounded-[3px]"
+                className="absolute top-1/2 left-1/2 h-[378px] w-[270px] cursor-pointer overflow-hidden rounded-[3px]"
                 style={{
                   zIndex: hidden ? 0 : pos.zIndex,
                   pointerEvents: hidden ? "none" : "auto",
@@ -150,11 +161,25 @@ export default function Carousel3D() {
                       "shadow-[0_20px_60px_rgba(0,0,0,.18),0_4px_16px_rgba(0,0,0,.1),0_0_0_1px_var(--line)]",
                   )}
                 >
-                  <div className="flex-1 overflow-hidden rounded-[1px]" style={{ background: art.gradient }} />
+                  <div
+                    className={cn(
+                      "relative flex-1 overflow-hidden rounded-[1px]",
+                      !hasRealArtworks && "border border-dashed border-line",
+                    )}
+                    style={{ background: art.gradient }}
+                  >
+                    {!hasRealArtworks && (
+                      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                        <span className="font-mono text-[0.55rem] tracking-[0.08em] text-paper uppercase opacity-40">
+                          [ photo goes here ]
+                        </span>
+                      </div>
+                    )}
+                  </div>
                   <div className="absolute inset-x-0 bottom-0 border-t border-line bg-surface px-4 py-3">
                     <p className="truncate font-sans text-[0.85rem] italic text-ink">{art.title}</p>
                     <p className="mt-0.5 font-mono text-[0.5rem] uppercase tracking-[0.08em] text-faint">
-                      {art.medium} · {art.year}
+                      {formatCaption(art)}
                     </p>
                   </div>
                 </div>
@@ -167,7 +192,7 @@ export default function Carousel3D() {
       <div className="mt-8 flex min-h-14 flex-col items-center gap-1.5 text-center">
         <p className="font-sans text-2xl italic text-ink">{active.title}</p>
         <p className="font-mono text-[0.58rem] uppercase tracking-[0.1em] text-faint">
-          {active.medium} · {active.year}
+          {formatCaption(active)}
         </p>
       </div>
 

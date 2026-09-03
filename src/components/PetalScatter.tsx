@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useMemo } from "react";
 import { cherryBlossomColor, seededRandom } from "@/lib/cherryBlossom";
+import { useTheme } from "@/context/ThemeContext";
 
 /** Same notched sakura silhouette as the hero scene, flattened to an SVG path. */
 const PETAL_PATH =
@@ -36,7 +37,8 @@ function makePetals(isDark: boolean): Petal[] {
  * with a faint idle rustle, not another 3D scene: this strip is short, so a
  * canvas would be overkill for what's decoration here.
  */
-export default function PetalScatter({ isDark }: { isDark: boolean }) {
+export default function PetalScatter() {
+  const { isDark } = useTheme();
   const prefersReducedMotion = useReducedMotion() ?? false;
   const petals = useMemo(() => makePetals(isDark), [isDark]);
 

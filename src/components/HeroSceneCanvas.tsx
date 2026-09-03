@@ -10,6 +10,7 @@ import {
   ShapeGeometry,
 } from "three";
 import { cherryBlossomColor, seededRandom } from "@/lib/cherryBlossom";
+import { useTheme } from "@/context/ThemeContext";
 
 /**
  * The hero's background: cherry blossom petals drifting down through the
@@ -199,13 +200,13 @@ function Scene({ isDark, animate }: { isDark: boolean; animate: boolean }) {
   );
 }
 
-export default function HeroSceneCanvas({
-  isDark,
-  animate,
-}: {
-  isDark: boolean;
-  animate: boolean;
-}) {
+export default function HeroSceneCanvas({ animate }: { animate: boolean }) {
+  // Petals/Scene below run inside react-three-fiber's own Canvas reconciler,
+  // a separate React root that context doesn't reliably bridge into — so
+  // isDark is read from context once here, outside the Canvas, and handed
+  // down to them as a plain prop instead.
+  const { isDark } = useTheme();
+
   return (
     <Canvas
       camera={{ position: [0, 0, 9], fov: 45 }}

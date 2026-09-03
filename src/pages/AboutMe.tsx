@@ -2,20 +2,22 @@ import { Fragment, type ReactNode } from "react";
 import { motion } from "motion/react";
 import HeroSceneBackdrop from "@/components/HeroSceneBackdrop";
 import PetalScatter from "@/components/PetalScatter";
-import TravelScroll from "@/components/off-hours/TravelScroll";
+import MyInterests from "@/components/off-hours/MyInterests";
 import Carousel3D from "@/components/off-hours/Carousel3D";
 import { hobbies, nowItems } from "@/data/offHours";
 import { cn } from "@/lib/utils";
 
 const NOW_ITEMS_LOOP = [...nowItems, ...nowItems];
 
-export default function AboutMe({ isDark }: { isDark: boolean }) {
+export default function AboutMe() {
   return (
     <main id="main-content">
-      <AboutMeHero isDark={isDark} />
+      <AboutMeHero />
 
-      <AboutSection title="Places I've been" chip="Travels" bordered={false}>
-        <TravelScroll />
+      <AboutSection title="My Interests" bordered={false}>
+        <div className="mx-auto w-full md:max-w-[65%]">
+          <MyInterests />
+        </div>
       </AboutSection>
 
       <CurrentlyTicker />
@@ -28,15 +30,15 @@ export default function AboutMe({ isDark }: { isDark: boolean }) {
         <HobbiesGrid />
       </AboutSection>
 
-      <Closing isDark={isDark} />
+      <Closing />
     </main>
   );
 }
 
-function AboutMeHero({ isDark }: { isDark: boolean }) {
+function AboutMeHero() {
   return (
     <header className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden pb-20">
-      <HeroSceneBackdrop isDark={isDark} />
+      <HeroSceneBackdrop />
 
       <div className="shell relative z-10 pt-32">
         <motion.p
@@ -86,7 +88,7 @@ function AboutMeHero({ isDark }: { isDark: boolean }) {
   );
 }
 
-/** One section shell: heading + chip, optionally bordered from the section above. */
+/** One section shell: heading + optional chip, optionally bordered from the section above. */
 function AboutSection({
   title,
   chip,
@@ -95,7 +97,7 @@ function AboutSection({
   children,
 }: {
   title: string;
-  chip: string;
+  chip?: string;
   amber?: boolean;
   bordered?: boolean;
   children: ReactNode;
@@ -110,18 +112,20 @@ function AboutSection({
   );
 }
 
-function SectionHead({ title, chip, amber }: { title: string; chip: string; amber?: boolean }) {
+function SectionHead({ title, chip, amber }: { title: string; chip?: string; amber?: boolean }) {
   return (
     <div className="mb-10 flex items-baseline gap-5">
       <h2 className="text-title font-display font-normal">{title}</h2>
-      <span
-        className={cn(
-          "inline-flex shrink-0 items-center rounded-full border px-2.5 py-0.5 font-mono text-[0.6rem] tracking-[0.1em] whitespace-nowrap uppercase",
-          amber ? "border-flaky-tint bg-flaky-tint text-flaky" : "border-pass-tint bg-pass-tint text-pass",
-        )}
-      >
-        {chip}
-      </span>
+      {chip && (
+        <span
+          className={cn(
+            "inline-flex shrink-0 items-center rounded-full border px-2.5 py-0.5 font-mono text-[0.6rem] tracking-[0.1em] whitespace-nowrap uppercase",
+            amber ? "border-flaky-tint bg-flaky-tint text-flaky" : "border-pass-tint bg-pass-tint text-pass",
+          )}
+        >
+          {chip}
+        </span>
+      )}
     </div>
   );
 }
@@ -165,10 +169,10 @@ function HobbiesGrid() {
   );
 }
 
-function Closing({ isDark }: { isDark: boolean }) {
+function Closing() {
   return (
     <div className="section relative overflow-hidden bg-sunk/60">
-      <PetalScatter isDark={isDark} />
+      <PetalScatter />
 
       <div className="shell relative flex flex-col items-center gap-6 text-center">
         <blockquote className="max-w-[22ch] font-display text-[clamp(1.5rem,3.5vw,2.6rem)] leading-[1.25] font-light tracking-[-0.025em] text-ink">

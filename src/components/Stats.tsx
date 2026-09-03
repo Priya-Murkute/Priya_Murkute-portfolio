@@ -17,10 +17,11 @@ const signalVar: Record<Signal, string> = {
 };
 
 /**
- * The three numbers from the résumé, given room to be read. They count up once,
- * on arrival — and now a small ring fills alongside each, since every one of
- * these numbers already is a percentage. Text alone was carrying weight a
- * chart could share.
+ * The three numbers from the résumé, given room to be read. They count up
+ * once, on arrival, with a thin bar filling in underneath to the same
+ * fraction. A ring read as "N% of the way to something" for a number that's
+ * actually a delta (+50%, −15%) rather than a completion state; a bar reads
+ * as a bar chart instead, which matches what the number actually means.
  */
 export default function Stats() {
   return (
@@ -38,20 +39,23 @@ export default function Stats() {
         >
           <dl className="grid gap-px sm:grid-cols-3">
             {stats.map((stat, index) => (
-              <div
-                key={stat.label}
-                className="flex items-start gap-5 py-10 sm:px-8 sm:first:pl-0 sm:last:pr-0"
-              >
-                <StatRing value={stat.value} signal={stat.signal} delay={index * 0.12} />
-                <div>
-                  <dd className="flex items-baseline font-display text-title font-semibold tracking-tight">
-                    <span className={signalText[stat.signal]}>{stat.prefix}</span>
-                    <AnimatedNumber value={stat.value} startOnView />
-                    <span className={signalText[stat.signal]}>{stat.suffix}</span>
-                  </dd>
-                  <dt className="mt-2 font-mono text-[0.8125rem] text-ink">{stat.label}</dt>
-                  <p className="measure mt-1.5 text-sm text-muted">{stat.note}</p>
-                </div>
+              <div key={stat.label} className="py-10 sm:px-8 sm:first:pl-0 sm:last:pr-0">
+                <dd className="flex items-baseline font-display text-[clamp(2.25rem,6vw,4rem)] font-semibold tracking-tight">
+                  <span className={signalText[stat.signal]}>{stat.prefix}</span>
+                  <AnimatedNumber value={stat.value} startOnView />
+                  <span className={signalText[stat.signal]}>{stat.suffix}</span>
+                </dd>
+                {/* A reduction (−15% defects) is framed as a delta, not growth toward
+                    a target, so its bar reads as flaky-amber rather than the
+                    pass-green every "+N%" stat uses — the same distinction the
+                    number's own colour already makes via stat.signal. */}
+                <StatBar
+                  value={stat.value}
+                  color={stat.prefix === "−" ? "var(--flaky)" : signalVar[stat.signal]}
+                  delay={index * 0.12}
+                />
+                <dt className="mt-4 font-mono text-[0.8125rem] text-ink">{stat.label}</dt>
+                <p className="measure mt-1.5 text-sm text-muted">{stat.note}</p>
               </div>
             ))}
           </dl>
@@ -62,41 +66,19 @@ export default function Stats() {
   );
 }
 
-function StatRing({ value, signal, delay }: { value: number; signal: Signal; delay: number }) {
-  const size = 56;
-  const strokeWidth = 3.5;
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
+function StatBar({ value, color, delay }: { value: number; color: string; delay: number }) {
   const fraction = Math.min(Math.abs(value), 100) / 100;
 
   return (
-    <svg
-      viewBox={`0 0 ${size} ${size}`}
-      className="mt-1 size-14 flex-none -rotate-90"
-      aria-hidden="true"
-    >
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        fill="none"
-        stroke="var(--line-strong)"
-        strokeWidth={strokeWidth}
-      />
-      <motion.circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        fill="none"
-        stroke={signalVar[signal]}
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
-        strokeDasharray={circumference}
-        initial={{ strokeDashoffset: circumference }}
-        whileInView={{ strokeDashoffset: circumference * (1 - fraction) }}
+    <div className="mt-4 h-[3px] w-full max-w-40 overflow-hidden rounded-full bg-line-strong">
+      <motion.div
+        className="h-full rounded-full"
+        style={{ background: color }}
+        initial={{ width: "0%" }}
+        whileInView={{ width: `${fraction * 100}%` }}
         viewport={{ once: true, margin: "-15% 0px" }}
         transition={{ duration: 0.9, delay, ease: [0.22, 1, 0.36, 1] }}
       />
-    </svg>
+    </div>
   );
 }

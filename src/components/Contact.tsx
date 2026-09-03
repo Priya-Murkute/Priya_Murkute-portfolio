@@ -15,10 +15,10 @@ const channels = [
  * left, the contact channels as a distinct panel on the right, rather than
  * one more centered stacked column like every other section.
  */
-export default function Contact({ isDark }: { isDark: boolean }) {
+export default function Contact() {
   return (
     <section id="contact" className="section relative overflow-hidden">
-      <PetalScatter isDark={isDark} />
+      <PetalScatter />
 
       <div className="shell relative grid items-start gap-12 lg:grid-cols-12 lg:gap-10">
         <InView

@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect } from "react";
 import { navLinks } from "@/components/NavBar";
+import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 
 /**
@@ -11,14 +12,12 @@ import { cn } from "@/lib/utils";
 export default function MobileNav({
   isOpen,
   onClose,
-  isDark,
-  onToggleTheme,
 }: {
   isOpen: boolean;
   onClose: () => void;
-  isDark: boolean;
-  onToggleTheme: () => void;
 }) {
+  const { isDark, toggle } = useTheme();
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -98,7 +97,7 @@ export default function MobileNav({
             <div className="space-y-1 border-t border-line p-2">
               <button
                 type="button"
-                onClick={onToggleTheme}
+                onClick={toggle}
                 className="flex w-full items-center justify-between rounded-xl px-3 py-3 text-left text-sm text-muted transition-colors hover:bg-sunk hover:text-ink"
               >
                 <span>Theme</span>

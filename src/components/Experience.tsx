@@ -28,9 +28,16 @@ export default function Experience() {
                 </div>
 
                 <div className="lg:col-span-8">
-                  <h3 className="font-display text-xl font-semibold tracking-tight">
-                    {role.role}
-                  </h3>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                    <h3 className="font-display text-xl font-semibold tracking-tight">
+                      {role.role}
+                    </h3>
+                    {role.honors ? (
+                      <span className="rounded-full border border-flaky-tint bg-flaky-tint px-2.5 py-0.5 font-mono text-[0.625rem] uppercase tracking-[0.1em] text-flaky">
+                        {role.honors}
+                      </span>
+                    ) : null}
+                  </div>
                   <p className="mt-1 text-sm text-muted">{role.organisation}</p>
 
                   {role.note ? (

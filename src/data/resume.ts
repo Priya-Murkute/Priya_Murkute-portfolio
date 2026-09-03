@@ -5,6 +5,7 @@ import type {
   Profile,
   SkillGroup,
   Stat,
+  VolunteerItem,
   WorkItem,
 } from "@/types";
 
@@ -15,49 +16,71 @@ import type {
 
 export const profile: Profile = {
   name: "Priya Murkute",
-  title: "QA Engineer",
+  title: "QA Automation Engineer",
   location: "United Kingdom",
   email: "priyamurkute7@gmail.com",
   github: "https://github.com/Priya-Murkute",
   linkedin: "https://www.linkedin.com/in/priya-murkute-oct7",
   summary:
-    "Three years in enterprise QA at Wipro, then relocated to London for an MSc and UK-based SDET experience. Now building at the intersection of quality engineering and software development — writing tests, building tools, and caring about the whole system, not just the happy path.",
+    "Three years automating test coverage for banking platforms at Wipro, then an MSc in Computer Science at Queen Mary while working part-time as a London-based SDET. I build frameworks that behave like real software — version-controlled, CI-integrated, and built to be inherited by whoever's on call after me.",
   cvPath: "Priya-Murkute-CV.pdf",
 };
 
-/** The hero's signature: her achievements written as the tests they'd have to pass. */
+/**
+ * The hero's signature: her achievements written as Gherkin scenarios —
+ * Given/When/Then, the same shape as the 300+ scenarios she's actually
+ * authored (see the "bdd-adoption" work item below).
+ */
 export const assertions: Assertion[] = [
-  { id: "a1", text: "builds a framework the team keeps using", duration: 420 },
-  { id: "a2", text: "covers the contract, not just the happy path", duration: 300 },
-  { id: "a3", text: "closes defects so they stay closed", duration: 360 },
-  { id: "a4", text: "finds it in the sprint, not after the release", duration: 280 },
-  { id: "a5", text: "writes the report the release decision needs", duration: 340 },
+  {
+    id: "a1",
+    text: "Given a framework I built once, When I'm long gone, Then the team still swears by it",
+    duration: 420,
+  },
+  {
+    id: "a2",
+    text: "Given an API that looks fine, When I go hunting for what breaks it, Then it doesn't break",
+    duration: 300,
+  },
+  {
+    id: "a3",
+    text: "Given a bug marked fixed, When it comes back to check, Then it stays dead",
+    duration: 360,
+  },
+  {
+    id: "a4",
+    text: "Given a bug hiding in the code, When the sprint's still open, Then I've already caught it",
+    duration: 280,
+  },
+  {
+    id: "a5",
+    text: "Given a room deciding go or no-go, When they open the report, Then they just know",
+    duration: 340,
+  },
 ];
 
 export const stats: Stat[] = [
   {
+    value: 95,
+    suffix: "%",
+    label: "defect catch rate",
+    note: "REST Assured and Postman folded into CI with Newman, at Wipro",
+    signal: "pass",
+  },
+  {
     value: 50,
-    prefix: "+",
-    suffix: "%",
-    label: "testing efficiency",
-    note: "Selenium and Java framework built and maintained at Wipro",
-    signal: "pass",
-  },
-  {
-    value: 30,
-    prefix: "+",
-    suffix: "%",
-    label: "API test coverage",
-    note: "REST automation extended across services",
-    signal: "pass",
-  },
-  {
-    value: 15,
     prefix: "−",
     suffix: "%",
-    label: "recurring defects",
-    note: "Tracked, retested and closed rather than reopened",
-    signal: "fail",
+    label: "regression cycle time",
+    note: "Selenium and WebdriverIO automation that made weekly releases possible",
+    signal: "pass",
+  },
+  {
+    value: 300,
+    suffix: "+",
+    label: "Gherkin scenarios authored",
+    note: "Led BDD adoption with Cucumber to align testing with product requirements",
+    signal: "pass",
   },
 ];
 
@@ -68,54 +91,60 @@ export const stats: Stat[] = [
  */
 export const work: WorkItem[] = [
   {
-    id: "automation-framework",
-    name: "Automation framework, built to be inherited",
-    category: "Test automation",
-    organisation: "Wipro Technologies",
-    summary:
-      "Designed and maintained a Selenium and Java framework from scratch, then kept it healthy long enough for the rest of the team to rely on it.",
-    detail:
-      "The framework covered regression and functional suites for the product's core journeys. The work that made it stick wasn't the first version — it was the maintenance: keeping locators stable, keeping the suite fast enough to run every sprint, and keeping the failure output readable so a developer could act on a red build without asking me what it meant. It cut manual testing effort by half.",
-    metric: { value: 50, prefix: "+", suffix: "%", label: "testing efficiency" },
-    // TODO(Priya): confirm this framing before merging — worded from the
-    // existing detail/tools above (TestNG suite, Jenkins), not a new claim.
-    metricContext:
-      "by building and maintaining the TestNG regression suite from scratch, kept fast and readable enough for the team to run every sprint",
-    tools: ["Selenium WebDriver", "Java", "TestNG", "Jenkins"],
-    status: "measured",
-  },
-  {
-    id: "api-coverage",
-    name: "API coverage past the happy path",
+    id: "ci-api-automation",
+    name: "API automation that lives in the pipeline",
     category: "API testing",
     organisation: "Wipro Technologies",
     summary:
-      "Extended automated REST coverage across services so contract and error-path failures surfaced in CI instead of in a release candidate.",
+      "Built REST Assured and Postman API frameworks and wired them into CI with Newman, so defects surfaced in staging instead of in front of a client.",
     detail:
-      "Most of the existing API tests asserted a 200 and moved on. I added the cases that actually break: malformed payloads, missing required fields, auth failures, and response schema drift between environments. Coverage went up 30%, and the useful part was where the new failures showed up — in the pipeline, on the branch that caused them.",
-    metric: { value: 30, prefix: "+", suffix: "%", label: "API coverage" },
-    // TODO(Priya): confirm — worded from the existing detail (Rest Assured,
-    // contract/error-path cases surfacing "in the pipeline"), not a new claim.
+      "The brief was banking platforms, where a missed edge case is expensive. I built the API framework, then made sure it actually ran — integrated into CI with Newman so every push got tested, not just the ones someone remembered to run manually. Alongside it: RCA with developers on the failures that did get through, and the test plans, execution reports and automation logs that made the whole thing auditable rather than tribal knowledge. I also mentored the junior testers picking the framework up after me.",
+    metric: { value: 95, suffix: "%", label: "defect catch rate" },
     metricContext:
-      "by extending Rest Assured coverage to contract and error-path cases, surfacing failures in the pipeline instead of a release candidate",
-    tools: ["Rest Assured", "REST APIs", "JSON", "SQL"],
+      "by integrating REST Assured and Postman into CI with Newman, catching failures in staging before they reached a release candidate",
+    tools: ["REST Assured", "Postman", "Newman", "Java", "Jenkins"],
     status: "measured",
   },
   {
-    id: "defect-reduction",
-    name: "Defects that stayed closed",
-    category: "Defect management",
+    id: "regression-velocity",
+    name: "Regression fast enough for weekly releases",
+    category: "Test automation",
     organisation: "Wipro Technologies",
     summary:
-      "Owned identification, tracking and retesting through sprint cycles, and cut recurring issues by working the root cause rather than the ticket.",
+      "Led web automation with Selenium and WebdriverIO across a cross-functional Agile team, cutting regression cycle time enough to move the team to weekly releases.",
     detail:
-      "A reopened defect is a defect that was never understood. I ran root cause analysis on the repeat offenders, added the regression case that would have caught each one, and made retesting a step in the sprint rather than an afterthought. Recurring issues dropped 15%.",
-    metric: { value: 15, prefix: "−", suffix: "%", label: "recurring defects" },
-    // TODO(Priya): confirm — worded from the existing detail (root cause
-    // analysis on repeat offenders, regression case per fix), not a new claim.
+      "A regression suite that takes three days to run doesn't get run three days before a release — it gets skipped. I rebuilt the web automation around Selenium and WebdriverIO with release readiness as the actual goal, not just coverage for its own sake, and that's what took the cycle time down far enough that the team could ship weekly instead of working around a slow suite.",
+    metric: { value: 50, prefix: "−", suffix: "%", label: "regression cycle time" },
     metricContext:
-      "by running root cause analysis on repeat offenders and adding the regression case that would have caught each one, quarter over quarter",
-    tools: ["Jira", "Azure DevOps", "Root cause analysis"],
+      "by leading the Selenium/WebdriverIO web automation effort with release readiness as the explicit goal",
+    tools: ["Selenium WebDriver", "WebdriverIO", "Java", "Agile / Scrum"],
+    status: "measured",
+  },
+  {
+    id: "bdd-adoption",
+    name: "BDD adoption, 300+ scenarios in",
+    category: "Process",
+    organisation: "Wipro Technologies",
+    summary:
+      "Led the team's move to behaviour-driven testing with Cucumber, authoring 300+ Gherkin scenarios that tied test coverage directly to product requirements.",
+    detail:
+      "Selenium scripts don't tell a product manager anything. Gherkin does. I led the adoption of BDD with Cucumber specifically to close that gap — scenarios written in language a non-engineer could review meant ambiguity in requirements got caught before it became a defect, not after. 300+ scenarios later, it was the shared reference both engineering and product actually used.",
+    metric: { value: 300, suffix: "+", label: "Gherkin scenarios authored" },
+    metricContext:
+      "by leading BDD adoption with Cucumber, so testing and product requirements shared one language",
+    tools: ["Cucumber", "Gherkin", "BDD", "Java"],
+    status: "measured",
+  },
+  {
+    id: "ui-automation-framework",
+    name: "UI automation built on Page Objects, not scripts",
+    category: "Test automation",
+    organisation: "Wipro Technologies",
+    summary:
+      "Automated UI regression for enterprise financial applications with Selenium, applying OOP and Page Object structure so the framework stayed maintainable as it grew.",
+    detail:
+      "Early automation work is where a framework either becomes an asset or a liability for whoever inherits it. I applied OOP concepts and XPath/CSS locator optimisation to keep the Selenium suite from becoming the usual pile of brittle, copy-pasted scripts, and paired it with JSON-based REST API testing so UI and API coverage grew together rather than as two disconnected efforts.",
+    tools: ["Selenium WebDriver", "XPath / CSS", "JSON", "REST APIs", "OOP"],
     status: "measured",
   },
   {
@@ -142,18 +171,6 @@ export const work: WorkItem[] = [
     tools: ["Test case design", "Cucumber", "Jira", "Exploratory testing"],
     status: "ongoing",
   },
-  {
-    id: "qa-practice",
-    name: "QA practice, continuously sharpened",
-    category: "Process",
-    organisation: "Wipro Technologies",
-    summary:
-      "Contributed to how the team tested — process, strategy and standards — not only to what got tested this sprint.",
-    detail:
-      "Stand-ups, planning and retrospectives are where testing strategy actually changes. I used retros to argue for the unglamorous things: entry and exit criteria people agreed on, a regression suite trimmed of tests that no longer asserted anything, and a shared definition of what 'tested' meant before a story could move.",
-    tools: ["Agile / Scrum", "STLC", "Test planning", "Test reporting"],
-    status: "ongoing",
-  },
 ];
 
 export const experience: ExperienceItem[] = [
@@ -162,9 +179,7 @@ export const experience: ExperienceItem[] = [
     organisation: "Testing Info",
     location: "London",
     period: "Feb 2023 — Sept 2023",
-    // TODO(Priya): confirm phrasing — dates line up with the MSc start
-    // below, but double-check "ahead of an MSc" reads right before merging.
-    note: "First UK-based SDET role, taken while preparing for postgraduate study — hands-on API automation ahead of starting an MSc in Computer Science at Queen Mary.",
+    note: "Part-time SDET work in London, running alongside the MSc below — hands-on API automation for a UK client while studying full-time.",
     bullets: [
       "Created and executed test cases and scenarios for web applications",
       "Ran functional, regression and integration testing",
@@ -175,18 +190,32 @@ export const experience: ExperienceItem[] = [
     ],
   },
   {
-    role: "Senior QA Automation Tester",
+    role: "Senior Project Engineer",
     organisation: "Wipro Technologies",
-    location: "India",
-    period: "Oct 2019 — Oct 2022",
+    location: "Pune, Maharashtra, India",
+    period: "Oct 2021 — Sept 2022",
+    honors: "Inspiring Performance Award",
     bullets: [
-      "Designed and executed test plans, test cases and test scripts",
-      "Ran manual and automated functional, regression and UAT testing",
-      "Built and maintained Selenium and Java automation frameworks (+50% efficiency)",
-      "Increased API test coverage by 30% with REST automation tooling",
-      "Led defect identification, tracking and retesting (−15% recurring issues)",
-      "Worked across cross-functional Agile teams through sprint cycles",
-      "Contributed to QA process and testing strategy improvements",
+      "Led web and API automation initiatives (Selenium/Java, WebdriverIO, Postman) across a cross-functional Agile team on complex banking platforms",
+      "Built API frameworks and integrated them into CI pipelines with Newman, contributing to a 95% defect catch rate in staging",
+      "Ran RCA with developers to unblock bottlenecks and drive efficient defect resolution",
+      "Documented end-to-end test artefacts — test plans, strategies, execution reports, automation logs",
+      "Adopted BDD with Cucumber to improve requirement clarity within a CI/CD workflow",
+      "Mentored junior testers, helping raise team capability",
+    ],
+  },
+  {
+    role: "Project Engineer",
+    organisation: "Wipro Technologies",
+    location: "Pune Area, India",
+    period: "Oct 2019 — Dec 2021",
+    bullets: [
+      "Designed test scenarios and detailed test plans; executed functional and regression suites",
+      "Applied SDLC and STLC best practices across delivery cycles",
+      "Automated UI regression with Selenium, using XPath/CSS optimisation for stable locators",
+      "Supported API automation with JSON-based REST API testing",
+      "Worked directly with clients and stakeholders to keep testing cycles and requirements aligned",
+      "Applied OOP concepts within automation modules to improve system efficiency",
     ],
   },
 ];
@@ -195,9 +224,36 @@ export const education: EducationItem[] = [
   {
     qualification: "MSc Computer Science",
     institution: "Queen Mary University of London",
-    year: "2024",
+    year: "2023",
   },
-  { qualification: "BE Computer Engineering", institution: "India", year: "2019" },
+  {
+    qualification: "BE Computer Engineering",
+    institution: "R. H. Sapat College of Engineering, Nashik",
+    year: "2019",
+  },
+  {
+    qualification: "Diploma, Computer Engineering",
+    institution: "Met's Bhujbal Knowledge City, Nashik",
+    year: "2016",
+  },
+];
+
+export const certifications: string[] = [
+  "Programming Foundations: Software Testing/QA",
+  "Test Automation Foundations",
+  "Postman Essential Training",
+];
+
+/** Unpaid work, kept separate from `experience` so it never reads as a paid role. */
+export const volunteering: VolunteerItem[] = [
+  {
+    role: "Student Volunteer",
+    organisation: "Quick Heal Foundation",
+    location: "Nashik",
+    period: "Jul 2017 — Sept 2017",
+    summary:
+      "Educated students on cybersecurity — phishing risks, email threats, authentication best practices, online banking safety and data protection.",
+  },
 ];
 
 export const skillGroups: SkillGroup[] = [
@@ -214,11 +270,20 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     label: "Automation",
-    items: ["Selenium WebDriver", "C#", "Java", "NUnit", "TestNG", "Cucumber"],
+    items: [
+      "Selenium WebDriver",
+      "WebdriverIO",
+      "C#",
+      "Java",
+      "NUnit",
+      "TestNG",
+      "Cucumber",
+      "Page Object pattern",
+    ],
   },
   {
     label: "API tooling",
-    items: ["Postman", "Rest Assured", "RestSharp", "REST APIs", "JSON"],
+    items: ["Postman", "Newman", "Rest Assured", "RestSharp", "REST APIs", "JSON"],
   },
   {
     label: "Test & defect management",
@@ -226,11 +291,18 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     label: "Process",
-    items: ["Agile (Scrum)", "SDLC", "STLC", "Sprint planning", "Retrospectives"],
+    items: [
+      "Agile (Scrum)",
+      "SDLC",
+      "STLC",
+      "BDD / Gherkin modelling",
+      "Cross-functional Team Leadership",
+      "Sprint planning",
+      "Retrospectives",
+    ],
   },
   {
     label: "CI/CD & data",
     items: ["Jenkins", "Azure Pipelines", "GitHub", "SQL", "Root cause analysis"],
   },
 ];
-

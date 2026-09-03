@@ -2,6 +2,7 @@ import { useMotionValueEvent, useScroll } from "motion/react";
 import { useState } from "react";
 import { ScrollProgress } from "@/components/motion-primitives/scroll-progress";
 import MobileNav from "@/components/MobileNav";
+import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 
 export const navLinks = [
@@ -13,12 +14,8 @@ export const navLinks = [
 ];
 
 export default function NavBar({
-  isDark,
-  onToggleTheme,
   showSectionLinks = true,
 }: {
-  isDark: boolean;
-  onToggleTheme: () => void;
   /** The /#section links only resolve from "/" — from another route they force
    * a hard reload, and the browser attempts the hash scroll before the target
    * section has even mounted (it's still behind the preloader), so it silently
@@ -26,6 +23,7 @@ export default function NavBar({
    * logo and theme toggle show, rather than exposing links that can't work. */
   showSectionLinks?: boolean;
 }) {
+  const { isDark, toggle } = useTheme();
   const { scrollY } = useScroll();
   const [isLifted, setIsLifted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -61,7 +59,7 @@ export default function NavBar({
                 ))}
               </ul>
             ) : null}
-            <ThemeButton isDark={isDark} onToggle={onToggleTheme} />
+            <ThemeButton isDark={isDark} onToggle={toggle} />
             {showSectionLinks ? (
               <button
                 type="button"
@@ -85,12 +83,7 @@ export default function NavBar({
       <ScrollProgress className="absolute inset-x-0 top-full" />
 
       {showSectionLinks ? (
-        <MobileNav
-          isOpen={isMenuOpen}
-          onClose={() => setIsMenuOpen(false)}
-          isDark={isDark}
-          onToggleTheme={onToggleTheme}
-        />
+        <MobileNav isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       ) : null}
     </header>
   );

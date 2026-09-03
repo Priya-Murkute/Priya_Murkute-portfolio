@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
-import { profile, education } from "@/data/resume";
+import { profile } from "@/data/resume";
 import { BlurryGradient } from "@/components/Backgrounds";
 import HeroSceneBackdrop from "@/components/HeroSceneBackdrop";
 import SpecSuite from "@/components/SpecSuite";
@@ -9,7 +9,7 @@ import { TextEffect } from "@/components/motion-primitives/text-effect";
 import { AnimatedGroup } from "@/components/motion-primitives/animated-group";
 import { Magnetic } from "@/components/motion-primitives/magnetic";
 
-export default function Hero({ isDark }: { isDark: boolean }) {
+export default function Hero() {
   return (
     <section id="top" className="section relative overflow-hidden pt-32 sm:pt-36">
       <motion.div
@@ -21,7 +21,7 @@ export default function Hero({ isDark }: { isDark: boolean }) {
         <BlurryGradient />
       </motion.div>
 
-      <HeroSceneBackdrop isDark={isDark} />
+      <HeroSceneBackdrop />
 
       <div className="shell relative z-10 grid items-start gap-14 lg:grid-cols-12 lg:gap-10">
         <div className="lg:col-span-7">
@@ -52,32 +52,18 @@ export default function Hero({ isDark }: { isDark: boolean }) {
               </TextEffect>
             </Link>
 
-            <p className="credential text-sm">
-              {education[0].qualification} · {education[0].institution}
-            </p>
-
-            <AboutMeLink />
-
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="eyebrow">
+            <div className="flex flex-wrap items-center gap-2 font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-faint">
+              <span>
                 {profile.title} · {profile.location}
               </span>
-              <span className="pill-sheen relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-line bg-surface/70 px-3 py-1 font-mono text-[0.6875rem] text-muted backdrop-blur">
+              <span aria-hidden="true">·</span>
+              <span className="inline-flex items-center gap-1.5 text-pass">
                 <span className="status-dot bg-pass" />
                 Open to new opportunities
               </span>
             </div>
 
-            <TextEffect
-              as="p"
-              per="word"
-              preset="fade-in-blur"
-              delay={0.32}
-              speedReveal={1.9}
-              className="text-title max-w-[22ch] font-display font-medium text-muted"
-            >
-              The quiet work behind a smooth release.
-            </TextEffect>
+            <AboutMeLink />
 
             <p className="measure text-lead text-muted">{profile.summary}</p>
 

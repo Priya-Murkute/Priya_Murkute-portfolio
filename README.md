@@ -1,5 +1,10 @@
 # Priya Murkute — Portfolio
 
+## Live site
+🚧 [Deploy in progress — link will be added here after first Vercel deployment]
+
+_After deploying to Vercel, update this line with your live URL and remove the 🚧 emoji._
+
 A personal QA portfolio. Calm, near-white, typographic: soft Haikei-style
 gradient and wave SVGs behind the content, one green accent borrowed from a
 passing test, and motion that's there to orient you rather than to perform.
@@ -68,7 +73,7 @@ about:
 ```
 src/
 ├── main.tsx
-├── App.tsx                    # theme state, section order, grain overlay
+├── App.tsx                    # section order, grain overlay, routing
 ├── styles.css                 # the whole design system (see below)
 ├── types.ts
 ├── lib/utils.ts               # cn() = twMerge(clsx(...))
@@ -81,7 +86,9 @@ src/
     ├── About.tsx
     ├── Work.tsx               # six cards, each opening a morphing dialog
     ├── Experience.tsx
+    ├── Volunteering.tsx       # unpaid work, kept out of the paid-roles timeline
     ├── Skills.tsx
+    ├── Certifications.tsx
     ├── Contact.tsx
     ├── Footer.tsx
     ├── Backgrounds.tsx        # BlurryGradient, LayeredWaves, StackedWaves
@@ -90,7 +97,11 @@ src/
 
 `public/Priya-Murkute-CV.pdf` is what the two Download CV buttons serve. It's
 generated from the same facts as `resume.ts`; if you change a role or a metric
-there, regenerate or hand-edit the PDF so the two don't drift.
+there, regenerate or hand-edit the PDF so the two don't drift. **This is
+currently out of sync** — `resume.ts` was rewritten from the real LinkedIn
+export (split Wipro roles, corrected MSc year, real stats, new Certifications
+and Volunteering sections) but the PDF wasn't regenerated, since it's a
+binary this repo can't edit for you.
 
 ## The design system
 
@@ -133,5 +144,6 @@ Escape and returns focus to its trigger, and `prefers-reduced-motion` honoured
 in CSS and in `SpecSuite` (which jumps straight to its finished state).
 
 The theme switch reports state as text (`light` / `dark`) rather than a sun or
-moon glyph, and it remembers nothing between visits — no browser storage, by
-choice. Every reload starts light.
+moon glyph. State lives in `ThemeContext` (`src/context/ThemeContext.tsx`) and
+persists to `localStorage` under `pm-theme`, so it's remembered across
+reloads and route changes instead of resetting to light every visit.

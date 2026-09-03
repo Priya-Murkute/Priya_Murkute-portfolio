@@ -58,6 +58,18 @@ export interface ExperienceItem {
   bullets: string[];
   /** Short framing line for a role whose tenure needs context at a glance. */
   note?: string;
+  /** A named award earned during this role, shown as a small badge. */
+  honors?: string;
+}
+
+/** Unpaid work — kept structurally distinct from ExperienceItem so it can
+ * never accidentally render in the paid-roles timeline. */
+export interface VolunteerItem {
+  role: string;
+  organisation: string;
+  location: string;
+  period: string;
+  summary: string;
 }
 
 export interface EducationItem {
@@ -82,23 +94,25 @@ export interface Profile {
   cvPath: string;
 }
 
-/** A photo in the Off Hours travel scroller. `column` and `height` drive the
- * dual-column masonry layout; `gradient` stands in for a real photo. */
-export interface TravelPhoto {
+/** A photo in the About Me "My Interests" scroller. `column` and `height`
+ * drive the dual-column masonry layout; `gradient` stands in for a real
+ * photo. */
+export interface InterestPhoto {
   id: string;
   title: string;
-  location: string;
   year: string;
   gradient: string;
   height: "tall" | "med" | "short";
   column: "left" | "right";
 }
 
-/** A piece in the Off Hours 3D art carousel. */
+/** A piece in the Off Hours 3D art carousel. `medium` is optional — the
+ * auto-discovered entries (see src/data/artGallery.ts) only have one when
+ * the filename encodes it. */
 export interface Artwork {
   id: string;
   title: string;
-  medium: string;
+  medium?: string;
   year: string;
   gradient: string;
 }

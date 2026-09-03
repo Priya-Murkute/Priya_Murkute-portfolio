@@ -1,12 +1,14 @@
 import type { Hobby, NowItem } from "@/types";
 
 export const nowItems: NowItem[] = [
-  { label: "Reading", value: "The Ministry for the Future" },
-  { label: "Listening", value: "Mitski · Be the Cowboy" },
-  { label: "Watching", value: "The Bear, Season 3" },
-  { label: "Sketching", value: "Botanical illustrations" },
-  { label: "Dreaming of", value: "Japan — next autumn" },
-  { label: "Eating", value: "Everything in Lisbon" },
+  { label: "Currently exploring", value: "generative art tools" },
+  { label: "Reading", value: "The Creative Act — Rick Rubin" },
+  { label: "Building", value: "this portfolio" },
+  { label: "Listening to", value: "The Weeknd -- On Loop" },
+  { label: "Seeking", value: "QA/SDET roles in the UK" },
+  { label: "Cooking", value: "more than I should" },
+  { label: "Missing", value: "good chai" },
+  { label: "Watching", value: "whatever has subtitles" },
 ];
 
 export const hobbies: Hobby[] = [
