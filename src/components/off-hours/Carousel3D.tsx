@@ -130,6 +130,11 @@ export default function Carousel3D() {
           {artworks.map((art, i) => {
             const offset = offsetOf(i, current, total);
             const hidden = Math.abs(offset) > 2;
+            // The artwork is a CSS background, which `loading="lazy"` can't
+            // reach — so the fetch is deferred by not setting it until the
+            // card is close. One position beyond the visible fan, so the next
+            // card is already decoded by the time it rotates in.
+            const shouldLoad = Math.abs(offset) <= 3;
             const pos = POSITIONS[Math.max(-2, Math.min(2, offset)) + 2];
 
             return (
@@ -166,7 +171,7 @@ export default function Carousel3D() {
                       "relative flex-1 overflow-hidden rounded-[1px]",
                       !hasRealArtworks && "border border-dashed border-line",
                     )}
-                    style={{ background: art.gradient }}
+                    style={{ background: shouldLoad ? art.gradient : undefined }}
                   >
                     {!hasRealArtworks && (
                       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -189,21 +194,30 @@ export default function Carousel3D() {
         </div>
       </div>
 
-      <div className="mt-8 flex min-h-14 flex-col items-center gap-1.5 text-center">
+      {/* Announced on change, so the caption isn't a silent update for anyone
+          driving the carousel from the keyboard or a screen reader. */}
+      <div
+        className="mt-8 flex min-h-14 flex-col items-center gap-1.5 text-center"
+        aria-live="polite"
+        aria-atomic="true"
+      >
         <p className="font-sans text-2xl italic text-ink">{active.title}</p>
         <p className="font-mono text-[0.58rem] uppercase tracking-[0.1em] text-faint">
           {formatCaption(active)}
         </p>
       </div>
 
-      <div className="mt-6 flex justify-center gap-2.5" role="tablist" aria-label="Select artwork">
+      {/* Plain buttons, not a tablist: nothing here is a tabpanel — the cards
+          are buttons of their own — so tab roles would promise arrow-key
+          semantics this widget doesn't implement. `aria-current` says which
+          one is showing without making that claim. */}
+      <div className="mt-6 flex justify-center gap-2.5">
         {artworks.map((art, i) => (
           <button
             key={art.id}
             type="button"
-            role="tab"
-            aria-label={art.title}
-            aria-selected={i === current}
+            aria-label={`Show ${art.title}`}
+            aria-current={i === current}
             onClick={() => goto(i)}
             className={cn(
               "size-1.5 rounded-full transition-transform duration-300",
@@ -216,6 +230,13 @@ export default function Carousel3D() {
   );
 }
 
+/**
+ * The mouse affordance is a hover zone: the left/right 38% of the stage,
+ * invisible until the cursor arms it. That left keyboard users with a control
+ * they could reach but never see, so focus reveals the same zone — a visible
+ * ring track plus the charge ring — and Enter advances immediately, skipping
+ * the hold.
+ */
 function HoverZone({
   side,
   active,
@@ -233,9 +254,10 @@ function HoverZone({
       aria-label={side === "l" ? "Previous artwork" : "Next artwork"}
       onClick={onActivate}
       className={cn(
-        "absolute inset-y-0 z-20 flex w-[38%] cursor-default items-center bg-transparent transition-opacity duration-300",
+        "group/zone absolute inset-y-0 z-20 flex w-[38%] cursor-default items-center bg-transparent transition-opacity duration-300",
         side === "l" ? "left-0 justify-start pl-5" : "right-0 justify-end pr-5",
         active ? "opacity-100" : "pointer-events-none opacity-0",
+        "focus-visible:pointer-events-auto focus-visible:opacity-100",
       )}
     >
       <svg
@@ -244,6 +266,17 @@ function HoverZone({
         style={{ transform: "rotate(-90deg)", transformOrigin: "center" }}
         aria-hidden="true"
       >
+        {/* Track: makes the control legible the moment it's focused, rather
+            than only once the hold has started charging. */}
+        <circle
+          cx={21}
+          cy={21}
+          r={19}
+          fill="none"
+          stroke="var(--line-strong)"
+          strokeWidth={1.5}
+          className="opacity-0 group-focus-visible/zone:opacity-100"
+        />
         <circle
           cx={21}
           cy={21}

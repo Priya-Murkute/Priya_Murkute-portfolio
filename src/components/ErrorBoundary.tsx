@@ -1,0 +1,74 @@
+import { Component, type ErrorInfo, type ReactNode } from "react";
+
+/**
+ * React unmounts the whole tree on an uncaught render error, so without a
+ * boundary any single thrown error turns the site into a blank page with no
+ * way back. Used twice, deliberately at different granularities:
+ *
+ * - around the routes, with a real fallback, so a page-level failure still
+ *   leaves the visitor somewhere they can act;
+ * - around the lazy 3D hero scene with `fallback={null}`, so a WebGL or
+ *   three.js failure on an unusual GPU costs the decorative petals rather
+ *   than the page they sit behind.
+ */
+interface Props {
+  children: ReactNode;
+  /** Rendered in place of the subtree when it throws. `null` fails silently. */
+  fallback?: ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+}
+
+export default class ErrorBoundary extends Component<Props, State> {
+  state: State = { hasError: false };
+
+  static getDerivedStateFromError(): State {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    if (import.meta.env.DEV) {
+      console.error("[ErrorBoundary]", error, info.componentStack);
+    }
+  }
+
+  render() {
+    if (!this.state.hasError) return this.props.children;
+    return this.props.fallback ?? null;
+  }
+}
+
+/** The page-level fallback: an apology-free explanation and a way onward. */
+export function PageErrorFallback() {
+  return (
+    <main id="main-content" className="section flex min-h-[70vh] items-center">
+      <div className="shell">
+        <div className="max-w-[34rem]">
+          <span className="eyebrow flex w-fit items-center gap-2 text-fail">
+            <span className="status-dot bg-fail" />
+            Something broke on this page
+          </span>
+
+          <h1 className="text-title mt-4 font-display font-semibold">
+            This section didn't render.
+          </h1>
+
+          <p className="measure mt-4 text-lead text-muted">
+            An error stopped this part of the site from loading. Reloading usually clears it — the
+            rest of the site is unaffected.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="glow-cta mt-7 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-px"
+          >
+            Reload the page
+          </button>
+        </div>
+      </div>
+    </main>
+  );
+}

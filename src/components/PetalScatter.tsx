@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useMemo } from "react";
 import { cherryBlossomColor, seededRandom } from "@/lib/cherryBlossom";
+import { useOnScreen } from "@/lib/useOnScreen";
 import { useTheme } from "@/context/ThemeContext";
 
 /** Same notched sakura silhouette as the hero scene, flattened to an SVG path. */
@@ -42,8 +43,15 @@ export default function PetalScatter() {
   const prefersReducedMotion = useReducedMotion() ?? false;
   const petals = useMemo(() => makePetals(isDark), [isDark]);
 
+  // 42 petals × 3 looping tweens is 126 concurrent animations. Left running
+  // unconditionally they cost that much for the whole page lifetime, in two
+  // separate sections, whether or not either is on screen.
+  const { ref: containerRef, isOnScreen } = useOnScreen<HTMLDivElement>("100px");
+  const isAnimated = !prefersReducedMotion && isOnScreen;
+
   return (
     <div
+      ref={containerRef}
       className="pointer-events-none absolute inset-x-0 bottom-0 h-28 overflow-hidden"
       aria-hidden="true"
     >
@@ -60,7 +68,7 @@ export default function PetalScatter() {
           }}
           initial={{ rotate: petal.rotation, opacity: 0, x: 0, y: 0 }}
           animate={
-            prefersReducedMotion
+            !isAnimated
               ? { opacity: 0.85 }
               : {
                   opacity: 0.85,
@@ -70,7 +78,7 @@ export default function PetalScatter() {
                 }
           }
           transition={
-            prefersReducedMotion
+            !isAnimated
               ? { duration: 0.6 }
               : {
                   opacity: { duration: 0.6 },

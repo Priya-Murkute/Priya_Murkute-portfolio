@@ -4,7 +4,7 @@ import type { Signal } from "@/types";
 import { AnimatedNumber } from "@/components/motion-primitives/animated-number";
 import { InView } from "@/components/motion-primitives/in-view";
 
-const signalText: Record<string, string> = {
+const signalText: Record<Signal, string> = {
   pass: "text-pass",
   flaky: "text-flaky",
   fail: "text-fail",

@@ -30,7 +30,12 @@ export default function MyInterests() {
       variants={reveal}
       viewOptions={{ margin: "-15% 0px" }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className="relative grid h-[580px] grid-cols-2 gap-2.5 overflow-hidden rounded"
+      /* Taller than it was (580px flat) so more of each column is on screen
+         at once — the fades top and bottom eat ~112px each, which left the
+         old height showing very little actual photo. Stepped by breakpoint
+         rather than one fixed value: 820px on a laptop is generous, but on a
+         phone it would run past the fold on its own. */
+      className="relative grid h-[560px] grid-cols-2 gap-2.5 overflow-hidden rounded sm:h-[700px] lg:h-[820px]"
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-paper to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-paper to-transparent" />
@@ -46,9 +51,15 @@ function InterestColumn({ photos, direction }: { photos: InterestPhoto[]; direct
 
   return (
     <div className="group relative overflow-hidden">
+      {/* 45s, up from 22s. The animation always travels exactly one list
+          height, so the duration *is* the speed — doubling it halves the
+          drift, which reads as an ambient scroller rather than a feed
+          scrolling past. Hovering a column still pauses it outright. The
+          duration has to be a literal here: Tailwind scans source text, so an
+          interpolated arbitrary value would never get generated. */}
       <div
         className={cn(
-          "flex flex-col gap-2.5 will-change-transform animate-[interests-down_22s_linear_infinite] group-hover:[animation-play-state:paused]",
+          "flex flex-col gap-2.5 will-change-transform animate-[interests-down_45s_linear_infinite] group-hover:[animation-play-state:paused]",
           direction === "up" && "[animation-direction:reverse]",
         )}
       >
@@ -70,7 +81,11 @@ function InterestPhotoCard({ photo }: { photo: InterestPhoto }) {
       <div className="group/photo relative shrink-0 cursor-pointer overflow-hidden rounded-[3px]">
         <img
           src={photo.gradient}
-          alt=""
+          /* These are her photographs — the content of the section, not
+             decoration, so they get a real description rather than alt="". */
+          alt={photo.title}
+          loading="lazy"
+          decoding="async"
           className="block h-auto w-full transition-transform group-hover/photo:scale-105"
           style={{ transitionDuration: "650ms", transitionTimingFunction: "var(--ease-calm)" }}
         />

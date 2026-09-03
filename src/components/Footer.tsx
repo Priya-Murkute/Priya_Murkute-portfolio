@@ -1,5 +1,6 @@
 import { profile } from "@/data/resume";
 import { StackedWaves } from "@/components/Backgrounds";
+import { sectionHref } from "@/lib/links";
 
 export default function Footer() {
   return (
@@ -11,7 +12,7 @@ export default function Footer() {
           {profile.name} · {profile.title} · {profile.location}
         </p>
         <a
-          href="/#top"
+          href={sectionHref("top")}
           className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-faint transition-colors hover:text-ink"
         >
           Back to top ↑

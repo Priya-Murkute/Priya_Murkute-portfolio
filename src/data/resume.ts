@@ -24,7 +24,26 @@ export const profile: Profile = {
   summary:
     "Three years automating test coverage for banking platforms at Wipro, then an MSc in Computer Science at Queen Mary while working part-time as a London-based SDET. I build frameworks that behave like real software — version-controlled, CI-integrated, and built to be inherited by whoever's on call after me.",
   cvPath: "Priya-Murkute-CV.pdf",
+  yearsExperience: 3,
+  /* Printed on the downloadable CV only — never rendered on the site, which
+     deliberately routes contact through email and LinkedIn. Carried over from
+     the previous hand-made PDF so regenerating it loses nothing. */
+  phone: "+44 7789 595457",
 };
+
+/** Last path segment of a profile URL — "Priya-Murkute", "priya-murkute-oct7". */
+function handleFromUrl(url: string): string {
+  return url.replace(/\/+$/, "").split("/").pop() ?? "";
+}
+
+/**
+ * Derived rather than typed out a second time. Components previously
+ * hardcoded these next to the URLs that already contain them, which meant
+ * editing `profile` here could silently leave the displayed handle — and the
+ * GitHub API call in Projects.tsx — pointing at the old account.
+ */
+export const githubHandle = handleFromUrl(profile.github);
+export const linkedinHandle = handleFromUrl(profile.linkedin);
 
 /**
  * The hero's signature: her achievements written as Gherkin scenarios —
@@ -175,16 +194,16 @@ export const work: WorkItem[] = [
 
 export const experience: ExperienceItem[] = [
   {
-    role: "QA Automation Engineer (SDET)",
+    role: "QA Automation Engineer (Part-time)",
     organisation: "Testing Info",
     location: "London",
     period: "Feb 2023 — Sept 2023",
-    note: "Part-time SDET work in London, running alongside the MSc below — hands-on API automation for a UK client while studying full-time.",
+    note: "Part-time QA work in London, running alongside the MSc below — hands-on API automation for a UK client while studying full-time.",
     bullets: [
       "Created and executed test cases and scenarios for web applications",
       "Ran functional, regression and integration testing",
       "Tested REST APIs with Postman and RestSharp",
-      "Logged and tracked defects in Jira and Azure DevOps",
+      "Logged and tracked defects in Jira",
       "Worked with developers and product through Agile sprints",
       "Produced test reports and supported release validation",
     ],
@@ -208,7 +227,7 @@ export const experience: ExperienceItem[] = [
     role: "Project Engineer",
     organisation: "Wipro Technologies",
     location: "Pune Area, India",
-    period: "Oct 2019 — Dec 2021",
+    period: "Oct 2019 — Oct 2021",
     bullets: [
       "Designed test scenarios and detailed test plans; executed functional and regression suites",
       "Applied SDLC and STLC best practices across delivery cycles",

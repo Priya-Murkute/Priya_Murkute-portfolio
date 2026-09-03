@@ -2,3 +2,14 @@ node_modules
 dist
 .env
 *.tsbuildinfo
+
+# Full-resolution gallery originals, kept on disk by scripts/optimize-images.mjs
+# after it writes the width-capped WebP the site actually ships.
+_originals/
+
+# Playwright
+test-results/
+playwright-report/
+
+# `npm run cv -- --preview` output, for eyeballing the CV layout
+cv-preview.png

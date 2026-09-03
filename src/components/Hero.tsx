@@ -7,7 +7,6 @@ import SpecSuite from "@/components/SpecSuite";
 import AboutMeLink from "@/components/AboutMeLink";
 import { TextEffect } from "@/components/motion-primitives/text-effect";
 import { AnimatedGroup } from "@/components/motion-primitives/animated-group";
-import { Magnetic } from "@/components/motion-primitives/magnetic";
 
 export default function Hero() {
   return (
@@ -63,28 +62,17 @@ export default function Hero() {
               </span>
             </div>
 
-            <AboutMeLink />
-
             <p className="measure text-lead text-muted">{profile.summary}</p>
 
+            {/* One call to action rather than two. AboutMeLink used to sit
+                above the summary as a quiet text link with a separate "Get in
+                touch" pill below it; both pointed the visitor somewhere, and
+                the quieter of the two was the more interesting invitation.
+                They're now a single button carrying both styles. Contact is
+                still one nav click away, and the Contact section keeps its
+                own Download CV action. */}
             <div className="flex flex-wrap items-center gap-3 pt-1">
-              <Magnetic intensity={0.25} range={110}>
-                <a
-                  href="/#contact"
-                  className="glow-cta inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-px"
-                >
-                  Get in touch
-                  <svg viewBox="0 0 16 16" className="size-3.5" fill="none" aria-hidden="true">
-                    <path
-                      d="M3 8h9m0 0-3.2-3.2M12 8l-3.2 3.2"
-                      stroke="currentColor"
-                      strokeWidth={1.5}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </a>
-              </Magnetic>
+              <AboutMeLink />
             </div>
           </AnimatedGroup>
         </div>

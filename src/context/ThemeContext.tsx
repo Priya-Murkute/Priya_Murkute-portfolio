@@ -1,8 +1,20 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
 type Theme = "light" | "dark";
 
+/** Also read by the pre-paint script in index.html — change both together. */
 const THEME_STORAGE_KEY = "pm-theme";
+
+/** Matches the 240ms in `.theme-transition` (styles.css), plus a little slack. */
+const TRANSITION_MS = 260;
 
 interface ThemeContextValue {
   isDark: boolean;
@@ -32,6 +44,20 @@ function getStoredTheme(): Theme {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(getStoredTheme);
 
+  /**
+   * The colour crossfade lives on `.theme-transition` (styles.css) and is
+   * switched on only for the duration of a swap. Adding it here — before the
+   * state flip — means the transition is in place by the time the `.dark`
+   * class lands, without every node in the document carrying a transition
+   * for the whole session.
+   */
+  const toggle = useCallback(() => {
+    const root = document.documentElement;
+    root.classList.add("theme-transition");
+    window.setTimeout(() => root.classList.remove("theme-transition"), TRANSITION_MS);
+    setTheme((current) => (current === "dark" ? "light" : "dark"));
+  }, []);
+
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
     document
@@ -44,16 +70,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, [theme]);
 
-  return (
-    <ThemeContext.Provider
-      value={{
-        isDark: theme === "dark",
-        toggle: () => setTheme((t) => (t === "dark" ? "light" : "dark")),
-      }}
-    >
-      {children}
-    </ThemeContext.Provider>
-  );
+  const value = useMemo(() => ({ isDark: theme === "dark", toggle }), [theme, toggle]);
+
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export const useTheme = () => useContext(ThemeContext);

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { skillGroups } from "@/data/resume";
 import { InView } from "@/components/motion-primitives/in-view";
 
@@ -120,7 +120,7 @@ export default function Skills() {
                       {group.items.map((item) => (
                         <li
                           key={item}
-                          style={{ "--group-accent": accent } as React.CSSProperties}
+                          style={{ "--group-accent": accent } as CSSProperties}
                           className="rounded-full border border-line bg-surface px-3 py-1.5 text-[0.8125rem] text-ink transition-colors hover:border-[var(--group-accent)] hover:text-[var(--group-accent)]"
                         >
                           {item}

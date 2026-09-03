@@ -5,13 +5,13 @@ import { Magnetic } from "@/components/motion-primitives/magnetic";
 const SPRING = { type: "spring" as const, stiffness: 320, damping: 22 };
 
 const textVariants = {
-  rest: { letterSpacing: "0.04em" },
-  hover: { letterSpacing: "0.07em" },
+  rest: { letterSpacing: "0.01em" },
+  hover: { letterSpacing: "0.04em" },
 };
 
 const underlineVariants = {
-  rest: { scaleX: 0.35, opacity: 0.5 },
-  hover: { scaleX: 1, opacity: 1 },
+  rest: { scaleX: 0, opacity: 0 },
+  hover: { scaleX: 1, opacity: 0.55 },
 };
 
 const badgeVariants = {
@@ -25,37 +25,45 @@ const arrowVariants = {
 };
 
 /**
- * The Hero's entry point into /about-me. Quiet at rest — plain text, a
- * barely-there underline — but the whole thing wakes up together on hover
- * through one shared Motion variant state (propagated from the wrapping
- * motion.div to every child below, no per-element wiring needed): the
- * underline draws in solid, the badge tips open and turns --pass, the arrow
- * steps forward, the text tracks out a touch. Deliberately hover-only rather
- * than looping at idle — calmer than a constant nudge, and it reads as more
- * considered for a link that's meant to stay quieter than "Get in touch."
+ * The Hero's single call to action, into /about-me.
+ *
+ * This is the two former hero buttons folded together: the solid ink pill,
+ * the `glow-cta` bloom and the magnetic pull that used to belong to "Get in
+ * touch", carrying the hover choreography that used to belong to the quiet
+ * text link — one shared Motion variant state, propagated from the wrapping
+ * motion.div to every child, so the badge tips open, the arrow steps forward,
+ * the label tracks out and the underline draws in all at once with no
+ * per-element wiring.
+ *
+ * The underline starts fully retracted rather than half-drawn: at rest this
+ * now reads as a solid button, so a permanent hairline under the label would
+ * look like an artefact instead of the invitation it was on plain text.
+ *
+ * Deliberately hover-only rather than looping at idle — calmer than a
+ * constant nudge, and it reads as more considered.
  */
 export default function AboutMeLink() {
   return (
-    <Magnetic intensity={0.2} range={90}>
+    <Magnetic intensity={0.25} range={110}>
       <motion.div initial="rest" whileHover="hover" whileTap={{ scale: 0.97 }} className="w-fit">
         <Link
           to="/about-me"
-          className="group inline-flex items-center gap-2 font-mono text-[0.75rem] text-muted transition-colors hover:text-pass"
+          className="glow-cta inline-flex items-center gap-2.5 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-px"
         >
           <motion.span variants={textVariants} transition={SPRING} className="relative">
-            Click here to know about me
+            Click here to know me
             <motion.span
               variants={underlineVariants}
               transition={SPRING}
               style={{ originX: 0 }}
-              className="absolute -bottom-0.5 left-0 h-px w-full bg-line-strong group-hover:bg-pass"
+              className="absolute -bottom-1 left-0 h-px w-full bg-paper"
             />
           </motion.span>
 
           <motion.span
             variants={badgeVariants}
             transition={SPRING}
-            className="flex size-5 flex-none items-center justify-center rounded-full bg-ink text-paper transition-colors group-hover:bg-pass"
+            className="flex size-5 flex-none items-center justify-center rounded-full bg-paper text-ink"
           >
             <motion.svg
               variants={arrowVariants}

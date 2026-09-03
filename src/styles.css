@@ -19,7 +19,12 @@
   --surface-sunk: #f4f4ef;
   --ink: #14171a;
   --ink-muted: #6b7078;
-  --ink-faint: #9a9ea3;
+  /* 4.9:1 on --paper. The previous #9a9ea3 measured ~2.6:1, below the 4.5:1
+     WCAG AA needs at the sizes this token is used at — and it carries a lot
+     of the page's small text: every .eyebrow, the mono captions, the footer,
+     timeline locations and stat notes. Still clearly quieter than
+     --ink-muted, so the three-step hierarchy is intact. */
+  --ink-faint: #71767c;
   --line: #e8e7e1;
   --line-strong: #d6d5cd;
 
@@ -52,7 +57,8 @@
   --surface-sunk: #101315;
   --ink: #eceded;
   --ink-muted: #9aa0a4;
-  --ink-faint: #6d7378;
+  /* 6.0:1 on the dark --paper; #6d7378 measured ~4.0:1. See the light note. */
+  --ink-faint: #8b9298;
   --line: #24282c;
   --line-strong: #343a3f;
 
@@ -170,13 +176,26 @@
   }
 
   /* The theme transition is the one global animation; keep it short so
-     switching feels like a light change, not a crossfade. */
-  body,
-  body * {
+     switching feels like a light change, not a crossfade.
+
+     Scoped to the moment a switch is in flight rather than left on every
+     node permanently: ThemeProvider adds .theme-transition to <html>, flips
+     the theme, and removes it ~260ms later. Applied to `body *` for the
+     whole page lifetime it made every hover, mount and layout change in the
+     document pay a 240ms colour ramp, and scaled style recalculation with
+     DOM size — expensive on the sections carrying dozens of animated
+     petals. Interactive elements carry their own `transition-colors`, so
+     hover states are unaffected by the narrower scope.
+
+     !important because Tailwind's utilities layer outranks this one, and a
+     `transition-transform` on a card would otherwise drop it from the
+     crossfade. Safe here: the rule is only live for a quarter of a second. */
+  html.theme-transition,
+  html.theme-transition * {
     transition:
       background-color 240ms var(--ease-calm),
       border-color 240ms var(--ease-calm),
-      color 240ms var(--ease-calm);
+      color 240ms var(--ease-calm) !important;
   }
 }
 
@@ -325,33 +344,9 @@
     opacity: 0.42;
   }
 
-  /* A faint top sheen on glass surfaces, layered over the existing blur/border
-     pill treatment for a slightly more glassy read. */
-  .pill-sheen {
-    position: relative;
-    isolation: isolate;
-  }
-
-  .pill-sheen::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    background: linear-gradient(to bottom, color-mix(in srgb, white 22%, transparent), transparent 60%);
-  }
-
-  .dark .pill-sheen::before {
-    background: linear-gradient(to bottom, color-mix(in srgb, white 10%, transparent), transparent 60%);
-  }
-
   .haikei-drift {
     animation: haikei-drift var(--drift-duration, 20s) ease-in-out infinite;
     animation-delay: var(--drift-delay, 0s);
-  }
-
-  .arrow-nudge {
-    animation: arrow-nudge 1.15s ease-in-out infinite;
   }
 }
 
@@ -374,20 +369,6 @@
   }
   50% {
     transform: translate(var(--drift-x, 16px), var(--drift-y, 12px));
-  }
-}
-
-/* GIF-style nudge for the "click here" affordance — a plain CSS loop (not a
-   motion value) so it runs for the page's whole lifetime off the main
-   thread, and so prefers-reduced-motion freezes it for free via the global
-   rule below. */
-@keyframes arrow-nudge {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(5px);
   }
 }
 

@@ -29,17 +29,37 @@ export function Magnetic({
   const springX = useSpring(x, springOptions);
   const springY = useSpring(y, springOptions);
 
-  const calculateDistance = useCallback(
-    (event: MouseEvent) => {
-      if (!ref.current) return;
-      const { left, top, width, height } = ref.current.getBoundingClientRect();
-      const centerX = left + width / 2;
-      const centerY = top + height / 2;
-      const distanceX = event.clientX - centerX;
-      const distanceY = event.clientY - centerY;
+  /**
+   * Upstream reads `getBoundingClientRect()` inside the mousemove handler,
+   * before checking whether the cursor is anywhere near — so every instance
+   * forces a layout reflow on every mouse move for the whole page lifetime.
+   * The rect is cached instead, read only while hovered (the only time the
+   * value is used) and refreshed on the two things that can invalidate it.
+   */
+  const rectRef = useRef<DOMRect | null>(null);
+  const readRect = useCallback(() => {
+    rectRef.current = ref.current?.getBoundingClientRect() ?? null;
+  }, []);
+
+  useEffect(() => {
+    if (!isHovered) {
+      rectRef.current = null;
+      x.set(0);
+      y.set(0);
+      return;
+    }
+
+    readRect();
+
+    const handleMouseMove = (event: MouseEvent) => {
+      const rect = rectRef.current;
+      if (!rect) return;
+
+      const distanceX = event.clientX - (rect.left + rect.width / 2);
+      const distanceY = event.clientY - (rect.top + rect.height / 2);
       const absoluteDistance = Math.hypot(distanceX, distanceY);
 
-      if (isHovered && absoluteDistance <= range) {
+      if (absoluteDistance <= range) {
         const scale = 1 - absoluteDistance / range;
         x.set(distanceX * intensity * scale);
         y.set(distanceY * intensity * scale);
@@ -47,14 +67,17 @@ export function Magnetic({
         x.set(0);
         y.set(0);
       }
-    },
-    [isHovered, intensity, range, x, y],
-  );
+    };
 
-  useEffect(() => {
-    window.addEventListener("mousemove", calculateDistance);
-    return () => window.removeEventListener("mousemove", calculateDistance);
-  }, [calculateDistance]);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("scroll", readRect, { passive: true });
+    window.addEventListener("resize", readRect);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("scroll", readRect);
+      window.removeEventListener("resize", readRect);
+    };
+  }, [isHovered, intensity, range, x, y, readRect]);
 
   useEffect(() => {
     if (actionArea === "global") {

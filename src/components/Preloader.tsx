@@ -18,21 +18,39 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
 
   useEffect(() => {
     const start = performance.now();
-    let frame: number;
+    let frame = 0;
+    let holdTimer = 0;
+    let cancelled = false;
+
+    // The bar used to be pure theatre on a fixed timer. Holding the finish
+    // until the webfonts have loaded makes the number mean something — and
+    // stops the hero's headline from re-flowing a beat after the curtain
+    // lifts, which is what the wait is really buying.
+    const fontsReady: Promise<unknown> = document.fonts?.ready ?? Promise.resolve();
 
     const tick = (now: number) => {
-      const elapsed = now - start;
-      const pct = Math.min(100, Math.round((elapsed / DURATION_MS) * 100));
+      const pct = Math.min(100, Math.round(((now - start) / DURATION_MS) * 100));
       setProgress(pct);
+
       if (pct < 100) {
         frame = requestAnimationFrame(tick);
-      } else {
-        window.setTimeout(onComplete, HOLD_MS);
+        return;
       }
+
+      fontsReady.then(() => {
+        if (!cancelled) holdTimer = window.setTimeout(onComplete, HOLD_MS);
+      });
     };
 
     frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
+
+    return () => {
+      // The hold timer needs clearing too — cancelling only the frame left
+      // `onComplete` able to fire after unmount.
+      cancelled = true;
+      cancelAnimationFrame(frame);
+      window.clearTimeout(holdTimer);
+    };
   }, [onComplete]);
 
   return (

@@ -6,6 +6,7 @@ import MyInterests from "@/components/off-hours/MyInterests";
 import Carousel3D from "@/components/off-hours/Carousel3D";
 import { hobbies, nowItems } from "@/data/offHours";
 import { cn } from "@/lib/utils";
+import { sectionHref } from "@/lib/links";
 
 const NOW_ITEMS_LOOP = [...nowItems, ...nowItems];
 
@@ -180,7 +181,7 @@ function Closing() {
         </blockquote>
         <small className="text-[0.85rem] text-muted">— Priya, probably on a train</small>
         <a
-          href="/#top"
+          href={sectionHref("top")}
           className="mt-3 inline-flex items-center gap-2 font-mono text-[0.65rem] tracking-[0.09em] text-muted uppercase transition-colors hover:text-ink"
         >
           ← back to work

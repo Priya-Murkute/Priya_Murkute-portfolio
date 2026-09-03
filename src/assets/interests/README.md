@@ -30,7 +30,7 @@ browser console in dev mode (`npm run dev`) for a warning naming the exact
 file if something you added isn't appearing.
 
 If this folder has no images in it, the scroller falls back to the
-placeholder gradients in `src/data/gallery.ts` — add one real file here and
+placeholder gradients in `src/data/galleryPlaceholders.ts` — add one real file here and
 the placeholders are replaced entirely.
 
 ## The photos already in here

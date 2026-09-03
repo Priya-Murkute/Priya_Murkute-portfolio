@@ -1,9 +1,13 @@
 # Priya Murkute — Portfolio
 
 ## Live site
-🚧 [Deploy in progress — link will be added here after first Vercel deployment]
 
-_After deploying to Vercel, update this line with your live URL and remove the 🚧 emoji._
+https://priya-murkute-portfolio.vercel.app
+
+> The same URL is written into `index.html` (canonical, Open Graph, JSON-LD),
+> `public/robots.txt` and `public/sitemap.xml`. If the Vercel project ends up
+> on a different subdomain, change it in those three files — a wrong absolute
+> URL means the social preview image silently fails to load.
 
 A personal QA portfolio. Calm, near-white, typographic: soft Haikei-style
 gradient and wave SVGs behind the content, one green accent borrowed from a
@@ -21,9 +25,44 @@ npm run dev
 Open the local URL it prints (usually http://localhost:5173).
 
 ```bash
+npm run lint        # ESLint: hook rules + jsx-a11y
 npm run typecheck   # tsc -b --force, no emit beyond build info
 npm run build       # static dist/, deployable anywhere
+npm test            # Playwright, against the production build
 ```
+
+Three generator scripts produce committed artefacts. None of them run during
+`npm run build` — run them by hand when their inputs change:
+
+```bash
+npm run cv          # public/Priya-Murkute-CV.pdf, from src/data/resume.ts
+npm run cv -- --preview   # ...and a cv-preview.png to actually look at
+npm run og          # public/og-image.png, the social preview card
+npm run images      # converts new gallery photos to width-capped WebP
+```
+
+## Testing
+
+`tests/` holds a Playwright suite that runs against the real production
+build (`playwright.config.ts` builds and serves it), across Chromium, a Pixel
+5 viewport and WebKit. It covers the things most likely to break silently:
+
+- **theme** — persists across reloads and routes, and is applied *before first
+  paint* (the test blocks the JS bundle entirely and still expects `.dark`,
+  which is what stops a white flash for dark-mode visitors).
+- **navigation** — every section anchor is built from the deploy base path, so
+  the GitHub Pages subpath can't be broken by writing a bare `/#work`. Also
+  covers the mobile drawer, the 404 route and the CV download resolving.
+- **work dialog** — Escape, the close button, focus trap, focus return to the
+  trigger, and `inert` on the page behind it.
+- **github feed** — renders, filters forks, degrades to a profile link when
+  rate-limited, and answers a second visit from the session cache.
+
+On Windows, WebKit crashes its worker at full concurrency, so the config caps
+workers at 2 there. CI (Linux) is unaffected.
+
+`.github/workflows/ci.yml` runs lint, typecheck, build and the full suite on
+every push and PR.
 
 ## Deploy
 
@@ -57,9 +96,14 @@ subpath handling and deploys are simpler to reason about.
 ## Where the content lives
 
 `src/data/resume.ts` is the single source of truth. Every word on the page
-comes from it — headline metrics, the six work entries and their dialog copy,
-both roles, education, skill groups, contact details. Edit that file; don't
-edit the components.
+comes from it — headline metrics, the work entries and their dialog copy, the
+three roles, education, skill groups, contact details — and so does the
+generated CV. Edit that file; don't edit the components.
+
+Counts and handles are derived, never retyped: the Work heading counts its own
+entries, `githubHandle`/`linkedinHandle` are parsed off the profile URLs (the
+GitHub API call uses the same value), and `yearsExperience` feeds the
+SpecSuite footer. Adding a seventh work item updates the heading by itself.
 
 The types it satisfies are in `src/types.ts`. Two of them are worth knowing
 about:
@@ -73,35 +117,50 @@ about:
 ```
 src/
 ├── main.tsx
-├── App.tsx                    # section order, grain overlay, routing
+├── App.tsx                    # routing, preloader gate, page error boundary
 ├── styles.css                 # the whole design system (see below)
 ├── types.ts
-├── lib/utils.ts               # cn() = twMerge(clsx(...))
-├── data/resume.ts             # all content
+├── lib/
+│   ├── utils.ts               # cn() = twMerge(clsx(...))
+│   ├── links.ts               # sectionHref/publicHref — base-path-aware URLs
+│   ├── gallery.ts             # shared filename grammar for both galleries
+│   ├── cherryBlossom.ts       # one sakura gradient + a seeded PRNG
+│   └── useOnScreen.ts         # pauses ambient animation off-screen
+├── data/
+│   ├── resume.ts              # all résumé content
+│   ├── offHours.ts            # About Me content
+│   ├── artGallery.ts          # auto-discovers src/assets/art/
+│   ├── interestsGallery.ts    # auto-discovers src/assets/interests/
+│   └── galleryPlaceholders.ts # fallback gradients while those folders are empty
+├── pages/                     # AboutMe (also served at /off-hours), NotFound
 └── components/
     ├── NavBar.tsx             # border appears past 24px, scroll progress, theme switch
     ├── Hero.tsx               # headline + SpecSuite
     ├── SpecSuite.tsx          # achievements as a passing test run
-    ├── Stats.tsx
-    ├── About.tsx
-    ├── Work.tsx               # six cards, each opening a morphing dialog
-    ├── Experience.tsx
-    ├── Volunteering.tsx       # unpaid work, kept out of the paid-roles timeline
-    ├── Skills.tsx
-    ├── Certifications.tsx
-    ├── Contact.tsx
-    ├── Footer.tsx
+    ├── Work.tsx               # cards, each opening a morphing dialog
+    ├── Projects.tsx           # live GitHub feed, session-cached
+    ├── HeroScene.tsx          # gates the lazy 3D scene on idle + visibility
+    ├── ErrorBoundary.tsx      # page-level fallback; also wraps the 3D scene
     ├── Backgrounds.tsx        # BlurryGradient, LayeredWaves, StackedWaves
+    ├── off-hours/             # Carousel3D, MyInterests
     └── motion-primitives/     # local copies, APIs matching motion-primitives.com
+
+scripts/                       # generators for the committed artefacts
+tests/                         # Playwright specs
 ```
 
-`public/Priya-Murkute-CV.pdf` is what the two Download CV buttons serve. It's
-generated from the same facts as `resume.ts`; if you change a role or a metric
-there, regenerate or hand-edit the PDF so the two don't drift. **This is
-currently out of sync** — `resume.ts` was rewritten from the real LinkedIn
-export (split Wipro roles, corrected MSc year, real stats, new Certifications
-and Volunteering sections) but the PDF wasn't regenerated, since it's a
-binary this repo can't edit for you.
+### The CV
+
+`public/Priya-Murkute-CV.pdf` is what the Download CV button serves, and it is
+**generated from `src/data/resume.ts`** by `npm run cv` — Playwright's Chromium
+prints an HTML template styled with the site's own type. Edit `resume.ts`, run
+`npm run cv`, commit the PDF.
+
+It used to be a hand-made file, and it had drifted badly: different headline
+metrics from the site, one merged Wipro role instead of the two real ones, and
+the MSc dated 2024 rather than 2023. Generating it removes that whole class of
+problem — the CV cannot disagree with the site about a fact, because there is
+only one copy of each fact.
 
 ## The design system
 
@@ -123,27 +182,50 @@ components layer, a one-off `pt-32` on a section still works.
 ## motion-primitives
 
 `src/components/motion-primitives/` holds local copies of TextEffect, InView,
-AnimatedGroup, Spotlight, BorderTrail, Magnetic, AnimatedNumber,
-ScrollProgress and MorphingDialog. The prop APIs match the upstream site, and
+AnimatedGroup, Spotlight, Magnetic, AnimatedNumber, ScrollProgress and
+MorphingDialog. The prop APIs match the upstream site, and
 the three things upstream code expects are all in place — `motion/react`, a
 `cn()` at `@/lib/utils`, and the `@/*` alias in both `tsconfig.json` and
 `vite.config.ts` — so a component pasted from motion-primitives.com should
 work without edits.
 
-Two local deviations, both to satisfy `strict` TypeScript: `Spotlight` takes an
-explicit `color` prop instead of relying on Tailwind's gradient custom
-properties, and the polymorphic `as` props accept a short list of tags rather
-than every intrinsic element, because the full union is too wide for TS to
-resolve.
+Local deviations, each for a stated reason: `Spotlight` takes an explicit
+`color` prop instead of relying on Tailwind's gradient custom properties, and
+the polymorphic `as` props accept a short list of tags rather than every
+intrinsic element, because the full union is too wide for TS to resolve.
+`Magnetic` caches its bounding rect instead of reading it inside the mousemove
+handler — upstream forces a layout reflow on every mouse move, for the whole
+page lifetime, before checking whether the cursor is anywhere near. And
+`MorphingDialog` adds a real focus trap and `inert` on the app root.
+
+Because that directory tracks upstream, `eslint.config.js` turns off the two
+React-Compiler-era hook rules there — `motion.create(as)` inside a `useMemo` is
+their documented pattern for polymorphic components. The accessibility rules
+still apply, and they caught a genuine dialog bug.
 
 ## Accessibility
 
 Skip link, visible `:focus-visible` outlines, `aria-hidden` on all decorative
-SVG, screen-reader copy behind the animated headline, a dialog that traps
-Escape and returns focus to its trigger, and `prefers-reduced-motion` honoured
-in CSS and in `SpecSuite` (which jumps straight to its finished state).
+SVG, and screen-reader copy behind the animated headline.
+
+The Work dialog implements what a native `<dialog>` gives for free: Escape,
+a focus trap, focus return to the trigger, and `inert` on the app root so a
+screen reader can't wander the page underneath it. All five are covered by
+`tests/work-dialog.spec.ts`.
+
+`prefers-reduced-motion` is honoured in CSS and in `SpecSuite` (which jumps
+straight to its finished state), and ambient animation — the 3D petals, the
+petal scatter — stops entirely when its section scrolls out of view.
+
+Text colours meet WCAG AA. `--ink-faint` in particular carries a lot of the
+site's small type (every `.eyebrow`, the mono captions, the footer, timeline
+locations); it previously measured ~2.6:1 on paper, well under the 4.5:1 that
+size needs, and is now 4.9:1 in light and 6.0:1 in dark.
 
 The theme switch reports state as text (`light` / `dark`) rather than a sun or
 moon glyph. State lives in `ThemeContext` (`src/context/ThemeContext.tsx`) and
-persists to `localStorage` under `pm-theme`, so it's remembered across
-reloads and route changes instead of resetting to light every visit.
+persists to `localStorage` under `pm-theme`. A small inline script in
+`index.html` applies it **before first paint** — `ThemeProvider` alone can only
+act after React mounts, which is after the browser has already painted a light
+page, so dark-mode visitors saw a white flash on every load. The storage key
+is duplicated between those two files by necessity; keep them in step.

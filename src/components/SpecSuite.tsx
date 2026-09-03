@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
-import { assertions } from "@/data/resume";
+import { assertions, profile } from "@/data/resume";
 
 /**
  * The signature element: the résumé's claims, written as the assertions they
@@ -51,9 +51,11 @@ export default function SpecSuite() {
           {passed} passing
         </motion.span>
         <span className="text-faint">·</span>
+        {/* A constant of the conceit rather than a count: none of these
+            assertions is written to fail. */}
         <span className="text-faint">0 failing</span>
         <span className="text-faint">·</span>
-        <span className="text-faint">3 years</span>
+        <span className="text-faint">{profile.yearsExperience} years</span>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { profile } from "@/data/resume";
+import { githubHandle, profile } from "@/data/resume";
 import { InView } from "@/components/motion-primitives/in-view";
 import { LayeredWaves } from "@/components/Backgrounds";
 
@@ -14,10 +14,40 @@ type Repo = {
   fork: boolean;
 };
 
-const GITHUB_USERNAME = "Priya-Murkute";
 const MAX_REPOS = 6;
 
+/**
+ * Asks for a little more than it shows, because forks and the profile README
+ * repo get filtered out below. Deliberately not `per_page=100`: the
+ * unauthenticated GitHub API allows 60 requests per hour *per IP*, and a
+ * visitor behind a shared corporate NAT can arrive to find the budget already
+ * spent — so the response is also cached for the session.
+ */
+const PER_PAGE = 12;
+const CACHE_KEY = "pm-github-repos";
+const CACHE_TTL_MS = 30 * 60 * 1000;
+
 type FetchState = { status: "loading" } | { status: "error" } | { status: "ready"; repos: Repo[] };
+
+function readCachedRepos(): Repo[] | null {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const cached = JSON.parse(raw) as { at: number; repos: Repo[] };
+    if (!Array.isArray(cached.repos) || Date.now() - cached.at > CACHE_TTL_MS) return null;
+    return cached.repos;
+  } catch {
+    return null;
+  }
+}
+
+function writeCachedRepos(repos: Repo[]) {
+  try {
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), repos }));
+  } catch {
+    // sessionStorage unavailable or full — the feed just refetches next time
+  }
+}
 
 function formatRepoName(name: string) {
   return name.replace(/[-_]+/g, " ");
@@ -34,12 +64,21 @@ function formatDate(iso: string) {
  * username) and forks are filtered out — neither is really "a project."
  */
 export default function Projects() {
-  const [state, setState] = useState<FetchState>({ status: "loading" });
+  // Seeded from the session cache so a second visit to the homepage renders
+  // the list immediately, with no skeleton and no second API call.
+  const [state, setState] = useState<FetchState>(() => {
+    const cached = readCachedRepos();
+    return cached ? { status: "ready", repos: cached } : { status: "loading" };
+  });
 
   useEffect(() => {
+    if (state.status === "ready") return;
+
     let cancelled = false;
 
-    fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=pushed&direction=desc&per_page=100`)
+    fetch(
+      `https://api.github.com/users/${githubHandle}/repos?sort=pushed&direction=desc&per_page=${PER_PAGE}`,
+    )
       .then((response) => {
         if (!response.ok) throw new Error(`GitHub responded ${response.status}`);
         return response.json() as Promise<Repo[]>;
@@ -47,8 +86,9 @@ export default function Projects() {
       .then((data) => {
         if (cancelled) return;
         const repos = data
-          .filter((repo) => !repo.fork && repo.name.toLowerCase() !== GITHUB_USERNAME.toLowerCase())
+          .filter((repo) => !repo.fork && repo.name.toLowerCase() !== githubHandle.toLowerCase())
           .slice(0, MAX_REPOS);
+        writeCachedRepos(repos);
         setState({ status: "ready", repos });
       })
       .catch(() => {
@@ -58,6 +98,8 @@ export default function Projects() {
     return () => {
       cancelled = true;
     };
+    // Runs once: the guard above short-circuits if the cache already filled state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -80,7 +122,7 @@ export default function Projects() {
               rel="noreferrer"
               className="underline decoration-line-strong underline-offset-4 hover:text-ink"
             >
-              github.com/{GITHUB_USERNAME}
+              github.com/{githubHandle}
             </a>{" "}
             — this list changes as the repos do.
           </p>

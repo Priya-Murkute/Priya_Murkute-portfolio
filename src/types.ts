@@ -92,6 +92,10 @@ export interface Profile {
   linkedin: string;
   summary: string;
   cvPath: string;
+  /** Years of professional QA experience, so no component has to hardcode it. */
+  yearsExperience: number;
+  /** CV-only: printed by scripts/generate-cv.ts, never shown on the site. */
+  phone: string;
 }
 
 /** A photo in the About Me "My Interests" scroller. `column` and `height`

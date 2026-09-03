@@ -200,17 +200,31 @@ function Scene({ isDark, animate }: { isDark: boolean; animate: boolean }) {
   );
 }
 
-export default function HeroSceneCanvas({ animate }: { animate: boolean }) {
+export default function HeroSceneCanvas({
+  animate,
+  isOnScreen,
+}: {
+  animate: boolean;
+  /** False once the hero scrolls away — stops the render loop entirely. */
+  isOnScreen: boolean;
+}) {
   // Petals/Scene below run inside react-three-fiber's own Canvas reconciler,
   // a separate React root that context doesn't reliably bridge into — so
   // isDark is read from context once here, outside the Canvas, and handed
   // down to them as a plain prop instead.
   const { isDark } = useTheme();
 
+  // "never" doesn't just skip useFrame — it stops r3f rendering at all, so an
+  // off-screen hero costs nothing instead of running at 60fps for the life of
+  // the page. Under reduced motion the scene still needs one frame to appear,
+  // which "demand" gives it (r3f renders once on mount and on prop changes).
+  const frameloop = !animate ? "demand" : isOnScreen ? "always" : "never";
+
   return (
     <Canvas
       camera={{ position: [0, 0, 9], fov: 45 }}
       dpr={[1, 1.5]}
+      frameloop={frameloop}
       gl={{ alpha: true, antialias: true }}
       style={{ pointerEvents: "none" }}
     >

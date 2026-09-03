@@ -4,13 +4,14 @@ import { ScrollProgress } from "@/components/motion-primitives/scroll-progress";
 import MobileNav from "@/components/MobileNav";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
+import { sectionHref } from "@/lib/links";
 
 export const navLinks = [
-  { href: "/#work", label: "Work" },
-  { href: "/#projects", label: "Projects" },
-  { href: "/#experience", label: "Experience" },
-  { href: "/#skills", label: "Skills" },
-  { href: "/#contact", label: "Contact" },
+  { href: sectionHref("work"), label: "Work" },
+  { href: sectionHref("projects"), label: "Projects" },
+  { href: sectionHref("experience"), label: "Experience" },
+  { href: sectionHref("skills"), label: "Skills" },
+  { href: sectionHref("contact"), label: "Contact" },
 ];
 
 export default function NavBar({
@@ -39,7 +40,7 @@ export default function NavBar({
         )}
       >
         <nav className="shell flex h-16 items-center justify-between gap-6">
-          <a href="/#top" className="group flex items-baseline gap-2.5">
+          <a href={sectionHref("top")} className="group flex items-baseline gap-2.5">
             <span className="font-mono text-[0.8125rem] tracking-tight text-pass">PM</span>
             <span className="text-sm font-medium tracking-tight">Priya Murkute</span>
           </a>

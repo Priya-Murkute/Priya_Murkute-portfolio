@@ -1,13 +1,14 @@
 import { motion } from "motion/react";
-import { profile } from "@/data/resume";
+import { githubHandle, linkedinHandle, profile } from "@/data/resume";
 import { TextEffect } from "@/components/motion-primitives/text-effect";
 import { InView } from "@/components/motion-primitives/in-view";
 import PetalScatter from "@/components/PetalScatter";
+import { publicHref } from "@/lib/links";
 
 const channels = [
   { label: "Email", value: profile.email, href: `mailto:${profile.email}` },
-  { label: "GitHub", value: "Priya-Murkute", href: profile.github },
-  { label: "LinkedIn", value: "priya-murkute-oct7", href: profile.linkedin },
+  { label: "GitHub", value: githubHandle, href: profile.github },
+  { label: "LinkedIn", value: linkedinHandle, href: profile.linkedin },
 ];
 
 /**
@@ -46,7 +47,7 @@ export default function Contact() {
           </TextEffect>
 
           <a
-            href={`${import.meta.env.BASE_URL}${profile.cvPath}`}
+            href={publicHref(profile.cvPath)}
             download
             className="glow-cta mt-10 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-px"
           >

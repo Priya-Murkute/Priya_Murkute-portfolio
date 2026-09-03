@@ -14,6 +14,29 @@ import {
   MorphingDialogTrigger,
 } from "@/components/motion-primitives/morphing-dialog";
 
+/**
+ * Keeps the heading's voice ("Six things...") while letting the data decide
+ * the number — the heading used to be typed out, so adding a seventh work
+ * item made the page quietly untrue.
+ */
+const NUMBER_WORDS = [
+  "No",
+  "One",
+  "Two",
+  "Three",
+  "Four",
+  "Five",
+  "Six",
+  "Seven",
+  "Eight",
+  "Nine",
+  "Ten",
+];
+
+function inWords(count: number): string {
+  return NUMBER_WORDS[count] ?? String(count);
+}
+
 export default function Work() {
   return (
     <section id="work" className="section relative">
@@ -24,7 +47,7 @@ export default function Work() {
           <div>
             <p className="eyebrow">Selected work</p>
             <h2 className="text-title mt-3 max-w-[26ch] font-display font-semibold">
-              Six things worth showing you.
+              {inWords(work.length)} things worth showing you.
             </h2>
           </div>
           <p className="measure text-sm text-muted sm:max-w-xs">
