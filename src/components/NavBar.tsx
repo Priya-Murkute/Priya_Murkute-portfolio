@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils";
 import { sectionHref } from "@/lib/links";
 
 export const navLinks = [
-  { href: sectionHref("work"), label: "Work" },
-  { href: sectionHref("projects"), label: "Projects" },
   { href: sectionHref("experience"), label: "Experience" },
+  { href: sectionHref("projects"), label: "Projects" },
+  { href: sectionHref("certifications"), label: "Certifications" },
   { href: sectionHref("skills"), label: "Skills" },
   { href: sectionHref("contact"), label: "Contact" },
 ];
@@ -44,7 +44,7 @@ export default function NavBar({
 
           <div className="flex items-center gap-1">
             {showSectionLinks ? (
-              <ul className="hidden items-center gap-1 sm:flex">
+              <ul className="hidden items-center gap-1 md:flex">
                 {navLinks.map((link) => (
                   <li key={link.href}>
                     <a
@@ -63,7 +63,7 @@ export default function NavBar({
                 type="button"
                 onClick={() => setIsMenuOpen(true)}
                 aria-label="Open menu"
-                className="ml-1 flex size-8 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-line-strong hover:text-ink sm:hidden"
+                className="ml-1 flex size-8 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-line-strong hover:text-ink md:hidden"
               >
                 <svg viewBox="0 0 16 16" className="size-3.5" fill="none" aria-hidden="true">
                   <path

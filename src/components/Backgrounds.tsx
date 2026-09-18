@@ -113,9 +113,9 @@ export function StackedWaves({ className }: { className?: string }) {
   const { ref, isOnScreen } = useOnScreen<HTMLDivElement>("100px");
 
   const layers = [
-    { offset: 0, fill: "var(--halo-mint)", opacity: 0.7, duration: 12 },
-    { offset: 34, fill: "var(--halo-sage)", opacity: 0.55, duration: 15 },
-    { offset: 68, fill: "var(--halo-sky)", opacity: 0.4, duration: 18 },
+    { offset: 0, fill: "var(--wave-1)", opacity: 0.7, duration: 12 },
+    { offset: 34, fill: "var(--wave-2)", opacity: 0.55, duration: 15 },
+    { offset: 68, fill: "var(--wave-3)", opacity: 0.4, duration: 18 },
   ];
 
   return (

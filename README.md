@@ -51,12 +51,11 @@ build (`playwright.config.ts` builds and serves it), across Chromium, a Pixel
   paint* (the test blocks the JS bundle entirely and still expects `.dark`,
   which is what stops a white flash for dark-mode visitors).
 - **navigation** — every section anchor is built from the deploy base path, so
-  the GitHub Pages subpath can't be broken by writing a bare `/#work`. Also
+  the GitHub Pages subpath can't be broken by writing a bare `/#experience`. Also
   covers the mobile drawer, the 404 route and the CV download resolving.
-- **work dialog** — Escape, the close button, focus trap, focus return to the
-  trigger, and `inert` on the page behind it.
 - **github feed** — renders, filters forks, degrades to a profile link when
-  rate-limited, and answers a second visit from the session cache.
+  rate-limited, answers a second visit from the session cache, and exposes
+  each repo once despite the drifting row painting it several times.
 
 On Windows, WebKit crashes its worker at full concurrency, so the config caps
 workers at 2 there. CI (Linux) is unaffected.
@@ -115,21 +114,16 @@ and paste the result into `vercel.json`'s `script-src` directive.
 ## Where the content lives
 
 `src/data/resume.ts` is the single source of truth. Every word on the page
-comes from it — headline metrics, the work entries and their dialog copy, the
-three roles, education, skill groups, contact details — and so does the
-generated CV. Edit that file; don't edit the components.
+comes from it — headline metrics, the three roles,
+projects and certifications, education, skill groups, contact details — and
+so does the generated CV. Edit that file; don't edit the components.
 
-Counts and handles are derived, never retyped: the Work heading counts its own
-entries, `githubHandle`/`linkedinHandle` are parsed off the profile URLs (the
-GitHub API call uses the same value), and `yearsExperience` feeds the
-SpecSuite footer. Adding a seventh work item updates the heading by itself.
+Handles are derived, never retyped: `githubHandle`/`linkedinHandle` are parsed
+off the profile URLs (the GitHub API call uses the same value), and
+`yearsExperience` feeds the hero's How I think card footer.
 
-The types it satisfies are in `src/types.ts`. Two of them are worth knowing
-about:
-
-- `Signal` (`pass` / `flaky` / `fail`) only ever chooses a colour.
-- `WorkStatus` (`measured` / `ongoing`) labels the work. It's deliberately a
-  separate type — "flaky" is not a word to attach to a tester's own work.
+The types it satisfies are in `src/types.ts`. `Signal` (`pass` / `flaky` /
+`fail`) only ever chooses a colour — it never labels her work.
 
 ## Project structure
 
@@ -147,6 +141,8 @@ src/
 │   ├── links.ts               # sectionHref/publicHref — base-path-aware URLs
 │   ├── gallery.ts             # shared filename grammar for both galleries
 │   ├── cherryBlossom.ts       # one sakura gradient + a seeded PRNG
+│   ├── petalRelease.ts        # page → 3D scene channel: "release a petal here"
+│   ├── useNamePetals.ts       # the hero name sheds petals on hover, and once per visit
 │   └── useOnScreen.ts         # pauses ambient animation off-screen
 ├── data/
 │   ├── resume.ts              # all résumé content
@@ -157,12 +153,12 @@ src/
 ├── pages/                     # AboutMe (also served at /off-hours), NotFound
 └── components/
     ├── NavBar.tsx             # border appears past 24px, scroll progress, theme switch
-    ├── Hero.tsx               # headline + SpecSuite
-    ├── SpecSuite.tsx          # achievements as a passing test run
-    ├── Work.tsx               # cards, each opening a morphing dialog
-    ├── Projects.tsx           # live GitHub feed, session-cached
+    ├── Hero.tsx               # headline + How I think card
+    ├── HowIThink.tsx          # Test → Analyse → Improve, ticking on then cycling
+    ├── Showcase.tsx           # projects & certifications, tabbed by track
+    ├── Projects.tsx           # live GitHub feed as a slow drifting row, session-cached
     ├── HeroScene.tsx          # gates the lazy 3D scene on idle + visibility
-    ├── HeroSceneBackdrop.tsx, HeroSceneCanvas.tsx  # the r3f canvas itself
+    ├── HeroSceneBackdrop.tsx, HeroSceneCanvas.tsx  # the r3f canvas: ambient petals + ones released from the name
     ├── ErrorBoundary.tsx      # page-level fallback; also wraps the 3D scene
     ├── Preloader.tsx          # "running the suite before you arrive"; once per session
     ├── CursorGlow.tsx         # cursor-trailing glow, fine-pointer only
@@ -171,8 +167,8 @@ src/
     ├── AboutMeLink.tsx        # Hero's link into /about-me
     ├── PullQuote.tsx          # the full-bleed editorial line between sections
     ├── MobileNav.tsx          # the small-viewport nav drawer
-    ├── About.tsx, Stats.tsx, Experience.tsx, Volunteering.tsx,
-    │   Skills.tsx, Certifications.tsx, Contact.tsx, Footer.tsx
+    ├── Education.tsx, Stats.tsx, Experience.tsx, Volunteering.tsx,
+    │   Skills.tsx, Contact.tsx, Footer.tsx
     │                          # one straightforward renderer per résumé section
     ├── off-hours/             # Carousel3D, MyInterests
     └── motion-primitives/     # local copies, APIs matching motion-primitives.com
@@ -228,7 +224,9 @@ intrinsic element, because the full union is too wide for TS to resolve.
 `Magnetic` caches its bounding rect instead of reading it inside the mousemove
 handler — upstream forces a layout reflow on every mouse move, for the whole
 page lifetime, before checking whether the cursor is anywhere near. And
-`MorphingDialog` adds a real focus trap and `inert` on the app root.
+`MorphingDialog` adds a real focus trap and `inert` on the app root. (Nothing
+on the site uses it since the Work section was merged into Experience; it's
+kept as a ready, accessible modal.)
 
 Because that directory tracks upstream, `eslint.config.js` turns off the two
 React-Compiler-era hook rules there — `motion.create(as)` inside a `useMemo` is
@@ -240,14 +238,14 @@ still apply, and they caught a genuine dialog bug.
 Skip link, visible `:focus-visible` outlines, `aria-hidden` on all decorative
 SVG, and screen-reader copy behind the animated headline.
 
-The Work dialog implements what a native `<dialog>` gives for free: Escape,
-a focus trap, focus return to the trigger, and `inert` on the app root so a
-screen reader can't wander the page underneath it. All five are covered by
-`tests/work-dialog.spec.ts`.
+The GitHub row paints each repo several times to loop seamlessly; only the
+first copy is in the accessibility tree and the tab order, and the row pauses
+on hover and keyboard focus.
 
-`prefers-reduced-motion` is honoured in CSS and in `SpecSuite` (which jumps
-straight to its finished state), and ambient animation — the 3D petals, the
-petal scatter — stops entirely when its section scrolls out of view.
+`prefers-reduced-motion` is honoured in CSS, in `HowIThink` (which jumps
+straight to its finished state and doesn't cycle) and in the GitHub row (a
+still, swipeable list), and ambient animation — the 3D petals, the petal
+scatter, the GitHub row — stops entirely when its section scrolls out of view.
 
 Text colours meet WCAG AA. `--ink-faint` in particular carries a lot of the
 site's small type (every `.eyebrow`, the mono captions, the footer, timeline

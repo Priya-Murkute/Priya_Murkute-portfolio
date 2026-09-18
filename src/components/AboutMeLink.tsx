@@ -25,8 +25,9 @@ const arrowVariants = {
 };
 
 /**
- * The Hero's single call to action. One shared variant state propagates from
- * the wrapping motion.div, so the whole thing animates together on hover.
+ * The Hero's secondary call to action, beside "View My Work". One shared
+ * variant state propagates from the wrapping motion.div, so the whole thing
+ * animates together on hover.
  */
 export default function AboutMeLink() {
   return (
@@ -34,22 +35,22 @@ export default function AboutMeLink() {
       <motion.div initial="rest" whileHover="hover" whileTap={{ scale: 0.97 }} className="w-fit">
         <Link
           to="/about-me"
-          className="glow-cta inline-flex items-center gap-2.5 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-px"
+          className="inline-flex items-center gap-2.5 rounded-full border border-line-strong bg-surface px-5 py-2.5 text-sm font-medium text-ink transition-transform hover:-translate-y-px"
         >
           <motion.span variants={textVariants} transition={SPRING} className="relative">
-            Click here to know me
+            About Me
             <motion.span
               variants={underlineVariants}
               transition={SPRING}
               style={{ originX: 0 }}
-              className="absolute -bottom-1 left-0 h-px w-full bg-paper"
+              className="absolute -bottom-1 left-0 h-px w-full bg-ink"
             />
           </motion.span>
 
           <motion.span
             variants={badgeVariants}
             transition={SPRING}
-            className="flex size-5 flex-none items-center justify-center rounded-full bg-paper text-ink"
+            className="flex size-5 flex-none items-center justify-center rounded-full bg-ink text-paper"
           >
             <motion.svg
               variants={arrowVariants}

@@ -53,8 +53,8 @@ const groupMeta: Record<string, { color: string; icon: ReactNode }> = {
       </>
     ),
   },
-  "CI/CD & data": {
-    color: "var(--accent-violet)",
+  "CI/CD & tooling": {
+    color: "var(--accent-rose)",
     icon: (
       <>
         <circle cx="3" cy="8" r="1.3" />
@@ -63,6 +63,11 @@ const groupMeta: Record<string, { color: string; icon: ReactNode }> = {
         <path d="M4.3 8h2.3M9.4 8h2.3" />
       </>
     ),
+  },
+  /** Violet, to match the Data & Analytics tab and the hero's Analyse step. */
+  "Data & Analytics": {
+    color: "var(--accent-violet)",
+    icon: <path d="M2.5 13.5h11M5 11V8M8 11V4.5M11 11V6.5" />,
   },
 };
 

@@ -1,5 +1,5 @@
 /**
- * Anchors must be built from Vite's `base`, never written as a bare "/#work" —
+ * Anchors must be built from Vite's `base`, never written as a bare "/#experience" —
  * an origin-absolute href ignores it and breaks the GitHub Pages subpath.
  */
 export function sectionHref(id: string): string {

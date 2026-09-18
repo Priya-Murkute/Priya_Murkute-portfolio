@@ -3,12 +3,24 @@ import { Link } from "react-router-dom";
 import { profile } from "@/data/resume";
 import { BlurryGradient } from "@/components/Backgrounds";
 import HeroSceneBackdrop from "@/components/HeroSceneBackdrop";
-import SpecSuite from "@/components/SpecSuite";
+import HowIThink from "@/components/HowIThink";
 import AboutMeLink from "@/components/AboutMeLink";
 import { TextEffect } from "@/components/motion-primitives/text-effect";
 import { AnimatedGroup } from "@/components/motion-primitives/animated-group";
+import { sectionHref } from "@/lib/links";
+import { useNamePetals } from "@/lib/useNamePetals";
+
+/** Second sentence of the headline gets the accent colour. */
+const [headlineStart, headlineEnd] = profile.headline.split(/(?<=\.)\s+/, 2);
 
 export default function Hero() {
+  // The name sheds petals into the falling-petals scene behind it.
+  const {
+    ref: nameRef,
+    onPointerEnter: onNameEnter,
+    onPointerMove: onNameMove,
+  } = useNamePetals<HTMLAnchorElement>();
+
   return (
     <section id="top" className="section relative overflow-hidden pt-32 sm:pt-36">
       <motion.div
@@ -35,6 +47,9 @@ export default function Hero() {
             }}
           >
             <Link
+              ref={nameRef}
+              onPointerEnter={onNameEnter}
+              onPointerMove={onNameMove}
               to="/about-me"
               aria-label={`${profile.name} — read more about me`}
               className="inline-block transition-opacity hover:opacity-80"
@@ -51,10 +66,17 @@ export default function Hero() {
               </TextEffect>
             </Link>
 
+            <p className="text-title max-w-[20ch] font-display font-semibold">
+              {headlineStart}{" "}
+              {headlineEnd ? <span className="text-pass">{headlineEnd}</span> : null}
+            </p>
+
+            <p className="measure text-lead text-muted">{profile.tagline}</p>
+
             <div className="flex flex-wrap items-center gap-2 font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-faint">
-              <span>
-                {profile.title} · {profile.location}
-              </span>
+              <span className="text-ink">{profile.keywords.join("  ·  ")}</span>
+              <span aria-hidden="true">·</span>
+              <span>{profile.location}</span>
               <span aria-hidden="true">·</span>
               <span className="inline-flex items-center gap-1.5 text-pass">
                 <span className="status-dot bg-pass" />
@@ -62,21 +84,26 @@ export default function Hero() {
               </span>
             </div>
 
-            <p className="measure text-lead text-muted">{profile.summary}</p>
-
             <div className="flex flex-wrap items-center gap-3 pt-1">
+              <a
+                href={sectionHref("experience")}
+                className="glow-cta inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-px"
+              >
+                View My Work
+                <span aria-hidden="true">↓</span>
+              </a>
               <AboutMeLink />
             </div>
           </AnimatedGroup>
         </div>
 
         <motion.div
-          className="lg:col-span-5 mt-6 sm:mt-12"
+          className="mt-6 w-full max-w-sm sm:mt-12 lg:col-span-5 lg:ml-auto"
           initial={{ opacity: 0, y: 46, scale: 0.95, filter: "blur(14px)" }}
           animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
           transition={{ type: "spring", bounce: 0.22, duration: 1.1, delay: 0.42 }}
         >
-          <SpecSuite />
+          <HowIThink />
         </motion.div>
       </div>
     </section>
