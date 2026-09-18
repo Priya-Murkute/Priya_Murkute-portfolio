@@ -193,9 +193,9 @@ const html = `<!doctype html>
   <header>
     <h1>${escapeHtml(profile.name)}</h1>
     <p class="role-line">${escapeHtml(profile.title)} · ${escapeHtml(profile.location)}</p>
+    <!-- No phone number: contact routes through email/LinkedIn only, same as the live site. -->
     <p class="contact">
       <span><a href="mailto:${escapeHtml(profile.email)}">${escapeHtml(profile.email)}</a></span>
-      <span>${escapeHtml(profile.phone)}</span>
       <span><a href="${escapeHtml(profile.linkedin)}">${escapeHtml(linkedinDisplay)}</a></span>
       <span><a href="${escapeHtml(profile.github)}">${escapeHtml(githubDisplay)}</a></span>
     </p>

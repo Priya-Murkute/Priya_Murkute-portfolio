@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { AnimatePresence, useReducedMotion } from "motion/react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Preloader from "@/components/Preloader";
 import CursorGlow from "@/components/CursorGlow";
 import NavBar from "@/components/NavBar";
@@ -90,7 +90,10 @@ export default function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/about-me" element={<AboutMe />} />
-              <Route path="/off-hours" element={<AboutMe />} />
+              {/* Redirect rather than render a second time — a real 301-ish
+                  client-side redirect collapses this into one indexable URL
+                  instead of two pages fighting over the same canonical. */}
+              <Route path="/off-hours" element={<Navigate to="/about-me" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </ErrorBoundary>

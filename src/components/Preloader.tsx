@@ -2,8 +2,8 @@ import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { AnimatedNumber } from "@/components/motion-primitives/animated-number";
 
-const DURATION_MS = 900;
-const HOLD_MS = 300;
+const DURATION_MS = 600;
+const HOLD_MS = 150;
 
 /**
  * A short "test suite" run rather than a spinner. Mounted exclusively, so the

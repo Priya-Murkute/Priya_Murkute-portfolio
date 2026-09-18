@@ -76,6 +76,11 @@ function InterestPhotoCard({ photo }: { photo: InterestPhoto }) {
           alt={photo.title}
           loading="lazy"
           decoding="async"
+          /* From the optimize-images manifest — reserves the aspect ratio
+             before the file loads instead of shifting layout as it lands.
+             h-auto keeps it responsive; these only set the ratio. */
+          width={photo.width}
+          height={photo.imageHeight}
           className="block h-auto w-full transition-transform group-hover/photo:scale-105"
           style={{ transitionDuration: "650ms", transitionTimingFunction: "var(--ease-calm)" }}
         />

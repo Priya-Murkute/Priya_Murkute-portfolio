@@ -42,8 +42,10 @@ interface CreateGalleryOptions<T> {
   /** Prefix for the dev-only skipped-file warning. */
   label: string;
   placeholders: T[];
-  /** `index` is the position in the sorted, newest-first list. */
-  toEntry: (input: { url: string; parsed: ParsedFilename; index: number }) => T;
+  /** `index` is the position in the sorted, newest-first list. `path` is the
+   * original glob key (e.g. "/src/assets/interests/2026-09-01__Photo-01.webp"),
+   * there for callers that need to look a file up by name (e.g. a manifest). */
+  toEntry: (input: { url: string; parsed: ParsedFilename; index: number; path: string }) => T;
 }
 
 export interface Gallery<T> {
@@ -70,10 +72,10 @@ export function createGallery<T>({
         }
         return [];
       }
-      return [{ url, parsed }];
+      return [{ url, parsed, path }];
     })
     .sort((a, b) => (a.parsed.date < b.parsed.date ? 1 : -1))
-    .map(({ url, parsed }, index) => toEntry({ url, parsed, index }));
+    .map(({ url, parsed, path }, index) => toEntry({ url, parsed, index, path }));
 
   return {
     items: discovered.length > 0 ? discovered : placeholders,

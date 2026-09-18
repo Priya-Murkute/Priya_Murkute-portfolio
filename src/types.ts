@@ -94,6 +94,10 @@ export interface InterestPhoto {
   gradient: string;
   height: "tall" | "med" | "short";
   column: "left" | "right";
+  /** Real photos only, from the optimize-images manifest — lets the <img>
+   * reserve its aspect ratio before it loads instead of shifting layout. */
+  width?: number;
+  imageHeight?: number;
 }
 
 export interface Artwork {

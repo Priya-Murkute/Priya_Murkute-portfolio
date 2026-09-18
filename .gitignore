@@ -1,6 +1,6 @@
 node_modules
 dist
-.env
+.env*
 *.tsbuildinfo
 
 # Full-resolution gallery originals, kept on disk by scripts/optimize-images.mjs

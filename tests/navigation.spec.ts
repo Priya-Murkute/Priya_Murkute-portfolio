@@ -61,11 +61,14 @@ test.describe("navigation", () => {
     }
   });
 
-  test("/off-hours and /about-me both render the same page", async ({ page }) => {
+  test("/off-hours redirects to /about-me instead of duplicating it", async ({ page }) => {
     await page.goto("/about-me");
     await expect(page.getByRole("heading", { level: 1 })).toContainText(/artist/i);
 
+    // A real redirect, not a second route rendering the same component — so
+    // there's only one indexable URL for this content, not two.
     await page.goto("/off-hours");
+    await expect(page).toHaveURL(/\/about-me$/);
     await expect(page.getByRole("heading", { level: 1 })).toContainText(/artist/i);
   });
 

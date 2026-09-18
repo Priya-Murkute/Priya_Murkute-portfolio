@@ -49,11 +49,27 @@ async function optimizeFolder({ dir, maxWidth, quality }) {
 
   let before = 0;
   let after = 0;
+  /** filename -> final pixel size, so <img width/height> can reserve layout
+   * before the file loads instead of shifting the page as each one lands. */
+  const manifest = {};
 
   for (const name of images) {
     const source = path.join(absolute, name);
-    const stem = path.basename(name, path.extname(name));
-    const destination = path.join(absolute, `${stem}.webp`);
+    const ext = path.extname(name).toLowerCase();
+    const stem = path.basename(name, ext);
+    const outputName = `${stem}.webp`;
+
+    if (ext === ".webp") {
+      // Already this folder's optimized output from a previous run — just
+      // record its size for the manifest. Re-resizing/re-encoding it would
+      // both compress an already-compressed file (visible generational
+      // loss) and rename it into _originals/ for no reason.
+      const { width, height } = await sharp(source).metadata();
+      manifest[outputName] = { width, height };
+      continue;
+    }
+
+    const destination = path.join(absolute, outputName);
 
     // metadata().size is only populated for buffer input.
     const { size } = await stat(source);
@@ -66,14 +82,21 @@ async function optimizeFolder({ dir, maxWidth, quality }) {
       .webp({ quality })
       .toBuffer();
 
+    // Dimensions of the actual output, not the source — this is what the
+    // browser will render, so it's what width/height must describe.
+    const outputMeta = await sharp(output).metadata();
+    manifest[outputName] = { width: outputMeta.width, height: outputMeta.height };
+
     // Move before writing, so a same-named .webp source isn't clobbered mid-read.
     await rename(source, path.join(originalsDir, name));
     await writeFile(destination, output);
 
     before += size;
     after += output.length;
-    console.log(`  ${name} → ${stem}.webp   ${formatKb(size)} → ${formatKb(output.length)}`);
+    console.log(`  ${name} → ${outputName}   ${formatKb(size)} → ${formatKb(output.length)}`);
   }
+
+  await writeFile(path.join(absolute, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
 
   console.log(`· ${dir} — ${images.length} images, ${formatKb(before)} → ${formatKb(after)}\n`);
   return { before, after, count: images.length };
@@ -89,6 +112,9 @@ for (const target of TARGETS) {
 
 if (totals.count === 0) {
   console.log("Nothing to do.");
+} else if (totals.before === 0) {
+  // Every image was already .webp — manifest.json refreshed, nothing re-encoded.
+  console.log(`${totals.count} images already optimized. manifest.json refreshed.`);
 } else {
   const saved = totals.before - totals.after;
   const percent = Math.round((saved / totals.before) * 100);

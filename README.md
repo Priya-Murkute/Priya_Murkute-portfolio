@@ -93,6 +93,25 @@ are wired up:
 Use Vercel unless you specifically want the site on `github.io` — it needs no
 subpath handling and deploys are simpler to reason about.
 
+### Security headers
+
+`vercel.json` sends a `Content-Security-Policy`, `X-Frame-Options: DENY`,
+`X-Content-Type-Options: nosniff`, `Referrer-Policy` and a `Permissions-Policy`
+on every route — Vercel only; GitHub Pages has no mechanism for custom
+response headers, so that deploy target ships without them regardless.
+
+The CSP allows exactly one inline script by SHA-256 hash — the
+before-first-paint theme script in `index.html` — rather than the much
+weaker `'unsafe-inline'`. **If you edit that script, the hash goes stale and
+the CSP silently blocks it in production**, which reintroduces the dark-mode
+white-flash bug with no visible error. Recompute it with:
+
+```bash
+node -e 'const c=require("fs").readFileSync("index.html","utf8").match(/<script(?![^>]*type=)[^>]*>([\s\S]*?)<\/script>/)[1];console.log("sha256-"+require("crypto").createHash("sha256").update(c,"utf8").digest("base64"))'
+```
+
+and paste the result into `vercel.json`'s `script-src` directive.
+
 ## Where the content lives
 
 `src/data/resume.ts` is the single source of truth. Every word on the page
@@ -120,6 +139,9 @@ src/
 ├── App.tsx                    # routing, preloader gate, page error boundary
 ├── styles.css                 # the whole design system (see below)
 ├── types.ts
+├── context/
+│   └── ThemeContext.tsx       # theme state + localStorage; index.html's inline
+│                              # script does the before-first-paint part
 ├── lib/
 │   ├── utils.ts               # cn() = twMerge(clsx(...))
 │   ├── links.ts               # sectionHref/publicHref — base-path-aware URLs
@@ -140,8 +162,18 @@ src/
     ├── Work.tsx               # cards, each opening a morphing dialog
     ├── Projects.tsx           # live GitHub feed, session-cached
     ├── HeroScene.tsx          # gates the lazy 3D scene on idle + visibility
+    ├── HeroSceneBackdrop.tsx, HeroSceneCanvas.tsx  # the r3f canvas itself
     ├── ErrorBoundary.tsx      # page-level fallback; also wraps the 3D scene
+    ├── Preloader.tsx          # "running the suite before you arrive"; once per session
+    ├── CursorGlow.tsx         # cursor-trailing glow, fine-pointer only
     ├── Backgrounds.tsx        # BlurryGradient, LayeredWaves, StackedWaves
+    ├── PetalScatter.tsx       # ambient petals, paused off-screen
+    ├── AboutMeLink.tsx        # Hero's link into /about-me
+    ├── PullQuote.tsx          # the full-bleed editorial line between sections
+    ├── MobileNav.tsx          # the small-viewport nav drawer
+    ├── About.tsx, Stats.tsx, Experience.tsx, Volunteering.tsx,
+    │   Skills.tsx, Certifications.tsx, Contact.tsx, Footer.tsx
+    │                          # one straightforward renderer per résumé section
     ├── off-hours/             # Carousel3D, MyInterests
     └── motion-primitives/     # local copies, APIs matching motion-primitives.com
 
