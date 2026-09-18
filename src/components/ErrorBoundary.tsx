@@ -1,16 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
-/**
- * React unmounts the whole tree on an uncaught render error, so without a
- * boundary any single thrown error turns the site into a blank page with no
- * way back. Used twice, deliberately at different granularities:
- *
- * - around the routes, with a real fallback, so a page-level failure still
- *   leaves the visitor somewhere they can act;
- * - around the lazy 3D hero scene with `fallback={null}`, so a WebGL or
- *   three.js failure on an unusual GPU costs the decorative petals rather
- *   than the page they sit behind.
- */
 interface Props {
   children: ReactNode;
   /** Rendered in place of the subtree when it throws. `null` fails silently. */
@@ -40,7 +29,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 }
 
-/** The page-level fallback: an apology-free explanation and a way onward. */
+/** The page-level fallback. */
 export function PageErrorFallback() {
   return (
     <main id="main-content" className="section flex min-h-[70vh] items-center">

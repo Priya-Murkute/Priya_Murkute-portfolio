@@ -1,11 +1,7 @@
 import { volunteering } from "@/data/resume";
 import { InView } from "@/components/motion-primitives/in-view";
 
-/**
- * Unpaid work, given its own section rather than folded into Experience — a
- * "Volunteer" tag distinguishes it at a glance so it never reads as a paid
- * role padding out the timeline.
- */
+/** Unpaid work, tagged so it never reads as a paid role in the timeline. */
 export default function Volunteering() {
   if (volunteering.length === 0) return null;
 

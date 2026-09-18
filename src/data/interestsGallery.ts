@@ -3,17 +3,9 @@ import { interestPhotos as placeholderInterestPhotos } from "@/data/galleryPlace
 import { createGallery, galleryId } from "@/lib/gallery";
 
 /**
- * Auto-discovers real photos from src/assets/interests/ — no data file to
- * edit. Drop an image in there named:
- *
- *   YYYY-MM-DD__Title-Words.webp
- *
- * and it appears in the scroller automatically, newest date first. Run
- * `npm run images` afterwards to convert it to width-capped WebP.
- *
- * `height`/`column` are layout details assigned by position, not something to
- * name in the filename. The filename grammar, the sort and the placeholder
- * fallback all live in lib/gallery.ts, shared with the art carousel.
+ * Auto-discovers src/assets/interests/. Drop in a file named
+ * `YYYY-MM-DD__Title-Words.webp`, then run `npm run images`.
+ * `height`/`column` are assigned by position, not named in the filename.
  */
 const files = import.meta.glob("/src/assets/interests/*.{jpg,jpeg,png,webp}", {
   eager: true,
@@ -31,9 +23,7 @@ const gallery = createGallery<InterestPhoto>({
     id: galleryId(parsed),
     title: parsed.title,
     year: parsed.date.slice(0, 4),
-    // A bare URL, not a CSS background value — real photos render as an
-    // <img> sized to their own aspect ratio (see MyInterests.tsx), not
-    // cropped into the placeholders' fixed-height boxes.
+    // A bare URL, not a CSS background: real photos render as an <img>.
     gradient: url,
     height: HEIGHTS[index % HEIGHTS.length],
     column: index % 2 === 0 ? "left" : "right",
@@ -42,7 +32,5 @@ const gallery = createGallery<InterestPhoto>({
 
 export const interestPhotos = gallery.items;
 
-/** True once at least one real file has been discovered — MyInterests uses
- * this to switch from fixed-height placeholder boxes (with the "[ photo
- * goes here ]" hint) to real <img>s sized to their own aspect ratio. */
+/** Switches MyInterests from fixed-height placeholder boxes to real <img>s. */
 export const hasRealInterestPhotos = gallery.hasReal;

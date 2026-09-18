@@ -1,9 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 /**
- * The Work cards open a custom modal — not a <dialog> — so every affordance a
- * native dialog gives you for free has to be implemented and kept working:
- * Escape, focus return, a focus trap, and the page behind it being inert.
+ * A custom modal, not a <dialog>, so everything a native one gives for free
+ * has to be implemented and kept working.
  */
 test.describe("work dialog", () => {
   test.beforeEach(async ({ page }) => {
@@ -34,8 +33,6 @@ test.describe("work dialog", () => {
     await page.getByRole("button", { name: /BDD adoption/i }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
 
-    // Without `inert` on the app root, a screen reader can wander the page
-    // underneath an open modal.
     await expect(page.locator("#root")).toHaveAttribute("inert", "");
 
     await page.keyboard.press("Escape");
@@ -47,8 +44,7 @@ test.describe("work dialog", () => {
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
 
-    // Tab well past the number of focusable elements the dialog contains; if
-    // focus is not trapped it will have escaped into the page behind.
+    // More tabs than the dialog has focusable elements.
     for (let i = 0; i < 8; i += 1) {
       await page.keyboard.press("Tab");
       const focusIsInsideDialog = await dialog.evaluate((node) =>

@@ -6,12 +6,8 @@ const DURATION_MS = 900;
 const HOLD_MS = 300;
 
 /**
- * The curtain before the site: a short "test suite" run rather than a
- * generic spinner, in keeping with the rest of the page's vocabulary
- * (SpecSuite's assertions, the pass/flaky/fail signal colors). Mounted
- * exclusively — the real page doesn't mount underneath until this calls
- * `onComplete`, so the hero's own entrance choreography starts fresh
- * instead of running invisibly while this covers it.
+ * A short "test suite" run rather than a spinner. Mounted exclusively, so the
+ * hero's entrance starts fresh rather than running behind this.
  */
 export default function Preloader({ onComplete }: { onComplete: () => void }) {
   const [progress, setProgress] = useState(0);
@@ -22,10 +18,8 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     let holdTimer = 0;
     let cancelled = false;
 
-    // The bar used to be pure theatre on a fixed timer. Holding the finish
-    // until the webfonts have loaded makes the number mean something — and
-    // stops the hero's headline from re-flowing a beat after the curtain
-    // lifts, which is what the wait is really buying.
+    // Holding the finish until webfonts land stops the hero headline
+    // re-flowing a beat after the curtain lifts.
     const fontsReady: Promise<unknown> = document.fonts?.ready ?? Promise.resolve();
 
     const tick = (now: number) => {
@@ -45,8 +39,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     frame = requestAnimationFrame(tick);
 
     return () => {
-      // The hold timer needs clearing too — cancelling only the frame left
-      // `onComplete` able to fire after unmount.
+      // The hold timer needs clearing too, or onComplete can fire after unmount.
       cancelled = true;
       cancelAnimationFrame(frame);
       window.clearTimeout(holdTimer);

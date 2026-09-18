@@ -11,11 +11,7 @@ const channels = [
   { label: "LinkedIn", value: linkedinHandle, href: profile.linkedin },
 ];
 
-/**
- * Two columns, echoing the Hero's own shape — a closing statement on the
- * left, the contact channels as a distinct panel on the right, rather than
- * one more centered stacked column like every other section.
- */
+/** Two columns, echoing the Hero's shape rather than another stacked section. */
 export default function Contact() {
   return (
     <section id="contact" className="section relative overflow-hidden">

@@ -10,8 +10,7 @@ if (!container) throw new Error("Missing #root element");
 
 createRoot(container).render(
   <StrictMode>
-    {/* basename tracks vite.config.ts's `base` (root on Vercel, /priya-portfolio/
-        on GitHub Pages) so routes like /off-hours resolve on either host. */}
+    {/* Tracks vite.config.ts's `base`, so routes resolve on either host. */}
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <ThemeProvider>
         <App />

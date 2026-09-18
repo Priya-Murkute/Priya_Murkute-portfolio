@@ -1,12 +1,8 @@
 /**
- * Renders public/og-image.png — the 1200×630 card LinkedIn, Slack and
- * Twitter/X show when the site's URL is pasted anywhere.
+ * Renders public/og-image.png, the 1200×630 social preview card.
  *
- * Drawn as an SVG and rasterised with sharp rather than screenshotted, so it
- * stays reproducible and needs no browser. The palette is lifted from
- * src/styles.css so the card and the site agree; the type is a generic stack,
- * since the rasteriser only has system fonts and the site's webfonts are not
- * available to it.
+ * SVG rasterised with sharp, so it needs no browser. The type is a generic
+ * stack — the rasteriser only has system fonts, not the site's webfonts.
  *
  * Run after changing the name, title or palette:  npm run og
  */
@@ -37,7 +33,6 @@ const LINE_2 = "not a phase at the end.";
 const SANS = "Segoe UI, DejaVu Sans, Helvetica, Arial, sans-serif";
 const MONO = "Consolas, DejaVu Sans Mono, Menlo, monospace";
 
-/** The site's own hairline wave, reused as a quiet base for the card. */
 const WAVE = "M0 96C160 40 320 152 480 96S800 24 960 96 1280 160 1440 96";
 
 const svg = `

@@ -1,8 +1,4 @@
-/**
- * A shared sakura gradient for both the hero's 3D petals and the footer's
- * flat SVG ones, so "cherry blossom pink" means the same two colors
- * everywhere instead of each spot picking its own swatch.
- */
+/** One sakura gradient, shared by the 3D petals and the flat SVG ones. */
 const LIGHT_GRADIENT: [string, string] = ["#fff2f6", "#f5a0c4"];
 const DARK_GRADIENT: [string, string] = ["#ff9fd0", "#dc2686"];
 
@@ -20,7 +16,7 @@ function rgbToHex(r: number, g: number, b: number): string {
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
-/** Mixes a point along the real sakura gradient — t in [0, 1]. */
+/** Mixes a point along the gradient — t in [0, 1]. */
 export function cherryBlossomColor(t: number, isDark: boolean): string {
   const [fromHex, toHex] = isDark ? DARK_GRADIENT : LIGHT_GRADIENT;
   const [r1, g1, b1] = hexToRgb(fromHex);
@@ -28,9 +24,7 @@ export function cherryBlossomColor(t: number, isDark: boolean): string {
   return rgbToHex(r1 + (r2 - r1) * t, g1 + (g2 - g1) * t, b1 + (b2 - b1) * t);
 }
 
-/** A tiny deterministic PRNG so petal layouts are stable across renders instead
- * of reshuffling every time — shared by the 3D hero petals and the flat
- * scattered ones, which both need this and nothing fancier. */
+/** Deterministic PRNG, so petal layouts are stable across renders. */
 export function seededRandom(seed: number) {
   let state = seed;
   return () => {

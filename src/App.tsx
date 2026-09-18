@@ -38,12 +38,7 @@ function HomePage() {
   );
 }
 
-/**
- * The preloader is a nice piece of theatre, but it is also ~1.2s in front of
- * every page view — and it is the Largest Contentful Paint. Showing it once
- * per browser session keeps the first impression and stops charging returning
- * visitors, and anyone who navigates back to the site later still sees it.
- */
+/** Shown once per session — it's the LCP, and returning visitors shouldn't pay for it. */
 const PRELOADER_SESSION_KEY = "pm-preloaded";
 
 function hasSeenPreloader(): boolean {
@@ -58,7 +53,7 @@ function markPreloaderSeen() {
   try {
     sessionStorage.setItem(PRELOADER_SESSION_KEY, "1");
   } catch {
-    // sessionStorage unavailable — the preloader just shows every load
+    // storage unavailable
   }
 }
 
@@ -90,15 +85,10 @@ export default function App() {
             Skip to content
           </a>
           <NavBar showSectionLinks={isHome} />
-          {/* Keyed on pathname so navigating away from a page that threw
-              resets the boundary — otherwise the fallback would persist for
-              the rest of the session. */}
+          {/* Keyed on pathname so navigating away from a page that threw resets it. */}
           <ErrorBoundary key={location.pathname} fallback={<PageErrorFallback />}>
             <Routes>
               <Route path="/" element={<HomePage />} />
-              {/* /off-hours is an alias for the same page — the Hero's "about
-                  me" link and this task's brief for an off-hours route both
-                  point at the one page rather than being duplicated. */}
               <Route path="/about-me" element={<AboutMe />} />
               <Route path="/off-hours" element={<AboutMe />} />
               <Route path="*" element={<NotFound />} />

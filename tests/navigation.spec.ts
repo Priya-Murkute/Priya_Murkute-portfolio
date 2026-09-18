@@ -1,24 +1,15 @@
 import { expect, test, type Page } from "@playwright/test";
 
 /**
- * Guards the bug this suite was written for: section links were authored as
- * origin-absolute "/#work", which ignores Vite's `base` and sends every
- * visitor on the GitHub Pages deploy to the account root instead of the site.
- *
- * These assert the *shape* of the hrefs rather than a literal "/#work", so
- * they hold on both deploy targets — and fail the moment someone writes an
- * anchor that doesn't respect the base path.
+ * Asserts the *shape* of each href rather than a literal "/#work", so these
+ * hold on both deploy targets and fail on any anchor that ignores the base path.
  */
 const SECTIONS = ["work", "projects", "experience", "skills", "contact"];
 
 /** Width below which the header hides its links behind the menu button. */
 const SM_BREAKPOINT = 640;
 
-/**
- * Below `sm` the header list is display:none and the links live in the drawer
- * instead, so the same assertions have to reach them by a different route.
- * Returns a scope containing the links either way.
- */
+/** Below `sm` the links live in the drawer, so return whichever holds them. */
 async function openNav(page: Page) {
   const width = page.viewportSize()?.width ?? SM_BREAKPOINT;
   if (width >= SM_BREAKPOINT) return page.locator("header");

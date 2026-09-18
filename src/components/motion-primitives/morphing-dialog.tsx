@@ -123,10 +123,8 @@ export function MorphingDialogContent({
   const { setIsOpen, uniqueId, triggerRef } = useMorphingDialog();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Focus return lives in the unmount cleanup below, not here: every close
-  // path (Escape, the Close button, a backdrop click) ends in this component
-  // unmounting, so doing it in one place covers all three — and it has to
-  // happen *after* `inert` comes off the app root.
+  // Focus return lives in the unmount cleanup below — every close path ends
+  // there, and it has to happen after `inert` comes off the app root.
   const close = useCallback(() => setIsOpen(false), [setIsOpen]);
 
   useEffect(() => {
@@ -136,8 +134,7 @@ export function MorphingDialogContent({
         return;
       }
 
-      // Without this, Tab walks straight out of the dialog and into the page
-      // behind it — which is exactly the thing a modal is supposed to prevent.
+      // Without this, Tab walks straight out into the page behind.
       if (event.key !== "Tab") return;
 
       const container = containerRef.current;
@@ -172,10 +169,8 @@ export function MorphingDialogContent({
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    // The dialog is portalled to <body>, so the whole app is a sibling of it.
-    // `inert` takes that subtree out of the tab order AND the accessibility
-    // tree in one attribute, so a screen reader can't wander the page
-    // underneath an open modal.
+    // The dialog is portalled to <body>, so the app is a sibling. `inert`
+    // takes it out of both the tab order and the accessibility tree.
     const appRoot = document.getElementById("root");
     appRoot?.setAttribute("inert", "");
 
@@ -186,9 +181,7 @@ export function MorphingDialogContent({
 
     return () => {
       document.body.style.overflow = previousOverflow;
-      // Order matters: focusing an element inside an inert subtree silently
-      // does nothing, so the attribute has to come off first or the trigger
-      // never gets focus back and the keyboard user is dropped at <body>.
+      // Order matters: focusing inside an inert subtree silently does nothing.
       appRoot?.removeAttribute("inert");
       trigger?.focus();
     };
@@ -204,8 +197,6 @@ export function MorphingDialogContent({
       aria-modal="true"
       aria-labelledby={`dialog-title-${uniqueId}`}
       aria-describedby={`dialog-description-${uniqueId}`}
-      /* Focusable as a last resort, so the dialog itself can hold focus if it
-         ever contains nothing focusable. */
       tabIndex={-1}
       onClick={(event) => event.stopPropagation()}
     >
@@ -225,10 +216,8 @@ export function MorphingDialogContainer({ children }: { children: ReactNode }) {
     <AnimatePresence initial={false} mode="sync">
       {isOpen && (
         <div
-          /* Click-outside-to-close is a mouse convenience, not the keyboard
-             path — Escape and the Close button are that, and both work. Marked
-             presentational so it doesn't advertise interactive semantics it
-             doesn't implement. */
+          /* Mouse convenience only — Escape and the Close button are the
+             keyboard path, so this advertises no interactive semantics. */
           role="presentation"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8"
           onClick={() => setIsOpen(false)}

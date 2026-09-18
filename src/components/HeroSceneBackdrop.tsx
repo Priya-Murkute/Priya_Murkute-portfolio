@@ -1,8 +1,7 @@
 import { motion } from "motion/react";
 import HeroScene from "@/components/HeroScene";
 
-/** Fades in the falling-petals scene behind a hero section. Shared by the
- * homepage Hero and the About Me hero so both fade it in identically. */
+/** Fades in the falling-petals scene behind a hero section. */
 export default function HeroSceneBackdrop() {
   return (
     <motion.div

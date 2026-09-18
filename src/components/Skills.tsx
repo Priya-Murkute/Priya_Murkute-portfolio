@@ -3,12 +3,9 @@ import { skillGroups } from "@/data/resume";
 import { InView } from "@/components/motion-primitives/in-view";
 
 /**
- * One hand-drawn glyph and accent per group. Deliberately not the
- * pass/flaky/fail vocabulary (this is a skills list, not a test result, so
- * nothing here should read as "flaky") and not the --halo-* tones either —
- * those are tuned to near-invisibility for background washes, which reads
- * as "broken icon" at foreground/stroke contrast. --accent-* in styles.css
- * exists for exactly this: decorative variety with real contrast.
+ * One glyph and accent per group. Uses --accent-* rather than the
+ * pass/flaky/fail vocabulary (a skills list isn't a test result) or the
+ * --halo-* tones (tuned for background washes, invisible at stroke contrast).
  */
 const groupMeta: Record<string, { color: string; icon: ReactNode }> = {
   "Testing types": {

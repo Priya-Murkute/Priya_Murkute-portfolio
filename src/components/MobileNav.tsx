@@ -4,11 +4,7 @@ import { navLinks } from "@/components/NavBar";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 
-/**
- * Small screens hid the nav links entirely (sm:flex on the link list) with
- * nothing standing in for them — this is what stands in. A glass panel in
- * the spirit of kokonut's smooth-drawer, re-skinned to the ink/paper system.
- */
+/** Stands in for the header links, which are hidden below `sm`. */
 export default function MobileNav({
   isOpen,
   onClose,

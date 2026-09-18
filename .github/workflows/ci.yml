@@ -1,8 +1,6 @@
 name: CI
 
-# Runs on every push and PR. deploy.yml publishes; this one decides whether
-# what's being published actually works — the portfolio of a QA engineer is
-# the last place a broken build should ship silently.
+# deploy.yml publishes; this decides whether what's published actually works.
 
 on:
   push:
@@ -10,7 +8,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-# A new push to the same branch makes the in-flight run redundant.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -51,8 +48,7 @@ jobs:
 
       - run: npm ci
 
-      # Browsers are a ~400MB download, so cache them on the lockfile — they
-      # only change when @playwright/test does.
+      # ~400MB, and only changes when @playwright/test does.
       - name: Cache Playwright browsers
         id: playwright-cache
         uses: actions/cache@v4
@@ -63,8 +59,7 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium webkit
 
-      # playwright.config.ts builds and serves the site itself (webServer), so
-      # this runs against the real production bundle, not the dev server.
+      # playwright.config.ts builds and serves the site itself.
       - name: Run Playwright
         run: npm test
 

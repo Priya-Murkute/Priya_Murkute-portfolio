@@ -9,10 +9,7 @@ import type {
   WorkItem,
 } from "@/types";
 
-/**
- * Every word on the site comes from this file. Edit here, not in components.
- * The facts are straight from Priya's résumé; only the framing is editorial.
- */
+/** Every word on the site, and the generated CV, comes from this file. */
 
 export const profile: Profile = {
   name: "Priya Murkute",
@@ -25,31 +22,19 @@ export const profile: Profile = {
     "Three years automating test coverage for banking platforms at Wipro, then an MSc in Computer Science at Queen Mary while working part-time as a London-based SDET. I build frameworks that behave like real software — version-controlled, CI-integrated, and built to be inherited by whoever's on call after me.",
   cvPath: "Priya-Murkute-CV.pdf",
   yearsExperience: 3,
-  /* Printed on the downloadable CV only — never rendered on the site, which
-     deliberately routes contact through email and LinkedIn. Carried over from
-     the previous hand-made PDF so regenerating it loses nothing. */
+  /** CV only — the site routes contact through email and LinkedIn. */
   phone: "+44 7789 595457",
 };
 
-/** Last path segment of a profile URL — "Priya-Murkute", "priya-murkute-oct7". */
 function handleFromUrl(url: string): string {
   return url.replace(/\/+$/, "").split("/").pop() ?? "";
 }
 
-/**
- * Derived rather than typed out a second time. Components previously
- * hardcoded these next to the URLs that already contain them, which meant
- * editing `profile` here could silently leave the displayed handle — and the
- * GitHub API call in Projects.tsx — pointing at the old account.
- */
+/** Derived, so a changed URL can never leave a stale handle behind. */
 export const githubHandle = handleFromUrl(profile.github);
 export const linkedinHandle = handleFromUrl(profile.linkedin);
 
-/**
- * The hero's signature: her achievements written as Gherkin scenarios —
- * Given/When/Then, the same shape as the 300+ scenarios she's actually
- * authored (see the "bdd-adoption" work item below).
- */
+/** Achievements written as Gherkin scenarios, for the hero's SpecSuite. */
 export const assertions: Assertion[] = [
   {
     id: "a1",
@@ -103,11 +88,7 @@ export const stats: Stat[] = [
   },
 ];
 
-/**
- * These are achievements from the résumé, not separate side projects — the
- * résumé doesn't list discrete personal projects. Add entries here and they
- * appear in the Work grid automatically.
- */
+/** Résumé achievements, not side projects. Add here and the Work grid picks them up. */
 export const work: WorkItem[] = [
   {
     id: "ci-api-automation",
@@ -243,7 +224,7 @@ export const education: EducationItem[] = [
   {
     qualification: "MSc Computer Science",
     institution: "Queen Mary University of London",
-    year: "2023",
+    year: "2024",
   },
   {
     qualification: "BE Computer Engineering",
@@ -263,7 +244,7 @@ export const certifications: string[] = [
   "Postman Essential Training",
 ];
 
-/** Unpaid work, kept separate from `experience` so it never reads as a paid role. */
+/** Kept separate from `experience` so it never reads as a paid role. */
 export const volunteering: VolunteerItem[] = [
   {
     role: "Student Volunteer",

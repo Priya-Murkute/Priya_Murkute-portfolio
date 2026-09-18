@@ -14,11 +14,7 @@ import {
   MorphingDialogTrigger,
 } from "@/components/motion-primitives/morphing-dialog";
 
-/**
- * Keeps the heading's voice ("Six things...") while letting the data decide
- * the number — the heading used to be typed out, so adding a seventh work
- * item made the page quietly untrue.
- */
+/** Lets the heading count its own entries without dropping to a digit. */
 const NUMBER_WORDS = [
   "No",
   "One",

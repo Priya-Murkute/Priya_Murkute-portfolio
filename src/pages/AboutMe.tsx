@@ -89,7 +89,7 @@ function AboutMeHero() {
   );
 }
 
-/** One section shell: heading + optional chip, optionally bordered from the section above. */
+/** Heading + optional chip, optionally bordered from the section above. */
 function AboutSection({
   title,
   chip,

@@ -64,13 +64,6 @@ export default function Hero() {
 
             <p className="measure text-lead text-muted">{profile.summary}</p>
 
-            {/* One call to action rather than two. AboutMeLink used to sit
-                above the summary as a quiet text link with a separate "Get in
-                touch" pill below it; both pointed the visitor somewhere, and
-                the quieter of the two was the more interesting invitation.
-                They're now a single button carrying both styles. Contact is
-                still one nav click away, and the Contact section keeps its
-                own Download CV action. */}
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <AboutMeLink />
             </div>

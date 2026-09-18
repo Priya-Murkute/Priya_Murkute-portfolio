@@ -1,11 +1,8 @@
 import { useEffect, useRef } from "react";
 
 /**
- * A soft trailing glow that augments the real cursor rather than replacing
- * it — the system pointer stays visible and precise the whole time. Blooms
- * brighter over links and buttons so interactive elements read as "warm"
- * without a full cursor takeover. Fine-pointer devices only, and off
- * entirely under prefers-reduced-motion (see the CSS gate in styles.css too).
+ * A trailing glow that augments the real cursor rather than replacing it.
+ * Fine-pointer devices only, and off under prefers-reduced-motion.
  */
 export default function CursorGlow() {
   const glowRef = useRef<HTMLDivElement>(null);

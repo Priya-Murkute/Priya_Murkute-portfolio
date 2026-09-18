@@ -1,25 +1,15 @@
 /**
- * The shared half of the two auto-discovered galleries.
- *
- * src/data/artGallery.ts and src/data/interestsGallery.ts had near-identical
- * copies of all of this — the same filename grammar, the same dev warning,
- * the same newest-first sort, the same fall back to placeholders. Only the
- * glob path and the shape of the entry they build actually differ, so those
- * are the two things a caller supplies.
- *
- * The glob itself has to stay in the data files: `import.meta.glob` needs a
- * literal path at the call site, so it can't be parameterised from here.
+ * Shared by both auto-discovered galleries. The glob stays in the data files:
+ * `import.meta.glob` needs a literal path at the call site.
  */
 
 /** `YYYY-MM-DD__Title-Words[__Medium-Words].ext` */
 export interface ParsedFilename {
   date: string;
   title: string;
-  /** Only present when the filename carries a third segment. */
   medium?: string;
 }
 
-/** "Title-Words" → "Title Words", each word capitalised. */
 function toWords(segment: string): string {
   return segment
     .replace(/[-_]+/g, " ")
@@ -41,19 +31,18 @@ function parseFilename(path: string): ParsedFilename | null {
   };
 }
 
-/** A stable, readable id: "2026-09-03-botanical-study". */
+/** "2026-09-03-botanical-study" */
 export function galleryId(parsed: ParsedFilename): string {
   return `${parsed.date}-${parsed.title.toLowerCase().replace(/\s+/g, "-")}`;
 }
 
 interface CreateGalleryOptions<T> {
-  /** The eager `import.meta.glob` result: absolute path → asset URL. */
+  /** Eager `import.meta.glob` result: absolute path → asset URL. */
   files: Record<string, string>;
-  /** Prefix for the dev-only warning about skipped files. */
+  /** Prefix for the dev-only skipped-file warning. */
   label: string;
-  /** Used verbatim when the folder holds no matching files. */
   placeholders: T[];
-  /** Builds one entry. `index` is the position in the sorted, newest-first list. */
+  /** `index` is the position in the sorted, newest-first list. */
   toEntry: (input: { url: string; parsed: ParsedFilename; index: number }) => T;
 }
 

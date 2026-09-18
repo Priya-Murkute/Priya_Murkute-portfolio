@@ -1,10 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-/**
- * The theme is the site's one piece of persisted state, and it is easy to
- * break in two different ways: losing the stored value, or applying it too
- * late and flashing the wrong colours before React mounts. Both are covered.
- */
 test.describe("theme", () => {
   test("defaults to light and toggles to dark", async ({ page }) => {
     await page.goto("/");
@@ -23,8 +18,6 @@ test.describe("theme", () => {
 
     await page.reload();
 
-    // The regression this guards: reading the stored theme but applying it in
-    // a useEffect, so the class is briefly absent after a reload.
     await expect(page.locator("html")).toHaveClass(/dark/);
     await expect(page.getByRole("button", { name: /switch to light theme/i })).toBeVisible();
   });
@@ -34,9 +27,7 @@ test.describe("theme", () => {
     await page.getByRole("button", { name: /switch to dark theme/i }).click();
     await expect(page.locator("html")).toHaveClass(/dark/);
 
-    // Block the app bundle entirely: whatever paints now is what a visitor
-    // sees in the window before hydration. If the dark class only arrives
-    // with React, this fails — which is exactly the flash being prevented.
+    // With the bundle blocked, only the pre-paint script can apply the class.
     await page.route("**/assets/*.js", (route) => route.abort());
     await page.goto("/");
 

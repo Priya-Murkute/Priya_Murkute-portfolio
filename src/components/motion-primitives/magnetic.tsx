@@ -29,13 +29,8 @@ export function Magnetic({
   const springX = useSpring(x, springOptions);
   const springY = useSpring(y, springOptions);
 
-  /**
-   * Upstream reads `getBoundingClientRect()` inside the mousemove handler,
-   * before checking whether the cursor is anywhere near — so every instance
-   * forces a layout reflow on every mouse move for the whole page lifetime.
-   * The rect is cached instead, read only while hovered (the only time the
-   * value is used) and refreshed on the two things that can invalidate it.
-   */
+  // Cached rather than read inside the mousemove handler, which is what
+  // upstream does — that forces a layout reflow on every mouse move.
   const rectRef = useRef<DOMRect | null>(null);
   const readRect = useCallback(() => {
     rectRef.current = ref.current?.getBoundingClientRect() ?? null;

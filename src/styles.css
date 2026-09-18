@@ -3,27 +3,15 @@
 /* Theme switching is class-driven (see ThemeProvider), not media-query driven. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ---------------------------------------------------------------------------
-   Palette — borrowed from the vocabulary of test results rather than from a
-   generic portfolio palette. Ink and paper carry the page; pass / flaky / fail
-   are the only voices that carry MEANING (they always signal the same thing).
-   --accent-* below are different: plain decorative variety with no semantic
-   weight, for places (like the Skills icons) that just need to not all be the
-   same color. Don't reuse --halo-* for that — those are deliberately kept
-   near-paper for background washes and read as invisible at foreground
-   (icon/text) contrast.
---------------------------------------------------------------------------- */
+/* Palette. pass/flaky/fail carry meaning; --accent-* is decorative variety;
+   --halo-* is for background washes only and is invisible at text contrast. */
 :root {
   --paper: #fafaf7;
   --surface: #ffffff;
   --surface-sunk: #f4f4ef;
   --ink: #14171a;
   --ink-muted: #6b7078;
-  /* 4.9:1 on --paper. The previous #9a9ea3 measured ~2.6:1, below the 4.5:1
-     WCAG AA needs at the sizes this token is used at — and it carries a lot
-     of the page's small text: every .eyebrow, the mono captions, the footer,
-     timeline locations and stat notes. Still clearly quieter than
-     --ink-muted, so the three-step hierarchy is intact. */
+  /* 4.9:1 on --paper — this carries most of the page's small text. */
   --ink-faint: #71767c;
   --line: #e8e7e1;
   --line-strong: #d6d5cd;
@@ -35,8 +23,7 @@
   --fail: #a63d3d;
   --fail-tint: #f6e7e5;
 
-  /* Haikei-style ambient washes — kept close to paper rather than a distinct
-     rainbow of hues, so the wash reads as soft light, not added color. */
+  /* Kept close to paper, so the wash reads as soft light, not added colour. */
   --halo-sage: #ece8da;
   --halo-mint: #efe9dd;
   --halo-sky: #e6e6e2;
@@ -44,7 +31,6 @@
   --halo-opacity: 0.4;
   --grain-opacity: 0.035;
 
-  /* Decorative-only accents — foreground contrast, unlike --halo-*. */
   --accent-blue: #3f6f92;
   --accent-teal: #2f8378;
   --accent-violet: #6f5f96;
@@ -57,7 +43,7 @@
   --surface-sunk: #101315;
   --ink: #eceded;
   --ink-muted: #9aa0a4;
-  /* 6.0:1 on the dark --paper; #6d7378 measured ~4.0:1. See the light note. */
+  /* 6.0:1 on the dark --paper. */
   --ink-faint: #8b9298;
   --line: #24282c;
   --line-strong: #343a3f;
@@ -82,8 +68,8 @@
   --accent-clay: #d99a78;
 }
 
-/* @theme inline keeps the utilities pointing at the live variables above, so a
-   single class works in both themes instead of needing a dark: counterpart. */
+/* Points the utilities at the live variables, so one class works in both
+   themes instead of needing a dark: counterpart. */
 @theme inline {
   --color-paper: var(--paper);
   --color-surface: var(--surface);
@@ -113,8 +99,7 @@
   --text-display--line-height: 0.96;
   --text-display--letter-spacing: -0.035em;
 
-  /* Reserved for the hero's name — the one place a short line of text earns
-     going bigger than --text-display. */
+  /* The hero's name only. */
   --text-name: clamp(2.1rem, 5vw, 3.4rem);
   --text-name--line-height: 1;
   --text-name--letter-spacing: -0.025em;
@@ -126,9 +111,7 @@
   --text-lead: clamp(1.0625rem, 1.5vw, 1.25rem);
   --text-lead--line-height: 1.6;
 
-  /* The one full-bleed editorial statement between Projects and Experience —
-     bigger than a section heading, set for a multi-line quote rather than a
-     one-line title. */
+  /* PullQuote only — set for a multi-line quote, not a one-line title. */
   --text-quote: clamp(1.75rem, 4.4vw, 3.1rem);
   --text-quote--line-height: 1.18;
   --text-quote--letter-spacing: -0.02em;
@@ -175,21 +158,10 @@
     font-variation-settings: "wdth" 100;
   }
 
-  /* The theme transition is the one global animation; keep it short so
-     switching feels like a light change, not a crossfade.
-
-     Scoped to the moment a switch is in flight rather than left on every
-     node permanently: ThemeProvider adds .theme-transition to <html>, flips
-     the theme, and removes it ~260ms later. Applied to `body *` for the
-     whole page lifetime it made every hover, mount and layout change in the
-     document pay a 240ms colour ramp, and scaled style recalculation with
-     DOM size — expensive on the sections carrying dozens of animated
-     petals. Interactive elements carry their own `transition-colors`, so
-     hover states are unaffected by the narrower scope.
-
-     !important because Tailwind's utilities layer outranks this one, and a
-     `transition-transform` on a card would otherwise drop it from the
-     crossfade. Safe here: the rule is only live for a quarter of a second. */
+  /* Live only while a theme switch is in flight — ThemeProvider adds the
+     class, flips, and removes it ~260ms later. Left on every node
+     permanently it taxed every hover and mount in the document.
+     !important because Tailwind's utilities layer outranks this one. */
   html.theme-transition,
   html.theme-transition * {
     transition:
@@ -200,8 +172,7 @@
 }
 
 @layer components {
-  /* One container and one section rhythm, defined once. Nothing else sets
-     horizontal padding or vertical section spacing. */
+  /* Nothing else sets horizontal padding or vertical section spacing. */
   .shell {
     width: 100%;
     max-width: 71rem;
@@ -242,7 +213,6 @@
     border-radius: 1.125rem;
   }
 
-  /* A hairline that fades at both ends — reads softer than a full rule. */
   .hairline {
     height: 1px;
     border: 0;
@@ -255,8 +225,7 @@
     );
   }
 
-  /* Film grain over the whole page. It is what keeps large flat areas of
-     paper from looking like flat #fff, and it sits above the SVG washes. */
+  /* Keeps large flat areas of paper from reading as flat #fff. */
   .grain {
     position: fixed;
     inset: 0;
@@ -271,9 +240,6 @@
     mix-blend-mode: screen;
   }
 
-  /* Trails the real cursor rather than replacing it — the system pointer
-     stays visible and precise throughout. Blooms brighter over links and
-     buttons via .cursor-glow-hover (see CursorGlow.tsx). */
   .cursor-glow {
     position: fixed;
     top: 0;
@@ -317,8 +283,7 @@
     flex: none;
   }
 
-  /* A soft ambient bloom behind the primary action on hover — the manus.im-
-     style glow, kept to one accent so it reads as emphasis, not decoration. */
+  /* Ambient bloom behind the primary action on hover. */
   .glow-cta {
     position: relative;
     isolation: isolate;
@@ -347,21 +312,32 @@
   .haikei-drift {
     animation: haikei-drift var(--drift-duration, 20s) ease-in-out infinite;
     animation-delay: var(--drift-delay, 0s);
+    /* Promotes these to their own layer, so the drift is compositor work
+       rather than a repaint of a large gradient on every frame. */
+    will-change: transform;
+  }
+
+  /* Backgrounds.tsx sets this while the layer is off-screen. Animating SVG
+     content re-rasterises the whole SVG each frame, which competes with the
+     hero canvas even from far below the fold. */
+  .drift-paused {
+    animation-play-state: paused;
+  }
+
+  /* On a touch device the drift is 26px over 22s — imperceptible, and it
+     costs ~5fps that the petal canvas needs more. The wash itself stays. */
+  @media (hover: none) {
+    .haikei-drift {
+      animation: none;
+      will-change: auto;
+    }
   }
 }
 
-/* Custom @keyframes live at the top level, not nested inside @layer — Tailwind
-   v4's build (Lightning CSS) silently drops @keyframes nested inside @layer
-   components/utilities blocks, so every animation referencing one of these by
-   name (the classes above, plus the animate-[name_...] utilities in
-   MyInterests.tsx and the About Me "currently" ticker) would otherwise
-   render as a no-op with no error. */
+/* KEEP @keyframes AT THE TOP LEVEL. Tailwind v4's build silently drops any
+   nested inside @layer, and every animation referencing one becomes a no-op
+   with no error. */
 
-/* Haikei background drift — plain CSS keyframes rather than JS-driven motion
-   values, since these run continuously for the whole page lifetime. The
-   compositor can run these off the main thread; --drift-x/--drift-y/
-   animation-duration/animation-delay are set per element via inline style
-   for variety. prefers-reduced-motion below freezes them automatically. */
 @keyframes haikei-drift {
   0%,
   100% {
@@ -372,12 +348,7 @@
   }
 }
 
-/* Off Hours: the dual-column "My Interests" scroller and the "currently"
-   ticker — plain CSS loops for the same reason as haikei-drift above
-   (continuous, whole-page-lifetime, and frozen for free under
-   prefers-reduced-motion). The "up" column reuses interests-down with
-   animation-direction: reverse (see MyInterests.tsx) instead of a second,
-   mirrored keyframe. */
+/* The "up" column reuses this with animation-direction: reverse. */
 @keyframes interests-down {
   from {
     transform: translateY(0);

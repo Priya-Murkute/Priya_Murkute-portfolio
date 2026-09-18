@@ -2,11 +2,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 import { assertions, profile } from "@/data/resume";
 
-/**
- * The signature element: the résumé's claims, written as the assertions they
- * would have to satisfy, ticking over one at a time. No terminal chrome — it
- * is set in the page's own type, as a list rather than a fake console.
- */
+/** The résumé's claims as assertions, ticking over one at a time. */
 export default function SpecSuite() {
   const prefersReducedMotion = useReducedMotion() ?? false;
   const [passed, setPassed] = useState(0);
@@ -51,8 +47,6 @@ export default function SpecSuite() {
           {passed} passing
         </motion.span>
         <span className="text-faint">·</span>
-        {/* A constant of the conceit rather than a count: none of these
-            assertions is written to fail. */}
         <span className="text-faint">0 failing</span>
         <span className="text-faint">·</span>
         <span className="text-faint">{profile.yearsExperience} years</span>
@@ -61,10 +55,7 @@ export default function SpecSuite() {
   );
 }
 
-/**
- * A small radial readout of the same tick-over state — the ring closes as
- * assertions pass, so the count above isn't the only signal of progress.
- */
+/** Closes as assertions pass, so the count isn't the only signal of progress. */
 function CoverageRing({ passed, total }: { passed: number; total: number }) {
   const size = 18;
   const strokeWidth = 2.5;

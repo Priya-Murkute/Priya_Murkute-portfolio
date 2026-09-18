@@ -1,16 +1,9 @@
 /**
- * Renders public/Priya-Murkute-CV.pdf from src/data/resume.ts.
+ * Renders public/Priya-Murkute-CV.pdf from src/data/resume.ts, so the CV can
+ * never disagree with the site about a fact.
  *
- * Why this exists: the committed PDF had drifted badly from the site. It
- * claimed "+50% testing efficiency / +30% API coverage / −15% recurring
- * defects" where the site says "95% defect catch rate / −50% regression cycle
- * time / 300+ Gherkin scenarios"; it had one merged Wipro role with the wrong
- * dates instead of the two real ones; it dated the MSc 2024 rather than 2023.
- * A recruiter reading the site and then opening the CV saw two different
- * people. Generating from the same data makes that class of drift impossible.
- *
- * Printed through the Chromium that Playwright already installs, so the CV
- * uses the site's own typography and needs no PDF library.
+ * Printed through the Chromium Playwright already installs, so it uses the
+ * site's own typography and needs no PDF library.
  *
  * Run after editing resume.ts:  npm run cv
  */
@@ -30,7 +23,6 @@ import {
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUTPUT = path.join(ROOT, "public", profile.cvPath);
 
-/** Escapes text going into the HTML template. */
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -50,8 +42,7 @@ const html = `<!doctype html>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  /* Mirrors the site's palette so the CV and the portfolio read as one piece
-     of work. Print-safe: no background fills that eat toner, hairlines only. */
+  /* Mirrors the site's palette. Print-safe: hairlines, no background fills. */
   :root {
     --ink: #14171a;
     --ink-muted: #4a5058;
@@ -60,9 +51,7 @@ const html = `<!doctype html>
     --pass: #2e6b4f;
   }
 
-  /* Sized to land on a single page. Three years of experience does not need
-     two, and a second page holding only the volunteering block reads as
-     careless — so the type is tuned to fit rather than the content cut. */
+  /* Type is tuned to land the whole thing on one page. */
   @page { size: A4; margin: 11mm 13mm; }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -122,7 +111,6 @@ const html = `<!doctype html>
     border-top: 1px solid var(--line);
   }
 
-  /* Headline metrics, as three columns — the same three the site leads with. */
   .metrics { display: flex; gap: 20px; }
   .metric { flex: 1; }
   .metric-value {
@@ -305,8 +293,7 @@ const browser = await chromium.launch();
 const page = await browser.newPage();
 
 await page.setContent(html, { waitUntil: "networkidle" });
-// Webfonts arrive after networkidle resolves in some runs; without this the
-// PDF can be laid out in the fallback stack.
+// Webfonts can arrive after networkidle resolves.
 await page.evaluate(() => document.fonts.ready);
 
 await page.pdf({
@@ -316,9 +303,8 @@ await page.pdf({
   preferCSSPageSize: true,
 });
 
-// `npm run cv -- --preview` also writes a PNG. Headless Chromium downloads a
-// PDF rather than rendering it, so this is the only way to actually look at
-// the layout while editing it.
+// Headless Chromium downloads a PDF rather than rendering it, so a PNG is
+// the only way to actually look at the layout while editing it.
 if (process.argv.includes("--preview")) {
   const preview = path.join(ROOT, "cv-preview.png");
   await page.setViewportSize({ width: 794, height: 1123 });

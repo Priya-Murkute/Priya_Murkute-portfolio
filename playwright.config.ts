@@ -1,10 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * Runs against the production build, not the dev server — the two things
- * most worth protecting here (the base-path handling in section anchors, the
- * pre-paint theme script) only behave like production when they *are*
- * production.
+ * Runs against the production build, not the dev server: the base-path
+ * anchors and the pre-paint theme script only behave correctly when built.
  */
 export default defineConfig({
   testDir: "./tests",
@@ -12,11 +10,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
 
-  // WebKit's Windows build crashes its worker (STATUS_STACK_BUFFER_OVERRUN)
-  // when several instances launch at once — the whole suite passes serially
-  // but fails at full concurrency, which is an artefact of the browser build
-  // rather than anything about this site. Two workers is stable here and
-  // still parallel; Linux CI is unaffected but pinned for stable timings.
+  // WebKit's Windows build crashes its worker at full concurrency. Two is
+  // stable and still parallel; Linux CI is unaffected.
   workers: process.env.CI ? 1 : process.platform === "win32" ? 2 : undefined,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
 
@@ -27,8 +22,7 @@ export default defineConfig({
 
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    // A real narrow viewport, so the header's `hidden sm:flex` links and the
-    // drawer that replaces them are both actually exercised.
+    // A narrow viewport, so the mobile drawer is actually exercised.
     { name: "mobile-chrome", use: { ...devices["Pixel 5"] } },
     { name: "webkit", use: { ...devices["Desktop Safari"] } },
   ],

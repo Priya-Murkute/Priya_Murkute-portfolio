@@ -16,13 +16,7 @@ type Repo = {
 
 const MAX_REPOS = 6;
 
-/**
- * Asks for a little more than it shows, because forks and the profile README
- * repo get filtered out below. Deliberately not `per_page=100`: the
- * unauthenticated GitHub API allows 60 requests per hour *per IP*, and a
- * visitor behind a shared corporate NAT can arrive to find the budget already
- * spent — so the response is also cached for the session.
- */
+/** More than MAX_REPOS, since forks and the profile README repo get filtered out. */
 const PER_PAGE = 12;
 const CACHE_KEY = "pm-github-repos";
 const CACHE_TTL_MS = 30 * 60 * 1000;
@@ -45,7 +39,7 @@ function writeCachedRepos(repos: Repo[]) {
   try {
     sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), repos }));
   } catch {
-    // sessionStorage unavailable or full — the feed just refetches next time
+    // storage unavailable — the feed just refetches next time
   }
 }
 
@@ -58,14 +52,11 @@ function formatDate(iso: string) {
 }
 
 /**
- * Live, not curated: pulled straight from the GitHub API on mount so this
- * list changes as the repos do, instead of being a snapshot baked into
- * resume.ts. The profile's own README repo (named identically to the
- * username) and forks are filtered out — neither is really "a project."
+ * Live from the GitHub API rather than curated in resume.ts. Forks and the
+ * profile README repo are filtered out. Unauthenticated GitHub allows 60
+ * requests/hour per IP, so responses are cached for the session.
  */
 export default function Projects() {
-  // Seeded from the session cache so a second visit to the homepage renders
-  // the list immediately, with no skeleton and no second API call.
   const [state, setState] = useState<FetchState>(() => {
     const cached = readCachedRepos();
     return cached ? { status: "ready", repos: cached } : { status: "loading" };
@@ -98,7 +89,6 @@ export default function Projects() {
     return () => {
       cancelled = true;
     };
-    // Runs once: the guard above short-circuits if the cache already filled state.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

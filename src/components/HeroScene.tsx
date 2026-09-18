@@ -3,18 +3,7 @@ import { useReducedMotion } from "motion/react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { useOnScreen } from "@/lib/useOnScreen";
 
-/**
- * three + @react-three/fiber are the single heaviest dependency in this
- * project — this lazy-loads the actual scene so that weight is fetched in
- * its own chunk, off the critical path, instead of sitting in the main
- * bundle every page load pays for.
- *
- * The split alone only defers *parsing*, though: a bare `lazy()` still
- * requests the chunk the moment this mounts, so every visitor pays ~220 KB
- * gzip immediately for what is decoration. The import is therefore held
- * until the browser is idle AND the hero is actually on screen, and the
- * render loop is stopped whenever it scrolls away.
- */
+/** ~220 KB gzip of three.js — held until idle and on screen, not just code-split. */
 const HeroSceneCanvas = lazy(() => import("@/components/HeroSceneCanvas"));
 
 function supportsWebGL() {
@@ -22,8 +11,7 @@ function supportsWebGL() {
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("webgl") ?? canvas.getContext("experimental-webgl");
     if (!context) return false;
-    // Browsers cap the number of live WebGL contexts (~16). This probe runs on
-    // every mount of a hero, so release it rather than leaving it to GC.
+    // Browsers cap live WebGL contexts (~16), so release the probe's.
     (context as WebGLRenderingContext).getExtension("WEBGL_lose_context")?.loseContext();
     return true;
   } catch {
@@ -44,17 +32,11 @@ function onIdle(callback: () => void): () => void {
 export default function HeroScene() {
   const prefersReducedMotion = useReducedMotion() ?? false;
 
-  // Lazy initialiser rather than an effect: this is a one-off capability
-  // probe, and running it during the first render avoids a second render
-  // purely to record the answer.
   const [canRender] = useState(supportsWebGL);
 
-  // `isOnScreen` drives the render loop, so it stops when the hero scrolls
-  // away; `hasBeenOnScreen` latches, so the chunk stays mounted once fetched.
+  // isOnScreen drives the render loop; hasBeenOnScreen latches the mount.
   const { ref: containerRef, isOnScreen, hasBeenOnScreen } = useOnScreen<HTMLDivElement>("200px");
 
-  // Hold the import until the browser has nothing better to do, so it never
-  // competes with the fonts, the hero's own entrance, or first paint.
   const [isIdle, setIsIdle] = useState(false);
   useEffect(() => onIdle(() => setIsIdle(true)), []);
 

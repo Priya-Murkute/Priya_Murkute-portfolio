@@ -1,5 +1,5 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Color,
   DoubleSide,
@@ -13,22 +13,23 @@ import { cherryBlossomColor, seededRandom } from "@/lib/cherryBlossom";
 import { useTheme } from "@/context/ThemeContext";
 
 /**
- * The hero's background: cherry blossom petals drifting down through the
- * scene. One InstancedMesh, one useFrame loop — cheap regardless of petal
- * count since there's a single draw call.
- *
- * The material is unlit (MeshBasicMaterial, toneMapped off). Petals were
- * physically lit at first, but that made their color depend on which way
- * each one happened to be rotated relative to the lights — some read fine,
- * others read muddy/gray. Flat petals don't have that problem, and it also
- * matches the reference: a soft, evenly-colored falling-petals look, not
- * hard 3D shading.
- *
- * Split out of HeroScene.tsx and loaded lazily — three + @react-three/fiber
- * are the single heaviest thing in this project's bundle, so nothing here
- * should be in the initial chunk.
+ * Cherry blossom petals drifting down the hero. One InstancedMesh, one
+ * useFrame loop. The material is unlit so petal colour doesn't depend on
+ * which way each one happens to be rotated relative to a light.
  */
-const PETAL_COUNT = 150;
+/**
+ * Every petal costs a matrix rebuild on the main thread each frame, so the
+ * count scales with the device rather than being fixed at the desktop value.
+ * A phone shows a narrower slice of the scene anyway, so fewer petals read
+ * as much the same density.
+ */
+function petalCountForViewport(): number {
+  const width = typeof window === "undefined" ? 1280 : window.innerWidth;
+  if (width < 640) return 55;
+  if (width < 1024) return 95;
+  return 150;
+}
+
 const SPREAD_X = 9;
 const SPREAD_Z = 5;
 const TOP_Y = 6.5;
@@ -51,12 +52,7 @@ type PetalData = {
   scale: number;
 };
 
-/**
- * A real sakura petal is obovate — narrow at the base, rounding out wide,
- * with a shallow notch at the outer tip — not a plain teardrop. Built with
- * that notch, then given a gentle cupped curl (real petals aren't flat) by
- * displacing Z after the flat shape is triangulated.
- */
+/** Obovate with a notched tip, then cupped by displacing Z after triangulation. */
 function createPetalGeometry() {
   const shape = new Shape();
   shape.moveTo(0, 0);
@@ -82,9 +78,9 @@ function createPetalGeometry() {
   return geometry;
 }
 
-function makePetals(): PetalData[] {
+function makePetals(count: number): PetalData[] {
   const random = seededRandom(11);
-  return Array.from({ length: PETAL_COUNT }, () => ({
+  return Array.from({ length: count }, () => ({
     baseX: (random() - 0.5) * SPREAD_X,
     baseZ: (random() - 0.5) * SPREAD_Z,
     y: BOTTOM_Y + random() * (TOP_Y - BOTTOM_Y),
@@ -102,9 +98,9 @@ function makePetals(): PetalData[] {
   }));
 }
 
-function Petals({ isDark, animate }: { isDark: boolean; animate: boolean }) {
+function Petals({ isDark, animate, count }: { isDark: boolean; animate: boolean; count: number }) {
   const meshRef = useRef<InstancedMesh>(null);
-  const petals = useMemo(() => makePetals(), []);
+  const petals = useMemo(() => makePetals(count), [count]);
   const geometry = useMemo(() => createPetalGeometry(), []);
   const dummy = useMemo(() => new Object3D(), []);
 
@@ -131,10 +127,8 @@ function Petals({ isDark, animate }: { isDark: boolean; animate: boolean }) {
     const step = Math.min(delta, 0.05);
     const elapsed = state.clock.elapsedTime;
 
-    // A shared breeze on top of each petal's own sway — two sine waves at
-    // different speeds so it reads as gusting rather than a metronome, and
-    // it moves every petal together so the scene periodically feels like a
-    // gust passed through it, not just N independent particles.
+    // Two sine waves at different speeds, moving every petal together, so it
+    // reads as gusting rather than N independent particles.
     const gust = Math.sin(elapsed * 0.15) * 0.9 + Math.sin(elapsed * 0.37 + 1.3) * 0.4;
 
     petals.forEach((petal, index) => {
@@ -146,8 +140,6 @@ function Petals({ isDark, animate }: { isDark: boolean; animate: boolean }) {
       petal.rotation[2] += petal.spinSpeed[2] * step;
 
       const sway = Math.sin(petal.y * petal.swaySpeed + petal.swayPhase) * petal.swayAmplitude;
-      // A quick flutter layered on the steady tumble, like a petal catching
-      // and losing the wind rather than spinning at one constant rate.
       const flutter = Math.sin(elapsed * 2.4 + petal.swayPhase) * 0.15;
 
       dummy.position.set(petal.baseX + sway + gust, petal.y, petal.baseZ);
@@ -165,18 +157,28 @@ function Petals({ isDark, animate }: { isDark: boolean; animate: boolean }) {
   });
 
   return (
-    <instancedMesh ref={meshRef} args={[geometry, undefined, PETAL_COUNT]}>
+    <instancedMesh ref={meshRef} args={[geometry, undefined, count]}>
       <meshBasicMaterial toneMapped={false} side={DoubleSide} transparent opacity={0.95} />
     </instancedMesh>
   );
 }
 
-function Scene({ isDark, animate }: { isDark: boolean; animate: boolean }) {
+function Scene({
+  isDark,
+  animate,
+  count,
+}: {
+  isDark: boolean;
+  animate: boolean;
+  count: number;
+}) {
   const groupRef = useRef<Group>(null);
   const pointer = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    if (!animate) return;
+    // Nothing to track on a touch device, and the listener would keep the
+    // parallax useFrame doing work for a pointer that never moves.
+    if (!animate || !window.matchMedia("(pointer: fine)").matches) return;
     const handlePointerMove = (event: PointerEvent) => {
       pointer.current.x = (event.clientX / window.innerWidth) * 2 - 1;
       pointer.current.y = (event.clientY / window.innerHeight) * 2 - 1;
@@ -195,7 +197,7 @@ function Scene({ isDark, animate }: { isDark: boolean; animate: boolean }) {
 
   return (
     <group ref={groupRef}>
-      <Petals isDark={isDark} animate={animate} />
+      <Petals isDark={isDark} animate={animate} count={count} />
     </group>
   );
 }
@@ -208,16 +210,17 @@ export default function HeroSceneCanvas({
   /** False once the hero scrolls away — stops the render loop entirely. */
   isOnScreen: boolean;
 }) {
-  // Petals/Scene below run inside react-three-fiber's own Canvas reconciler,
-  // a separate React root that context doesn't reliably bridge into — so
-  // isDark is read from context once here, outside the Canvas, and handed
-  // down to them as a plain prop instead.
+  // Read outside the Canvas: r3f is a separate React root that context
+  // doesn't reliably bridge into, so isDark is passed down as a plain prop.
   const { isDark } = useTheme();
 
-  // "never" doesn't just skip useFrame — it stops r3f rendering at all, so an
-  // off-screen hero costs nothing instead of running at 60fps for the life of
-  // the page. Under reduced motion the scene still needs one frame to appear,
-  // which "demand" gives it (r3f renders once on mount and on prop changes).
+  // Fixed at mount: re-seeding the whole instanced mesh mid-resize would be a
+  // far more visible jolt than a phone keeping its phone-sized petal count
+  // after a rotation.
+  const [count] = useState(petalCountForViewport);
+
+  // "never" stops r3f rendering entirely, not just useFrame. "demand" still
+  // gives the reduced-motion case the one frame it needs to appear.
   const frameloop = !animate ? "demand" : isOnScreen ? "always" : "never";
 
   return (
@@ -228,7 +231,7 @@ export default function HeroSceneCanvas({
       gl={{ alpha: true, antialias: true }}
       style={{ pointerEvents: "none" }}
     >
-      <Scene isDark={isDark} animate={animate} />
+      <Scene isDark={isDark} animate={animate} count={count} />
     </Canvas>
   );
 }

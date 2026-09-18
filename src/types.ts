@@ -1,15 +1,9 @@
-/** The three states anything on this site can be in, borrowed from test runs. */
 export type Signal = "pass" | "flaky" | "fail";
 
-/**
- * Whether a piece of work has a number attached to it or is a practice she
- * kept up. Kept separate from `Signal` on purpose — "flaky" means something
- * specific and unflattering to a tester, so it never labels her work.
- */
+/** Kept separate from `Signal`: "flaky" must never label her work. */
 export type WorkStatus = "measured" | "ongoing";
 
 export interface Metric {
-  /** The number itself, so it can count up. */
   value: number;
   prefix?: string;
   suffix?: string;
@@ -21,13 +15,11 @@ export interface WorkItem {
   name: string;
   category: string;
   organisation: string;
-  /** One or two lines, shown on the card. */
   summary: string;
-  /** The fuller story, shown when the card opens. */
+  /** Shown when the card opens. */
   detail: string;
   metric?: Metric;
-  /** One clause tying the metric to how it was actually achieved, so the
-   * number reads as evidence rather than a bare claim. */
+  /** Ties the metric to how it was achieved, so it reads as evidence. */
   metricContext?: string;
   tools: string[];
   status: WorkStatus;
@@ -37,7 +29,7 @@ export interface WorkItem {
 export interface Assertion {
   id: string;
   text: string;
-  /** Milliseconds this "test" takes to tick over, purely for texture. */
+  /** Milliseconds this "test" takes to tick over. */
   duration: number;
 }
 
@@ -56,14 +48,11 @@ export interface ExperienceItem {
   location: string;
   period: string;
   bullets: string[];
-  /** Short framing line for a role whose tenure needs context at a glance. */
   note?: string;
-  /** A named award earned during this role, shown as a small badge. */
   honors?: string;
 }
 
-/** Unpaid work — kept structurally distinct from ExperienceItem so it can
- * never accidentally render in the paid-roles timeline. */
+/** Structurally distinct from ExperienceItem so it can never render in the paid timeline. */
 export interface VolunteerItem {
   role: string;
   organisation: string;
@@ -92,15 +81,12 @@ export interface Profile {
   linkedin: string;
   summary: string;
   cvPath: string;
-  /** Years of professional QA experience, so no component has to hardcode it. */
   yearsExperience: number;
   /** CV-only: printed by scripts/generate-cv.ts, never shown on the site. */
   phone: string;
 }
 
-/** A photo in the About Me "My Interests" scroller. `column` and `height`
- * drive the dual-column masonry layout; `gradient` stands in for a real
- * photo. */
+/** `column` and `height` drive the masonry layout; `gradient` is a URL or a CSS value. */
 export interface InterestPhoto {
   id: string;
   title: string;
@@ -110,24 +96,20 @@ export interface InterestPhoto {
   column: "left" | "right";
 }
 
-/** A piece in the Off Hours 3D art carousel. `medium` is optional — the
- * auto-discovered entries (see src/data/artGallery.ts) only have one when
- * the filename encodes it. */
 export interface Artwork {
   id: string;
   title: string;
+  /** Only set when the filename encodes one. */
   medium?: string;
   year: string;
   gradient: string;
 }
 
-/** One entry in the Off Hours "currently" ticker. */
 export interface NowItem {
   label: string;
   value: string;
 }
 
-/** One card in the Off Hours hobbies grid. */
 export interface Hobby {
   icon: string;
   name: string;

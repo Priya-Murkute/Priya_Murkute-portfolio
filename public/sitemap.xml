@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  /off-hours is deliberately absent: it is an alias for /about-me (see the
-  routes in src/App.tsx), and listing both would submit the same page twice.
--->
+<!-- /off-hours is absent: it's an alias for /about-me. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://priya-murkute-portfolio.vercel.app/</loc>

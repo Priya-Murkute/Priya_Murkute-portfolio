@@ -1,11 +1,6 @@
 import { TextEffect } from "@/components/motion-primitives/text-effect";
 
-/**
- * The one deliberate break in the page's section-section-section rhythm: no
- * eyebrow, no card, no two-column split — a single full-bleed editorial
- * statement in a tinted band, bridging the GitHub repos above (code) and the
- * career history below (track record) rather than restating either.
- */
+/** A deliberate break in the page's section rhythm: one full-bleed statement. */
 export default function PullQuote() {
   return (
     <section aria-label="Philosophy" className="section bg-sunk/60">

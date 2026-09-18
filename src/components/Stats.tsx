@@ -17,11 +17,8 @@ const signalVar: Record<Signal, string> = {
 };
 
 /**
- * The three numbers from the résumé, given room to be read. They count up
- * once, on arrival, with a thin bar filling in underneath to the same
- * fraction. A ring read as "N% of the way to something" for a number that's
- * actually a delta (+50%, −15%) rather than a completion state; a bar reads
- * as a bar chart instead, which matches what the number actually means.
+ * Counts up on arrival, with a bar filling to the same fraction. A bar, not a
+ * ring: these are deltas, not completion states.
  */
 export default function Stats() {
   return (
@@ -45,10 +42,7 @@ export default function Stats() {
                   <AnimatedNumber value={stat.value} startOnView />
                   <span className={signalText[stat.signal]}>{stat.suffix}</span>
                 </dd>
-                {/* A reduction (−15% defects) is framed as a delta, not growth toward
-                    a target, so its bar reads as flaky-amber rather than the
-                    pass-green every "+N%" stat uses — the same distinction the
-                    number's own colour already makes via stat.signal. */}
+                {/* A reduction reads as amber rather than the pass-green of a gain. */}
                 <StatBar
                   value={stat.value}
                   color={stat.prefix === "−" ? "var(--flaky)" : signalVar[stat.signal]}

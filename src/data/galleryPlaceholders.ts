@@ -1,12 +1,8 @@
 import type { Artwork, InterestPhoto } from "@/types";
 
 /**
- * Off Hours placeholder content — every `gradient` below stands in for a
- * real photo or scan, shown only as a fallback while src/assets/interests/
- * and src/assets/art/ are empty. To add real photos, don't edit this file —
- * drop images into those two folders instead (see the README in each) and
- * src/data/interestsGallery.ts / src/data/artGallery.ts pick them up
- * automatically, replacing these placeholders entirely.
+ * Fallback gradients, used only while src/assets/{art,interests}/ are empty.
+ * Don't edit this to add photos — drop them in those folders instead.
  */
 
 export const interestPhotos: InterestPhoto[] = [

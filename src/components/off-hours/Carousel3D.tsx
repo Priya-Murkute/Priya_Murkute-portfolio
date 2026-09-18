@@ -8,31 +8,20 @@ const HOLD_MS = 650;
 const REPEAT_GAP_MS = 80;
 const SPRING = { type: "spring" as const, stiffness: 100, damping: 18 };
 
-/** Auto-discovered artworks don't always have a medium (only when the
- * filename encodes one) — this drops the " · " rather than showing a blank. */
+/** Drops the " · " when the filename encoded no medium. */
 function formatCaption(art: { medium?: string; year: string }) {
   return art.medium ? `${art.medium} · ${art.year}` : art.year;
 }
 
-// 1.35x the original 200×280/1100px-perspective design, scaled uniformly (see
-// POSITIONS below) so the fan's proportions stay identical, just bigger.
 const CARD_WIDTH = 270;
 const CARD_HEIGHT = 378;
 
 /**
  * Card pose per offset from the active (0) position — index by clamped
- * offset + 2. `x` is the fan's horizontal spread, precomputed as if the
- * prototype's `rotateY(deg) translateZ(px)` orbit (rotate first, so the
- * translate rides along the tilted local Z axis and swings the card
- * sideways) had been applied, then projected through the stage's 1485px
- * perspective: x = translateZ*sin(rotateY) * (1485 / (1485 - translateZ*cos(rotateY))).
- * Motion composes x/y/z as a plain additive offset applied after rotate/scale
- * (not before, the way raw CSS transform strings would), so the sideways
- * swing has to be supplied directly rather than emerging from rotateY +
- * translateZ order the way it does in the prototype's CSS. `x` and
- * `translateZ` are the original values × 1.35 (matching CARD_WIDTH/HEIGHT
- * and the perspective below) — that scaling is what keeps the fan's
- * geometry proportionally identical at the larger size, not a re-derivation.
+ * offset + 2. `x` is precomputed rather than emergent: Motion applies x/y/z
+ * additively *after* rotate/scale, so the sideways swing a CSS
+ * `rotateY() translateZ()` would produce has to be supplied directly, already
+ * projected through the stage's 1485px perspective.
  */
 const POSITIONS = [
   { x: -74, rotateY: -62, translateZ: 81, scale: 0.52, opacity: 0.15, zIndex: 1 },
@@ -50,10 +39,8 @@ function offsetOf(index: number, current: number, total: number) {
 }
 
 /**
- * The 3D art carousel. No prev/next buttons — the left/right 36% of the
- * stage are hover zones; hold for 650ms (shown only by the SVG ring at the
- * edge) and it advances, then keeps advancing for as long as you stay in
- * the zone. A direct click on a zone skips the hold.
+ * The left/right edges of the stage are hover zones: hold for 650ms and it
+ * advances, then keeps advancing while held. A click skips the hold.
  */
 export default function Carousel3D() {
   const total = artworks.length;
@@ -67,8 +54,7 @@ export default function Carousel3D() {
       return;
     }
 
-    // A timer can't fire mid-flight once this cleanup runs, so clearing the
-    // pending one is enough to stop the chain — no separate "cancelled" flag needed.
+    // Clearing the pending timer stops the chain — no cancelled flag needed.
     let timer: number;
 
     const cycle = () => {
@@ -92,8 +78,7 @@ export default function Carousel3D() {
     setCurrent(((index % total) + total) % total);
   };
 
-  // Cached on enter/resize rather than re-read on every mousemove — the
-  // stage's position doesn't change mid-hover.
+  // Cached on enter rather than re-read on every mousemove.
   const stageRef = useRef<HTMLDivElement>(null);
   const stageRect = useRef<DOMRect | null>(null);
 
@@ -130,10 +115,8 @@ export default function Carousel3D() {
           {artworks.map((art, i) => {
             const offset = offsetOf(i, current, total);
             const hidden = Math.abs(offset) > 2;
-            // The artwork is a CSS background, which `loading="lazy"` can't
-            // reach — so the fetch is deferred by not setting it until the
-            // card is close. One position beyond the visible fan, so the next
-            // card is already decoded by the time it rotates in.
+            // A CSS background can't use loading="lazy", so the fetch is
+            // deferred by not setting it until the card is one position out.
             const shouldLoad = Math.abs(offset) <= 3;
             const pos = POSITIONS[Math.max(-2, Math.min(2, offset)) + 2];
 
@@ -194,8 +177,7 @@ export default function Carousel3D() {
         </div>
       </div>
 
-      {/* Announced on change, so the caption isn't a silent update for anyone
-          driving the carousel from the keyboard or a screen reader. */}
+      {/* Announced on change, so the caption isn't a silent update. */}
       <div
         className="mt-8 flex min-h-14 flex-col items-center gap-1.5 text-center"
         aria-live="polite"
@@ -207,10 +189,8 @@ export default function Carousel3D() {
         </p>
       </div>
 
-      {/* Plain buttons, not a tablist: nothing here is a tabpanel — the cards
-          are buttons of their own — so tab roles would promise arrow-key
-          semantics this widget doesn't implement. `aria-current` says which
-          one is showing without making that claim. */}
+      {/* Plain buttons, not a tablist: nothing here is a tabpanel, and tab
+          roles would promise arrow-key semantics this doesn't implement. */}
       <div className="mt-6 flex justify-center gap-2.5">
         {artworks.map((art, i) => (
           <button
@@ -230,13 +210,7 @@ export default function Carousel3D() {
   );
 }
 
-/**
- * The mouse affordance is a hover zone: the left/right 38% of the stage,
- * invisible until the cursor arms it. That left keyboard users with a control
- * they could reach but never see, so focus reveals the same zone — a visible
- * ring track plus the charge ring — and Enter advances immediately, skipping
- * the hold.
- */
+/** Invisible until the cursor arms it, or until it takes keyboard focus. */
 function HoverZone({
   side,
   active,
@@ -266,8 +240,7 @@ function HoverZone({
         style={{ transform: "rotate(-90deg)", transformOrigin: "center" }}
         aria-hidden="true"
       >
-        {/* Track: makes the control legible the moment it's focused, rather
-            than only once the hold has started charging. */}
+        {/* Track, so the control is legible on focus before it charges. */}
         <circle
           cx={21}
           cy={21}

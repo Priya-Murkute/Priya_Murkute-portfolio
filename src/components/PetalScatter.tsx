@@ -4,7 +4,7 @@ import { cherryBlossomColor, seededRandom } from "@/lib/cherryBlossom";
 import { useOnScreen } from "@/lib/useOnScreen";
 import { useTheme } from "@/context/ThemeContext";
 
-/** Same notched sakura silhouette as the hero scene, flattened to an SVG path. */
+/** The hero scene's petal silhouette, flattened to an SVG path. */
 const PETAL_PATH =
   "M12 27C6 21 4 11 6 5C7 2.2 9.2 1 12 4.4C14.8 1 17 2.2 18 5C20 11 18 21 12 27Z";
 
@@ -32,20 +32,15 @@ function makePetals(isDark: boolean): Petal[] {
 }
 
 /**
- * A scatter of fallen petals resting along the bottom of a section — the
- * "cherry blossoms on the street" companion to the hero's falling ones, as
- * if the ones from up top drifted down and settled here. Static SVG shapes
- * with a faint idle rustle, not another 3D scene: this strip is short, so a
- * canvas would be overkill for what's decoration here.
+ * Fallen petals resting along the bottom of a section — the companion to the
+ * hero's falling ones. Flat SVG rather than a second canvas.
  */
 export default function PetalScatter() {
   const { isDark } = useTheme();
   const prefersReducedMotion = useReducedMotion() ?? false;
   const petals = useMemo(() => makePetals(isDark), [isDark]);
 
-  // 42 petals × 3 looping tweens is 126 concurrent animations. Left running
-  // unconditionally they cost that much for the whole page lifetime, in two
-  // separate sections, whether or not either is on screen.
+  // 42 petals × 3 looping tweens — not worth running off-screen.
   const { ref: containerRef, isOnScreen } = useOnScreen<HTMLDivElement>("100px");
   const isAnimated = !prefersReducedMotion && isOnScreen;
 

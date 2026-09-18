@@ -25,22 +25,8 @@ const arrowVariants = {
 };
 
 /**
- * The Hero's single call to action, into /about-me.
- *
- * This is the two former hero buttons folded together: the solid ink pill,
- * the `glow-cta` bloom and the magnetic pull that used to belong to "Get in
- * touch", carrying the hover choreography that used to belong to the quiet
- * text link — one shared Motion variant state, propagated from the wrapping
- * motion.div to every child, so the badge tips open, the arrow steps forward,
- * the label tracks out and the underline draws in all at once with no
- * per-element wiring.
- *
- * The underline starts fully retracted rather than half-drawn: at rest this
- * now reads as a solid button, so a permanent hairline under the label would
- * look like an artefact instead of the invitation it was on plain text.
- *
- * Deliberately hover-only rather than looping at idle — calmer than a
- * constant nudge, and it reads as more considered.
+ * The Hero's single call to action. One shared variant state propagates from
+ * the wrapping motion.div, so the whole thing animates together on hover.
  */
 export default function AboutMeLink() {
   return (

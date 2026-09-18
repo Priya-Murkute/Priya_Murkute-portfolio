@@ -17,11 +17,8 @@ export const navLinks = [
 export default function NavBar({
   showSectionLinks = true,
 }: {
-  /** The /#section links only resolve from "/" — from another route they force
-   * a hard reload, and the browser attempts the hash scroll before the target
-   * section has even mounted (it's still behind the preloader), so it silently
-   * lands on the hero instead. Pages that aren't "/" pass false so only the
-   * logo and theme toggle show, rather than exposing links that can't work. */
+  /** Off "/" the hash scroll fires before the target section mounts, so
+   *  non-home pages pass false rather than expose links that can't work. */
   showSectionLinks?: boolean;
 }) {
   const { isDark, toggle } = useTheme();
@@ -90,10 +87,7 @@ export default function NavBar({
   );
 }
 
-/**
- * Reads as a status readout rather than a sun/moon icon — the label says which
- * theme is on, and the button says what pressing it does.
- */
+/** A status readout rather than a sun/moon icon. */
 function ThemeButton({ isDark, onToggle }: { isDark: boolean; onToggle: () => void }) {
   return (
     <button

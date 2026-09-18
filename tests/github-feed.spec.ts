@@ -1,11 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 /**
- * The Projects section is the only thing on the site that depends on a
- * third-party service at runtime. Unauthenticated GitHub allows 60 requests
- * per hour per IP, so the failure path is not hypothetical — a visitor on a
- * shared corporate address can hit it — and it has to degrade to something
- * that still points at the real profile.
+ * The only runtime third-party dependency. Unauthenticated GitHub allows 60
+ * requests/hour per IP, so the failure path is not hypothetical.
  */
 const REPOS_ENDPOINT = "https://api.github.com/users/*/repos*";
 
