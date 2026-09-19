@@ -4,22 +4,28 @@ name: Deploy to GitHub Pages
 # Vercel deploys automatically on push once the repo is imported there and
 # needs no workflow file. Use this workflow only if you're serving the site
 # from https://<user>.github.io/priya-portfolio/ instead.
+#
+# Actions are pinned to a commit, not a tag (see ci.yml for why).
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+# Read-only by default; the one job that publishes asks for more below.
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    # Pushing the built site to the gh-pages branch is the only write this workflow makes.
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 20
           cache: npm
@@ -37,7 +43,7 @@ jobs:
       # the app and lets react-router take over.
       - run: cp dist/index.html dist/404.html
 
-      - uses: peaceiris/actions-gh-pages@v4
+      - uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
