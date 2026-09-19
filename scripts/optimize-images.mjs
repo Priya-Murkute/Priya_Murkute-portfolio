@@ -80,7 +80,10 @@ async function optimizeFolder({ dir, maxWidth, quality }) {
 
     // metadata().size is only populated for buffer input.
     const { size } = await stat(source);
-    const input = sharp(source);
+    // Phone and camera photos are often stored sideways, with a flag saying which
+    // way up they go. Saving without that flag (which sharp does) would leave them
+    // lying down, so turn the pixels the right way up first.
+    const input = sharp(source).rotate();
     const { width } = await input.metadata();
 
     // Re-read from a buffer: sharp can't stream a file into itself.

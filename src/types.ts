@@ -98,6 +98,18 @@ export type HobbyIcon =
   | "flower"
   | "sparkle";
 
+export interface Place {
+  id: string;
+  name: string;
+  country: string;
+  lat: number;
+  lon: number;
+  /** "visited" places are pinned on the map; "bucket" ones are listed beside it. */
+  status: "visited" | "bucket";
+  /** One line about the place — shown on the bucket list. */
+  note?: string;
+}
+
 export interface Hobby {
   /** Also the name of its picture folder: src/assets/hobbies_interest/<id>/. */
   id: string;
