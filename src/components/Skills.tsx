@@ -1,6 +1,9 @@
+import { motion } from "motion/react";
 import type { CSSProperties, ReactNode } from "react";
+import { Icon } from "@/components/Icon";
 import { skillGroups } from "@/data/resume";
-import { InView } from "@/components/motion-primitives/in-view";
+import { iconPaths } from "@/lib/iconPaths";
+import { revealItem } from "@/lib/motion";
 
 /**
  * One glyph and accent per group. Uses --accent-* rather than the
@@ -46,12 +49,7 @@ const groupMeta: Record<string, { color: string; icon: ReactNode }> = {
   },
   Process: {
     color: "var(--ink-muted)",
-    icon: (
-      <>
-        <path d="M2.8 8a5.2 5.2 0 0 1 8.9-3.7M13.2 8a5.2 5.2 0 0 1-8.9 3.7" />
-        <path d="M11 1.8v3h-3M5 14.2v-3h3" />
-      </>
-    ),
+    icon: <path d={iconPaths.loop} />,
   },
   "CI/CD & tooling": {
     color: "var(--accent-rose)",
@@ -67,7 +65,7 @@ const groupMeta: Record<string, { color: string; icon: ReactNode }> = {
   /** Violet, to match the Data & Analytics tab and the hero's Analyse step. */
   "Data & Analytics": {
     color: "var(--accent-violet)",
-    icon: <path d="M2.5 13.5h11M5 11V8M8 11V4.5M11 11V6.5" />,
+    icon: <path d={iconPaths.chart} />,
   },
 };
 
@@ -89,49 +87,33 @@ export default function Skills() {
             const meta = groupMeta[group.label];
             const accent = meta?.color ?? "var(--pass)";
             return (
-              <InView
+              <motion.div
                 key={group.label}
-                once
-                viewOptions={{ margin: "-8% 0px" }}
-                variants={{
-                  hidden: { opacity: 0, y: 20, filter: "blur(6px)" },
-                  visible: { opacity: 1, y: 0, filter: "blur(0px)" },
-                }}
-                transition={{ duration: 0.55, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                className="grid gap-4 border-t border-line py-6 sm:grid-cols-12 sm:gap-8"
+                {...revealItem({ delay: index * 0.06 })}
               >
-                <div className="grid gap-4 border-t border-line py-6 sm:grid-cols-12 sm:gap-8">
-                  <dt className="flex items-center gap-2.5 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-faint sm:col-span-4 sm:pt-1">
-                    {meta ? (
-                      <svg
-                        viewBox="0 0 16 16"
-                        className="size-4 flex-none"
-                        fill="none"
-                        stroke={meta.color}
-                        strokeWidth={1.4}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
+                <dt className="mono-label flex items-center gap-2.5 text-faint sm:col-span-4 sm:pt-1">
+                  {meta ? (
+                    <Icon className="size-4 flex-none" strokeWidth={1.4} stroke={meta.color}>
+                      {meta.icon}
+                    </Icon>
+                  ) : null}
+                  {group.label}
+                </dt>
+                <dd className="sm:col-span-8">
+                  <ul className="flex flex-wrap gap-2">
+                    {group.items.map((item) => (
+                      <li
+                        key={item}
+                        style={{ "--group-accent": accent } as CSSProperties}
+                        className="rounded-full border border-line bg-surface px-3 py-1.5 text-[0.8125rem] text-ink transition-colors hover:border-[var(--group-accent)] hover:text-[var(--group-accent)]"
                       >
-                        {meta.icon}
-                      </svg>
-                    ) : null}
-                    {group.label}
-                  </dt>
-                  <dd className="sm:col-span-8">
-                    <ul className="flex flex-wrap gap-2">
-                      {group.items.map((item) => (
-                        <li
-                          key={item}
-                          style={{ "--group-accent": accent } as CSSProperties}
-                          className="rounded-full border border-line bg-surface px-3 py-1.5 text-[0.8125rem] text-ink transition-colors hover:border-[var(--group-accent)] hover:text-[var(--group-accent)]"
-                        >
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </dd>
-                </div>
-              </InView>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </motion.div>
             );
           })}
         </dl>

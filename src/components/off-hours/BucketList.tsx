@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { revealItem } from "@/lib/motion";
 import type { Place } from "@/types";
 
 /**
@@ -24,10 +25,7 @@ export default function BucketList({
     <motion.aside
       className="card row-span-3 grid grid-rows-subgrid bg-sunk p-5"
       aria-labelledby="bucket-list-title"
-      initial={{ opacity: 0, y: 22 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-8% 0px" }}
-      transition={{ duration: 0.55, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+      {...revealItem({ delay: 0.08, blur: false })}
     >
       <div className="grid content-start gap-1.5">
         <p className="eyebrow">Someday</p>

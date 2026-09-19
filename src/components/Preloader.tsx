@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { AnimatedNumber } from "@/components/motion-primitives/animated-number";
+import { EASE_CALM } from "@/lib/motion";
 
 const DURATION_MS = 600;
 const HOLD_MS = 150;
@@ -50,7 +51,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     <motion.div
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-5 bg-paper"
       exit={{ opacity: 0, filter: "blur(10px)" }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.5, ease: EASE_CALM }}
     >
       <span className="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-faint">
         Running the suite before you arrive

@@ -1,7 +1,7 @@
 import { animate, useReducedMotion } from "motion/react";
 import { useId, useLayoutEffect, useRef } from "react";
 import { easeInOut, schedule, type Leg } from "@/lib/journey";
-import { clamp } from "@/lib/worldMap";
+import { clamp } from "@/lib/utils";
 
 /** A beat before the first leg, so the map has settled and the eye has found it. */
 const START_DELAY = 0.5;

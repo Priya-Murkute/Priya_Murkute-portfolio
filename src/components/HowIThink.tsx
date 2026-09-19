@@ -1,6 +1,8 @@
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { profile, thinkingSteps } from "@/data/resume";
+import { iconPaths } from "@/lib/iconPaths";
+import { EASE_CALM } from "@/lib/motion";
 
 /** Same accents as the Showcase tabs, so the loop reads as QA → data → outcome. */
 const stepMeta: { color: string; icon: ReactNode }[] = [
@@ -15,7 +17,7 @@ const stepMeta: { color: string; icon: ReactNode }[] = [
   },
   {
     color: "var(--accent-violet)",
-    icon: <path d="M2.5 13.5h11M5 11V8M8 11V4.5M11 11V6.5" />,
+    icon: <path d={iconPaths.chart} />,
   },
   {
     color: "var(--pass)",
@@ -86,8 +88,7 @@ export default function HowIThink() {
           animate={prefersReducedMotion ? undefined : { rotate: tick * 120 }}
           transition={{ type: "spring", bounce: 0.25, duration: 0.7 }}
         >
-          <path d="M2.8 8a5.2 5.2 0 0 1 8.9-3.7M13.2 8a5.2 5.2 0 0 1-8.9 3.7" />
-          <path d="M11 1.8v3h-3M5 14.2v-3h3" />
+          <path d={iconPaths.loop} />
         </motion.svg>
         <span className={revealed === total ? "text-pass" : undefined}>on repeat</span>
         <span>·</span>
@@ -123,7 +124,7 @@ function StepRow({
             style={{ background: color }}
             initial={false}
             animate={{ scaleY: isRevealed ? 1 : 0 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.4, ease: EASE_CALM }}
           />
         </span>
       )}
@@ -158,7 +159,7 @@ function StepRow({
           <motion.g
             initial={false}
             animate={{ opacity: isRevealed ? 1 : 0, scale: isRevealed ? 1 : 0.5 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.3, ease: EASE_CALM }}
             style={{ transformOrigin: "8px 8px" }}
           >
             {icon}

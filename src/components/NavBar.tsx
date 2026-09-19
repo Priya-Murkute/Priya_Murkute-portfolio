@@ -1,18 +1,13 @@
 import { useMotionValueEvent, useScroll } from "motion/react";
 import { useState } from "react";
+import { Icon } from "@/components/Icon";
 import { ScrollProgress } from "@/components/motion-primitives/scroll-progress";
 import MobileNav from "@/components/MobileNav";
-import { useTheme } from "@/context/ThemeContext";
+import ThemeStatus from "@/components/ThemeStatus";
+import { useTheme } from "@/context/useTheme";
+import { navLinks } from "@/data/nav";
 import { cn } from "@/lib/utils";
 import { sectionHref } from "@/lib/links";
-
-export const navLinks = [
-  { href: sectionHref("experience"), label: "Experience" },
-  { href: sectionHref("projects"), label: "Projects" },
-  { href: sectionHref("certifications"), label: "Certifications" },
-  { href: sectionHref("skills"), label: "Skills" },
-  { href: sectionHref("contact"), label: "Contact" },
-];
 
 export default function NavBar({
   showSectionLinks = true,
@@ -65,14 +60,7 @@ export default function NavBar({
                 aria-label="Open menu"
                 className="ml-1 flex size-8 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-line-strong hover:text-ink md:hidden"
               >
-                <svg viewBox="0 0 16 16" className="size-3.5" fill="none" aria-hidden="true">
-                  <path
-                    d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"
-                    stroke="currentColor"
-                    strokeWidth={1.4}
-                    strokeLinecap="round"
-                  />
-                </svg>
+                <Icon d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11" strokeWidth={1.4} />
               </button>
             ) : null}
           </div>
@@ -95,15 +83,9 @@ function ThemeButton({ isDark, onToggle }: { isDark: boolean; onToggle: () => vo
       onClick={onToggle}
       aria-pressed={isDark}
       aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
-      className="ml-1 flex items-center gap-2 rounded-full border border-line px-3 py-1.5 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-muted transition-colors hover:border-line-strong hover:text-ink"
+      className="mono-label ml-1 flex items-center gap-2 rounded-full border border-line px-3 py-1.5 text-muted transition-colors hover:border-line-strong hover:text-ink"
     >
-      <span
-        className={cn(
-          "status-dot border border-line-strong",
-          isDark ? "bg-ink" : "bg-transparent",
-        )}
-      />
-      {isDark ? "dark" : "light"}
+      <ThemeStatus isDark={isDark} />
     </button>
   );
 }

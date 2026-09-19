@@ -9,6 +9,7 @@ import AboutMeLink from "@/components/AboutMeLink";
 import { TextEffect } from "@/components/motion-primitives/text-effect";
 import { AnimatedGroup } from "@/components/motion-primitives/animated-group";
 import { sectionHref } from "@/lib/links";
+import { EASE_CALM } from "@/lib/motion";
 import { useNamePetals } from "@/lib/useNamePetals";
 
 /** Second sentence of the headline gets the accent colour. */
@@ -28,7 +29,7 @@ export default function Hero() {
         className="absolute inset-x-0 -top-40 h-[38rem]"
         initial={{ opacity: 0, scale: 0.94 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 1.4, ease: EASE_CALM }}
       >
         <BlurryGradient />
       </motion.div>
@@ -44,7 +45,7 @@ export default function Hero() {
               staggerChildren: 0.12,
               delayChildren: 0.1,
               duration: 0.7,
-              ease: [0.22, 1, 0.36, 1],
+              ease: EASE_CALM,
             }}
           >
             <Link
@@ -90,7 +91,7 @@ export default function Hero() {
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <a
                 href={sectionHref("experience")}
-                className="glow-cta inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-px"
+                className="btn-primary glow-cta"
               >
                 View My Work
                 <span aria-hidden="true">↓</span>

@@ -8,6 +8,7 @@ import PlacesWandered from "@/components/off-hours/PlacesWandered";
 import VisionBoard from "@/components/off-hours/VisionBoard";
 import { nowItems } from "@/data/offHours";
 import { sectionHref } from "@/lib/links";
+import { EASE_CALM } from "@/lib/motion";
 
 const NOW_ITEMS_LOOP = [...nowItems, ...nowItems];
 
@@ -45,7 +46,7 @@ function AboutMeHero() {
           className="eyebrow mb-5 text-pass"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.7, ease: EASE_CALM }}
         >
           Priya Murkute · off hours
         </motion.p>
@@ -54,7 +55,7 @@ function AboutMeHero() {
           className="font-display text-[clamp(3rem,9vw,7.5rem)] leading-[1.04] font-light tracking-[-0.03em] text-ink"
           initial={{ opacity: 0, y: 22 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+          transition={{ duration: 0.9, ease: EASE_CALM, delay: 0.15 }}
         >
           Explorer.
           <br />
@@ -69,7 +70,7 @@ function AboutMeHero() {
           className="measure mt-7 max-w-[42ch] text-lead font-light text-muted"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
+          transition={{ duration: 0.8, ease: EASE_CALM, delay: 0.3 }}
         >
           There's a version of me that doesn't write test suites. This is her page.
         </motion.p>
@@ -78,7 +79,7 @@ function AboutMeHero() {
           className="mt-10 flex items-center gap-3 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-faint"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.55 }}
+          transition={{ duration: 0.6, ease: EASE_CALM, delay: 0.55 }}
         >
           <span className="h-px w-10 bg-line-strong" aria-hidden="true" />
           scroll to explore

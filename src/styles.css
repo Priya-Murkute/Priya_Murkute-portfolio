@@ -254,6 +254,16 @@
     color: var(--accent-rose);
   }
 
+  /* Small mono caps: field labels and the like. Add the colour where it's used. */
+  .mono-label {
+    @apply font-mono text-[0.6875rem] uppercase tracking-[0.14em];
+  }
+
+  /* The primary call to action: a solid ink pill. Pair it with .glow-cta for the hover bloom. */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-px;
+  }
+
   .built-with {
     color: color-mix(in srgb, var(--ink) 40%, transparent);
     transition: color 200ms ease;
@@ -358,7 +368,7 @@
   @media (hover: hover) and (pointer: fine) {
     .vision-note {
       transition:
-        translate 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        translate 0.4s var(--ease-calm),
         box-shadow 0.4s;
     }
 

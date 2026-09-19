@@ -13,7 +13,7 @@ import {
 } from "three";
 import { cherryBlossomColor, seededRandom } from "@/lib/cherryBlossom";
 import { onPetalRelease } from "@/lib/petalRelease";
-import { useTheme } from "@/context/ThemeContext";
+import { useTheme } from "@/context/useTheme";
 
 /**
  * Cherry blossom petals drifting down the hero. One InstancedMesh, one

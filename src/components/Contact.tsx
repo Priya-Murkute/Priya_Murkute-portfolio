@@ -1,8 +1,9 @@
 import { motion } from "motion/react";
 import { githubHandle, linkedinHandle, profile } from "@/data/resume";
 import { TextEffect } from "@/components/motion-primitives/text-effect";
-import { InView } from "@/components/motion-primitives/in-view";
+import { Icon } from "@/components/Icon";
 import PetalScatter from "@/components/PetalScatter";
+import { revealBlock } from "@/lib/motion";
 import { publicHref } from "@/lib/links";
 
 const channels = [
@@ -18,16 +19,7 @@ export default function Contact() {
       <PetalScatter />
 
       <div className="shell relative grid items-start gap-12 lg:grid-cols-12 lg:gap-10">
-        <InView
-          once
-          className="lg:col-span-7"
-          viewOptions={{ margin: "-15% 0px" }}
-          variants={{
-            hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
-            visible: { opacity: 1, y: 0, filter: "blur(0px)" },
-          }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        >
+        <motion.div className="lg:col-span-7" {...revealBlock()}>
           <p className="eyebrow eyebrow-section" style={{ color: "var(--flaky)" }}>
             Contact
           </p>
@@ -45,39 +37,20 @@ export default function Contact() {
             “Curiosity? Check. Caffeine? Always. Trust issues? Absolutely — they make excellent test cases.”
           </TextEffect>
 
-          <a
-            href={publicHref(profile.cvPath)}
-            download
-            className="glow-cta mt-10 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-px"
-          >
+          <a href={publicHref(profile.cvPath)} download className="btn-primary glow-cta mt-10">
             Download CV
-            <svg viewBox="0 0 16 16" className="size-3.5" fill="none" aria-hidden="true">
-              <path
-                d="M8 2v9m0 0 3.2-3.2M8 11 4.8 7.8M2.5 13.5h11"
-                stroke="currentColor"
-                strokeWidth={1.5}
-                strokeLinecap="round"
-              />
-            </svg>
+            <Icon d="M8 2v9m0 0 3.2-3.2M8 11 4.8 7.8M2.5 13.5h11" />
           </a>
-        </InView>
+        </motion.div>
 
-        <motion.div
-          className="card lg:col-span-5"
-          initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, margin: "-15% 0px" }}
-          transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-        >
+        <motion.div className="card lg:col-span-5" {...revealBlock({ delay: 0.15 })}>
           {channels.map((channel, index) => (
             <a
               key={channel.label}
               href={channel.href}
               className={`block px-6 py-5 transition-colors hover:bg-sunk ${index > 0 ? "border-t border-line" : ""}`}
             >
-              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-faint">
-                {channel.label}
-              </p>
+              <p className="mono-label text-faint">{channel.label}</p>
               <p className="mt-1.5 text-[0.9375rem] text-ink">{channel.value}</p>
             </a>
           ))}
