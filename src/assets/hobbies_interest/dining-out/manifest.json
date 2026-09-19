@@ -1,4 +1,12 @@
 {
+  "2026-05-25__Noodles-And-Crispy-Chicken.webp": {
+    "width": 900,
+    "height": 675
+  },
+  "2026-06-09__Curry-In-A-Stone-Bowl.webp": {
+    "width": 900,
+    "height": 1200
+  },
   "2026-09-01__Photo-04.webp": {
     "width": 900,
     "height": 1200
@@ -6,5 +14,13 @@
   "2026-09-01__Photo-09.webp": {
     "width": 900,
     "height": 675
+  },
+  "2026-09-19__Chole-Bhature-And-Kulcha.webp": {
+    "width": 900,
+    "height": 1125
+  },
+  "2026-09-19__Samosa-Chaat-To-Go.webp": {
+    "width": 900,
+    "height": 1200
   }
 }

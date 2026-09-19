@@ -108,4 +108,5 @@ export const pictureCaptions: Record<string, string> = {
   "Photo-15": "An evening by the water, flowers in hand",
   "Photo-16": "The White Tower in a sea of poppies",
   "Photo-21": "Wind on the hilltop",
+  "Insidious-Out-Of-The-Further": "Insidious: Out of the Further",
 };
