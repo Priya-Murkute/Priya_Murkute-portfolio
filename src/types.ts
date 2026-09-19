@@ -1,38 +1,5 @@
 export type Signal = "pass" | "flaky" | "fail";
 
-/** Kept separate from `Signal`: "flaky" must never label her work. */
-export type WorkStatus = "measured" | "ongoing";
-
-export interface Metric {
-  value: number;
-  prefix?: string;
-  suffix?: string;
-  label: string;
-}
-
-export interface WorkItem {
-  id: string;
-  name: string;
-  category: string;
-  organisation: string;
-  summary: string;
-  /** Shown when the card opens. */
-  detail: string;
-  metric?: Metric;
-  /** Ties the metric to how it was achieved, so it reads as evidence. */
-  metricContext?: string;
-  tools: string[];
-  status: WorkStatus;
-}
-
-/** A résumé achievement rewritten as the assertion it would have to satisfy. */
-export interface Assertion {
-  id: string;
-  text: string;
-  /** Milliseconds this "test" takes to tick over. */
-  duration: number;
-}
-
 export interface Stat {
   value: number;
   prefix?: string;
@@ -72,6 +39,31 @@ export interface SkillGroup {
   items: string[];
 }
 
+/** The two halves of the profile — each project and certificate belongs to one. */
+export type Track = "qa" | "data";
+
+export interface ShowcaseProject {
+  id: string;
+  title: string;
+  organisation: string;
+  /** "Job simulation", "Professional work" — sets expectations about scope. */
+  kind: string;
+  summary: string;
+  tools: string[];
+  track: Track;
+}
+
+export interface Certification {
+  name: string;
+  track: Track;
+}
+
+/** One step of the Test → Analyse → Improve loop. */
+export interface ThinkingStep {
+  verb: string;
+  line: string;
+}
+
 export interface Profile {
   name: string;
   title: string;
@@ -80,6 +72,10 @@ export interface Profile {
   github: string;
   linkedin: string;
   summary: string;
+  /** Hero only — the one-line positioning statement under the name. */
+  headline: string;
+  tagline: string;
+  keywords: string[];
   cvPath: string;
   yearsExperience: number;
   /** CV-only: printed by scripts/generate-cv.ts, never shown on the site. */

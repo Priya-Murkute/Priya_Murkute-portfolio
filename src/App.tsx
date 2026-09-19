@@ -6,14 +6,13 @@ import CursorGlow from "@/components/CursorGlow";
 import NavBar from "@/components/NavBar";
 import Hero from "@/components/Hero";
 import Stats from "@/components/Stats";
-import About from "@/components/About";
-import Work from "@/components/Work";
+import Education from "@/components/Education";
+import Showcase from "@/components/Showcase";
 import Projects from "@/components/Projects";
 import PullQuote from "@/components/PullQuote";
 import Experience from "@/components/Experience";
 import Volunteering from "@/components/Volunteering";
 import Skills from "@/components/Skills";
-import Certifications from "@/components/Certifications";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import AboutMe from "@/pages/AboutMe";
@@ -25,14 +24,13 @@ function HomePage() {
     <main id="main-content">
       <Hero />
       <Stats />
-      <About />
-      <Work />
-      <Projects />
-      <PullQuote />
       <Experience />
+      <Projects />
+      <Showcase />
+      <PullQuote />
+      <Education />
       <Volunteering />
       <Skills />
-      <Certifications />
       <Contact />
     </main>
   );

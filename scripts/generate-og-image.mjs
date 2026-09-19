@@ -18,11 +18,11 @@ const WIDTH = 1200;
 const HEIGHT = 630;
 
 // Kept in step with :root in src/styles.css.
-const PAPER = "#fafaf7";
+const PAPER = "#fffcfd";
 const INK = "#14171a";
-const INK_MUTED = "#6b7078";
+const INK_MUTED = "#62676f";
 const PASS = "#2e6b4f";
-const LINE = "#e8e7e1";
+const LINE = "#e9d3db";
 
 const NAME = "Priya Murkute";
 const TITLE = "QA Automation Engineer";

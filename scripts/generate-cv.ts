@@ -265,7 +265,7 @@ const html = `<!doctype html>
 
     <div>
       <h2>Certifications</h2>
-      <ul>${certifications.map((cert) => `<li>${escapeHtml(cert)}</li>`).join("")}</ul>
+      <ul>${certifications.map((cert) => `<li>${escapeHtml(cert.name)}</li>`).join("")}</ul>
 
       ${
         volunteering.length > 0

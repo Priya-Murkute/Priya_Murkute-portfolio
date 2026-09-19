@@ -6,15 +6,21 @@
 /* Palette. pass/flaky/fail carry meaning; --accent-* is decorative variety;
    --halo-* is for background washes only and is invisible at text contrast. */
 :root {
-  --paper: #fafaf7;
+  /* "Hint": white first, with the faintest rose warmth — mostly visible in
+     the tinted bands and the footer waves. */
+  --paper: #fffcfd;
   --surface: #ffffff;
-  --surface-sunk: #f4f4ef;
+  /* Every tinted token below is a clean pink — lighter and more saturated
+     rather than greyed. Greyed pinks are what made this palette read as dusty. */
+  --surface-sunk: #fdf3f6;
+  /* Neutral greys, a shade deeper than the originals so they clear AA on
+     --surface-sunk too. */
   --ink: #14171a;
-  --ink-muted: #6b7078;
-  /* 4.9:1 on --paper — this carries most of the page's small text. */
-  --ink-faint: #71767c;
-  --line: #e8e7e1;
-  --line-strong: #d6d5cd;
+  --ink-muted: #62676f;
+  /* 5.2:1 on --paper, 4.87:1 on --surface-sunk — this carries most of the page's small text. */
+  --ink-faint: #676c72;
+  --line: #f3e5ea;
+  --line-strong: #e9d3db;
 
   --pass: #2e6b4f;
   --pass-tint: #e8f0ea;
@@ -23,18 +29,31 @@
   --fail: #a63d3d;
   --fail-tint: #f6e7e5;
 
-  /* Kept close to paper, so the wash reads as soft light, not added colour. */
-  --halo-sage: #ece8da;
-  --halo-mint: #efe9dd;
-  --halo-sky: #e6e6e2;
-  --halo-sand: #eee3d2;
+  /* Kept close to paper, so the wash reads as soft light, not added colour:
+     rose, blush, a hint of lilac and peach. The names are historical. */
+  --halo-sage: #fdf0f4;
+  --halo-mint: #fef1f3;
+  --halo-sky: #f9f0f7;
+  --halo-sand: #fdf2ee;
   --halo-opacity: 0.4;
-  --grain-opacity: 0.035;
+  /* Lower than dark mode's: the grain multiplies, and on a pink tint any
+     more reads as dust rather than paper. */
+  --grain-opacity: 0.02;
+
+  /* The footer's filled waves. Deliberately separate from --halo-*: the halos
+     are tuned near-invisible for the hero wash, but the waves need real depth
+     to read as bands. Pink-tinted, at the same lightness as the original
+     beige waves, so they hold the same contrast against --paper. */
+  --wave-1: #fbe0e8;
+  --wave-2: #f8dfe8;
+  --wave-3: #f3e0ef;
 
   --accent-blue: #3f6f92;
-  --accent-teal: #2f8378;
+  /* Teal and clay a shade deeper than the originals, so hover text on --surface-sunk still reads. */
+  --accent-teal: #28756b;
   --accent-violet: #6f5f96;
-  --accent-clay: #a8663f;
+  --accent-clay: #975733;
+  --accent-rose: #a0506a;
 }
 
 .dark {
@@ -62,10 +81,16 @@
   --halo-opacity: 0.5;
   --grain-opacity: 0.055;
 
+  /* Same colours the dark waves always used. */
+  --wave-1: #16302a;
+  --wave-2: #1d3a2c;
+  --wave-3: #17293a;
+
   --accent-blue: #7fb0d9;
   --accent-teal: #6cc9ba;
   --accent-violet: #ab9bd9;
   --accent-clay: #d99a78;
+  --accent-rose: #e08fa8;
 }
 
 /* Points the utilities at the live variables, so one class works in both
@@ -182,7 +207,7 @@
 
   .section {
     position: relative;
-    padding-block: clamp(3rem, 6.5vw, 6rem);
+    padding-block: clamp(2.5rem, 5.25vw, 4.75rem);
   }
 
   .eyebrow {

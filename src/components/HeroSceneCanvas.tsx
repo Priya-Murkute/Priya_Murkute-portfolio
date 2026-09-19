@@ -1,4 +1,4 @@
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Color,
@@ -6,10 +6,13 @@ import {
   Group,
   InstancedMesh,
   Object3D,
+  PerspectiveCamera,
   Shape,
   ShapeGeometry,
+  Vector3,
 } from "three";
 import { cherryBlossomColor, seededRandom } from "@/lib/cherryBlossom";
+import { onPetalRelease } from "@/lib/petalRelease";
 import { useTheme } from "@/context/ThemeContext";
 
 /**
@@ -37,6 +40,14 @@ const BOTTOM_Y = -6.5;
 
 function petalColor(random: () => number, isDark: boolean) {
   return new Color(cherryBlossomColor(random(), isDark));
+}
+
+/**
+ * Two sine waves at different speeds, moving every petal together, so it
+ * reads as gusting rather than N independent particles.
+ */
+function gustAt(elapsed: number) {
+  return Math.sin(elapsed * 0.15) * 0.9 + Math.sin(elapsed * 0.37 + 1.3) * 0.4;
 }
 
 type PetalData = {
@@ -127,9 +138,7 @@ function Petals({ isDark, animate, count }: { isDark: boolean; animate: boolean;
     const step = Math.min(delta, 0.05);
     const elapsed = state.clock.elapsedTime;
 
-    // Two sine waves at different speeds, moving every petal together, so it
-    // reads as gusting rather than N independent particles.
-    const gust = Math.sin(elapsed * 0.15) * 0.9 + Math.sin(elapsed * 0.37 + 1.3) * 0.4;
+    const gust = gustAt(elapsed);
 
     petals.forEach((petal, index) => {
       petal.y -= petal.fallSpeed * step;
@@ -158,6 +167,199 @@ function Petals({ isDark, animate, count }: { isDark: boolean; animate: boolean;
 
   return (
     <instancedMesh ref={meshRef} args={[geometry, undefined, count]}>
+      <meshBasicMaterial toneMapped={false} side={DoubleSide} transparent opacity={0.95} />
+    </instancedMesh>
+  );
+}
+
+/**
+ * Petals the hero name lets go of (see useNamePetals). A separate pool, so
+ * the ambient loop above is untouched: same geometry, colours, tumble and
+ * gust, but each one starts at a point under the cursor and falls once.
+ */
+const RELEASE_POOL = 64;
+/** "Gentle": a quarter faster than the ambient petals' own speed range. */
+const RELEASE_SPEED = 1.25;
+const FADE_IN_SECONDS = 0.7;
+/** Distance above the hero's bottom edge over which a petal shrinks away. */
+const FADE_OUT_UNITS = 1.4;
+
+type ReleasedPetal = {
+  active: boolean;
+  x: number;
+  y: number;
+  z: number;
+  bottomY: number;
+  age: number;
+  fallSpeed: number;
+  swayAmplitude: number;
+  swaySpeed: number;
+  swayPhase: number;
+  swayOrigin: number;
+  gustOrigin: number;
+  spinSpeed: [number, number, number];
+  rotation: [number, number, number];
+  scale: number;
+};
+
+function makeReleasePool(): ReleasedPetal[] {
+  return Array.from({ length: RELEASE_POOL }, () => ({
+    active: false,
+    x: 0,
+    y: 0,
+    z: 0,
+    bottomY: 0,
+    age: 0,
+    fallSpeed: 0,
+    swayAmplitude: 0,
+    swaySpeed: 0,
+    swayPhase: 0,
+    swayOrigin: 0,
+    gustOrigin: 0,
+    spinSpeed: [0, 0, 0],
+    rotation: [0, 0, 0],
+    scale: 0,
+  }));
+}
+
+function ReleasedPetals({ isDark }: { isDark: boolean }) {
+  const meshRef = useRef<InstancedMesh>(null);
+  const geometry = useMemo(() => createPetalGeometry(), []);
+  const dummy = useMemo(() => new Object3D(), []);
+  const pool = useMemo(() => makeReleasePool(), []);
+  const nextSlot = useRef(0);
+  const isDarkRef = useRef(isDark);
+  const { camera, gl, clock } = useThree();
+
+  useEffect(() => {
+    isDarkRef.current = isDark;
+  }, [isDark]);
+
+  // Every slot starts hidden, and gets a colour now so the instance-colour
+  // attribute exists before the material first compiles.
+  useEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh) return;
+    dummy.scale.setScalar(0);
+    dummy.updateMatrix();
+    const random = seededRandom(7);
+    for (let index = 0; index < RELEASE_POOL; index += 1) {
+      mesh.setMatrixAt(index, dummy.matrix);
+      mesh.setColorAt(index, petalColor(random, isDarkRef.current));
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }, [dummy]);
+
+  useEffect(
+    () =>
+      onPetalRelease(({ clientX, clientY }) => {
+        const mesh = meshRef.current;
+        const rect = gl.domElement.getBoundingClientRect();
+        if (!mesh || rect.width === 0 || rect.height === 0) return;
+
+        // Cast a ray from the camera through the screen point to a depth just
+        // in front of the scene's middle, so released petals read slightly forward.
+        const z = 0.5 + Math.random();
+        const through = new Vector3(
+          ((clientX - rect.left) / rect.width) * 2 - 1,
+          -((clientY - rect.top) / rect.height) * 2 + 1,
+          0.5,
+        ).unproject(camera);
+        const direction = through.sub(camera.position).normalize();
+        const point = camera.position
+          .clone()
+          .add(direction.multiplyScalar((z - camera.position.z) / direction.z));
+        const fov = camera instanceof PerspectiveCamera ? camera.fov : 45;
+        const halfHeight = (camera.position.z - z) * Math.tan((fov * Math.PI) / 360);
+
+        const index = nextSlot.current;
+        nextSlot.current = (index + 1) % RELEASE_POOL;
+        const petal = pool[index];
+        const swaySpeed = 0.3 + Math.random() * 0.6;
+        const swayPhase = Math.random() * Math.PI * 2;
+        petal.active = true;
+        petal.x = point.x;
+        petal.y = point.y;
+        petal.z = z;
+        petal.bottomY = -halfHeight;
+        petal.age = 0;
+        petal.fallSpeed = (0.32 + Math.random() * 0.72) * RELEASE_SPEED;
+        petal.swayAmplitude = 0.2 + Math.random() * 0.4;
+        petal.swaySpeed = swaySpeed;
+        petal.swayPhase = swayPhase;
+        petal.swayOrigin = Math.sin(point.y * swaySpeed + swayPhase);
+        petal.gustOrigin = gustAt(clock.elapsedTime);
+        petal.spinSpeed = [
+          (Math.random() - 0.5) * 0.85,
+          (Math.random() - 0.5) * 0.85,
+          (Math.random() - 0.5) * 1.25,
+        ];
+        // Near face-on to begin with, so it reads as a petal as it leaves the letter.
+        petal.rotation = [
+          (Math.random() - 0.5) * 1.6,
+          (Math.random() - 0.5) * 1.6,
+          Math.random() * Math.PI * 2,
+        ];
+        petal.scale = 0.13 + Math.random() * 0.15;
+
+        mesh.setColorAt(index, new Color(cherryBlossomColor(Math.random(), isDarkRef.current)));
+        if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+      }),
+    [camera, gl, clock, pool],
+  );
+
+  useFrame((state, delta) => {
+    const mesh = meshRef.current;
+    if (!mesh) return;
+    const step = Math.min(delta, 0.05);
+    const elapsed = state.clock.elapsedTime;
+    const gust = gustAt(elapsed);
+    let changed = false;
+
+    pool.forEach((petal, index) => {
+      if (!petal.active) return;
+      changed = true;
+      petal.age += step;
+      petal.y -= petal.fallSpeed * step;
+      petal.rotation[0] += petal.spinSpeed[0] * step;
+      petal.rotation[1] += petal.spinSpeed[1] * step;
+      petal.rotation[2] += petal.spinSpeed[2] * step;
+
+      if (petal.y <= petal.bottomY) {
+        petal.active = false;
+        dummy.scale.setScalar(0);
+        dummy.updateMatrix();
+        mesh.setMatrixAt(index, dummy.matrix);
+        return;
+      }
+
+      const sway =
+        (Math.sin(petal.y * petal.swaySpeed + petal.swayPhase) - petal.swayOrigin) *
+        petal.swayAmplitude;
+      const flutter = Math.sin(elapsed * 2.4 + petal.swayPhase) * 0.15;
+      // Grows in as it leaves the letter, shrinks away near the bottom edge.
+      const fadeIn = Math.min(petal.age / FADE_IN_SECONDS, 1);
+      const fadeOut = Math.min((petal.y - petal.bottomY) / FADE_OUT_UNITS, 1);
+      const presence = (1 - (1 - fadeIn) ** 3) * fadeOut;
+
+      dummy.position.set(petal.x + sway + (gust - petal.gustOrigin), petal.y, petal.z);
+      dummy.rotation.set(
+        petal.rotation[0] + flutter,
+        petal.rotation[1],
+        petal.rotation[2] + flutter * 0.6,
+      );
+      dummy.scale.setScalar(petal.scale * presence);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(index, dummy.matrix);
+    });
+
+    if (changed) mesh.instanceMatrix.needsUpdate = true;
+  });
+
+  // Instances move far from the geometry's origin, so skip frustum culling.
+  return (
+    <instancedMesh ref={meshRef} args={[geometry, undefined, RELEASE_POOL]} frustumCulled={false}>
       <meshBasicMaterial toneMapped={false} side={DoubleSide} transparent opacity={0.95} />
     </instancedMesh>
   );
@@ -196,9 +398,13 @@ function Scene({
   });
 
   return (
-    <group ref={groupRef}>
-      <Petals isDark={isDark} animate={animate} count={count} />
-    </group>
+    <>
+      <group ref={groupRef}>
+        <Petals isDark={isDark} animate={animate} count={count} />
+      </group>
+      {/* Outside the parallax group, so a petal starts exactly under the cursor. */}
+      {animate ? <ReleasedPetals isDark={isDark} /> : null}
+    </>
   );
 }
 

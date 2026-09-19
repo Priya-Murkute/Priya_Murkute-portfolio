@@ -27,7 +27,63 @@ test.describe("github feed", () => {
 
     await page.goto("/");
     await expect(page.getByRole("heading", { name: /rest assured framework/i })).toBeVisible();
-    await expect(page.getByText("★ 4")).toBeVisible();
+    await expect(page.getByRole("link", { name: /rest assured framework/i })).toContainText("★ 4");
+  });
+
+  test("the drifting row exposes each repo once, however many times it repeats", async ({
+    page,
+  }) => {
+    await page.route(REPOS_ENDPOINT, (route) =>
+      route.fulfill({
+        json: [
+          {
+            id: 1,
+            name: "only-repo",
+            description: "Repeated visually to fill the loop.",
+            html_url: "https://github.com/Priya-Murkute/only-repo",
+            language: "Java",
+            stargazers_count: 0,
+            pushed_at: "2026-08-01T00:00:00Z",
+            fork: false,
+          },
+        ],
+      }),
+    );
+
+    await page.goto("/");
+    const section = page.locator("#projects");
+    await expect(section.getByRole("heading", { name: /only repo/i })).toBeVisible();
+
+    // Painted several times for a seamless loop...
+    expect(await section.getByText("Repeated visually to fill the loop.").count()).toBeGreaterThan(1);
+    // ...but one link in the accessibility tree, and one tab stop.
+    await expect(section.getByRole("link", { name: /only repo/i })).toHaveCount(1);
+    await expect(section.locator('a[tabindex="-1"]')).not.toHaveCount(0);
+  });
+
+  test("reduced motion gets a still row with no duplicate cards", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.route(REPOS_ENDPOINT, (route) =>
+      route.fulfill({
+        json: [
+          {
+            id: 1,
+            name: "still-repo",
+            description: "Should appear exactly once.",
+            html_url: "https://github.com/Priya-Murkute/still-repo",
+            language: "Java",
+            stargazers_count: 0,
+            pushed_at: "2026-08-01T00:00:00Z",
+            fork: false,
+          },
+        ],
+      }),
+    );
+
+    await page.goto("/");
+    const section = page.locator("#projects");
+    await expect(section.getByRole("heading", { name: /still repo/i })).toBeVisible();
+    await expect(section.getByText("Should appear exactly once.")).toHaveCount(1);
   });
 
   test("filters out forks and the profile README repo", async ({ page }) => {

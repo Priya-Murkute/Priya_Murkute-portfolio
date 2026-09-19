@@ -1,18 +1,18 @@
 import { expect, test, type Page } from "@playwright/test";
 
 /**
- * Asserts the *shape* of each href rather than a literal "/#work", so these
+ * Asserts the *shape* of each href rather than a literal "/#experience", so these
  * hold on both deploy targets and fail on any anchor that ignores the base path.
  */
-const SECTIONS = ["work", "projects", "experience", "skills", "contact"];
+const SECTIONS = ["experience", "projects", "certifications", "skills", "contact"];
 
-/** Width below which the header hides its links behind the menu button. */
-const SM_BREAKPOINT = 640;
+/** Width below which the header hides its links behind the menu button (Tailwind `md`). */
+const MD_BREAKPOINT = 768;
 
-/** Below `sm` the links live in the drawer, so return whichever holds them. */
+/** Below `md` the links live in the drawer, so return whichever holds them. */
 async function openNav(page: Page) {
-  const width = page.viewportSize()?.width ?? SM_BREAKPOINT;
-  if (width >= SM_BREAKPOINT) return page.locator("header");
+  const width = page.viewportSize()?.width ?? MD_BREAKPOINT;
+  if (width >= MD_BREAKPOINT) return page.getByRole("banner");
 
   await page.getByRole("button", { name: /open menu/i }).click();
   const drawer = page.getByRole("dialog", { name: /site navigation/i });

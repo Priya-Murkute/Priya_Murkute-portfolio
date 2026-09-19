@@ -34,7 +34,7 @@ export default function MobileNav({
   return (
     <AnimatePresence>
       {isOpen ? (
-        <div className="sm:hidden">
+        <div className="md:hidden">
           <motion.div
             key="backdrop"
             className="fixed inset-0 z-50 bg-ink/20 backdrop-blur-sm"
