@@ -100,11 +100,11 @@ export default function Projects() {
 
       <div className="shell relative">
         <header className="mx-auto max-w-[42ch] text-center">
-          <p className="eyebrow" style={{ color: "var(--pass)" }}>
+          <p className="eyebrow eyebrow-section" style={{ color: "var(--pass)" }}>
             From GitHub
           </p>
-          <h2 className="text-title mx-auto mt-3 max-w-[24ch] font-display font-semibold">
-            Whatever's live on the repo right now.
+          <h2 className="quote-text mx-auto mt-3 max-w-[24ch]">
+            “Whatever’s live on the repo <em>right now.</em>”
           </h2>
           <p className="measure mx-auto mt-4 text-sm text-muted">
             Pulled straight from{" "}

@@ -215,12 +215,15 @@ const CONTROL =
 export default function WorldMap({
   places,
   route,
+  trips = [],
   selectedId,
   onSelect,
 }: {
   places: Place[];
   /** The journey, as place ids in the order they were visited. */
   route: string[];
+  /** Places reached from the route's last stop: one line out to each, none back. */
+  trips?: string[];
   /** The bucket-list place being looked at, if any. */
   selectedId: string | null;
   onSelect: (id: string | null) => void;
@@ -364,8 +367,12 @@ export default function WorldMap({
   const unit = frame.w / (width || 1);
 
   const legs = useMemo(
-    () => buildLegs(route.flatMap((id) => located.find((place) => place.id === id) ?? [])),
-    [route, located],
+    () =>
+      buildLegs(
+        route.flatMap((id) => located.find((place) => place.id === id) ?? []),
+        trips.flatMap((id) => located.find((place) => place.id === id) ?? []),
+      ),
+    [route, trips, located],
   );
   // The route draws itself the first time the map is properly in view, and again on request.
   const reduced = useReducedMotion();
@@ -557,6 +564,12 @@ export default function WorldMap({
           </li>
         ))}
         <li>Route: {route.flatMap((id) => places.find((place) => place.id === id)?.name ?? []).join(", then ")}.</li>
+        {trips.length > 0 ? (
+          <li>
+            Trips from {places.find((place) => place.id === route[route.length - 1])?.name}:{" "}
+            {trips.flatMap((id) => places.find((place) => place.id === id)?.name ?? []).join(", ")}.
+          </li>
+        ) : null}
       </ul>
 
       <div className="grid gap-2">

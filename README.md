@@ -166,7 +166,7 @@ src/
     ├── NavBar.tsx             # border appears past 24px, scroll progress, theme switch
     ├── Hero.tsx               # headline + How I think card
     ├── HowIThink.tsx          # Test → Analyse → Improve, ticking on then cycling
-    ├── Showcase.tsx           # projects & certifications, tabbed by track
+    ├── Showcase.tsx           # certifications, tabbed by track
     ├── Projects.tsx           # live GitHub feed as a slow drifting row, session-cached
     ├── HeroScene.tsx          # gates the lazy 3D scene on idle + visibility
     ├── HeroSceneBackdrop.tsx, HeroSceneCanvas.tsx  # the r3f canvas: ambient petals + ones released from the name

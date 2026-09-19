@@ -1,23 +1,22 @@
 import { useRef, useState, type KeyboardEvent } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { certifications, showcaseProjects } from "@/data/resume";
+import { certifications } from "@/data/resume";
 import type { Track } from "@/types";
-import { Spotlight } from "@/components/motion-primitives/spotlight";
 import { LayeredWaves } from "@/components/Backgrounds";
 import { cn } from "@/lib/utils";
 
 const tabs: { track: Track; label: string; color: string }[] = [
   { track: "qa", label: "QA & Automation", color: "var(--accent-blue)" },
   { track: "data", label: "Data & Analytics", color: "var(--accent-violet)" },
+  { track: "other", label: "Others", color: "var(--accent-teal)" },
 ];
 
-/** Curated projects and certificates, split into the two tracks from the hero. */
+/** Certifications, split into the two tracks from the hero plus "others". */
 export default function Showcase() {
   const [active, setActive] = useState<Track>("qa");
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const activeTab = tabs.find((tab) => tab.track === active) ?? tabs[0];
-  const projects = showcaseProjects.filter((project) => project.track === active);
   const certs = certifications.filter((cert) => cert.track === active);
 
   /** WAI-ARIA tabs pattern: arrows move between tabs, Home/End jump to the ends. */
@@ -40,22 +39,22 @@ export default function Showcase() {
   }
 
   return (
-    <section id="certifications" className="section relative">
+    <section id="certifications" className="section relative z-10">
       <LayeredWaves className="absolute inset-x-0 top-0 h-24 opacity-50" />
 
       <div className="shell relative">
         <header className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <p className="eyebrow">Projects & certifications</p>
-            <h2 className="text-title mt-3 max-w-[22ch] font-display font-semibold">
-              Two tracks, one habit.
+            <p className="eyebrow eyebrow-section">Certifications</p>
+            <h2 className="quote-text mt-3 max-w-[22ch]">
+              “Two tracks, <em>one habit.</em>”
             </h2>
           </div>
 
           <div
             role="tablist"
-            aria-label="Project track"
-            className="flex gap-1 rounded-full border border-line bg-surface p-1"
+            aria-label="Certification track"
+            className="flex max-w-full gap-1 rounded-full border border-line bg-surface p-1"
           >
             {tabs.map((tab, index) => {
               const isActive = tab.track === active;
@@ -74,7 +73,7 @@ export default function Showcase() {
                   onClick={() => setActive(tab.track)}
                   onKeyDown={(event) => handleKeyDown(event, index)}
                   className={cn(
-                    "relative rounded-full px-4 py-2 text-sm transition-colors",
+                    "relative whitespace-nowrap rounded-full px-3 py-2 text-[0.8125rem] transition-colors max-[359px]:whitespace-normal max-[359px]:px-2 sm:px-4 sm:text-sm",
                     isActive ? "text-paper" : "text-muted hover:text-ink",
                   )}
                 >
@@ -106,67 +105,66 @@ export default function Showcase() {
               exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="grid gap-4 md:grid-cols-2">
-                {projects.map((project) => (
-                  <article key={project.id} className="card relative flex h-full flex-col gap-4 p-6">
-                    <Spotlight
-                      size={260}
-                      color={`color-mix(in oklab, ${activeTab.color} 22%, transparent)`}
-                    />
-                    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-                      <span
-                        className="whitespace-nowrap font-mono text-[0.6875rem] uppercase tracking-[0.14em]"
-                        style={{ color: activeTab.color }}
-                      >
-                        {project.kind}
-                      </span>
-                      <span className="font-mono text-[0.6875rem] text-faint">
-                        {project.organisation}
-                      </span>
-                    </div>
-
-                    <h3 className="font-display text-lg font-semibold leading-snug tracking-tight">
-                      {project.title}
-                    </h3>
-
-                    <p className="text-sm leading-relaxed text-muted">{project.summary}</p>
-
-                    <ul className="mt-auto flex flex-wrap gap-2 border-t border-line pt-4">
-                      {project.tools.map((tool) => (
-                        <li
-                          key={tool}
-                          className="rounded-full border border-line px-2.5 py-1 font-mono text-[0.6875rem] text-muted"
-                        >
-                          {tool}
-                        </li>
-                      ))}
-                    </ul>
-                  </article>
-                ))}
-              </div>
-
-              {certs.length > 0 ? (
-                <div className="mt-10">
-                  <h3 className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-faint">
-                    Certifications
-                  </h3>
-                  <ul className="mt-4 flex flex-wrap gap-2">
-                    {certs.map((cert) => (
-                      <li
-                        key={cert.name}
-                        className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-[0.8125rem] text-ink"
-                      >
+              {certs.length === 0 ? (
+                <p className="rounded-[1.125rem] border border-dashed border-line px-6 py-10 text-center text-sm text-muted">
+                  Nothing here yet — certifications outside QA and data will land in this tab.
+                </p>
+              ) : (
+                <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {certs.map((cert) => {
+                    const inner = (
+                      <>
                         <span
                           aria-hidden="true"
-                          className="status-dot"
+                          className="status-dot mt-[0.4rem] flex-none"
                           style={{ background: activeTab.color }}
                         />
-                        {cert.name}
+                        <span className="cert-title min-w-0 flex-1 text-[0.8125rem] leading-snug text-ink">
+                          {cert.name}
+                        </span>
+                        {cert.url ? (
+                          <>
+                            <span aria-hidden="true" className="flex-none text-faint">
+                              ↗
+                            </span>
+                            <span className="sr-only"> (opens in a new tab)</span>
+                            <span aria-hidden="true" className="cert-pop">
+                              <span className="cert-pop-card">
+                                <span className="block font-display text-sm font-semibold leading-snug tracking-tight text-ink">
+                                  {cert.name}
+                                </span>
+                                <span className="mt-2 block font-mono text-[0.6875rem] text-faint">
+                                  View certificate ↗
+                                </span>
+                              </span>
+                            </span>
+                          </>
+                        ) : null}
+                      </>
+                    );
+                    const chipClass =
+                      "cert-card card flex h-full items-start gap-2.5 rounded-[0.875rem] px-3.5 py-2.5";
+                    return (
+                      <li key={cert.name}>
+                        {cert.url ? (
+                          <a
+                            href={cert.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={chipClass}
+                          >
+                            {inner}
+                          </a>
+                        ) : (
+                          <div className={chipClass} title={cert.name}>
+                            {inner}
+                          </div>
+                        )}
                       </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
+                    );
+                  })}
+                </ul>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>

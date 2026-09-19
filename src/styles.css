@@ -136,11 +136,6 @@
   --text-lead: clamp(1.0625rem, 1.5vw, 1.25rem);
   --text-lead--line-height: 1.6;
 
-  /* PullQuote only — set for a multi-line quote, not a one-line title. */
-  --text-quote: clamp(1.75rem, 4.4vw, 3.1rem);
-  --text-quote--line-height: 1.18;
-  --text-quote--letter-spacing: -0.02em;
-
   --ease-calm: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -152,6 +147,15 @@
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+  }
+
+  /* Anchor jumps land below the fixed 4rem nav instead of under it. */
+  .section[id] {
+    scroll-margin-top: 4rem;
+  }
+
+  #top {
+    scroll-margin-top: 0;
   }
 
   body {
@@ -218,6 +222,29 @@
     color: var(--ink-faint);
   }
 
+  /* Larger label for a section's own heading (Experience, Education, …). */
+  .eyebrow-section {
+    font-size: clamp(1rem, 0.9rem + 0.55vw, 1.375rem);
+    letter-spacing: 0.14em;
+    font-weight: 500;
+  }
+
+  /* Shared look for every quotation on the site. */
+  .quote-text {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3.5vw, 2.6rem);
+    font-weight: 300;
+    line-height: 1.25;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+
+  .quote-text em,
+  .quote-accent {
+    font-style: italic;
+    color: var(--pass);
+  }
+
   .built-with {
     color: color-mix(in srgb, var(--ink) 40%, transparent);
     transition: color 200ms ease;
@@ -236,6 +263,68 @@
     background-color: var(--surface);
     border: 1px solid var(--line);
     border-radius: 1.125rem;
+  }
+
+  /*
+   * Certification chip. On hover-capable screens the title is trimmed to one line and
+   * hovering (or keyboard focus) pops a card out on top of the chip with the full title and
+   * the link. On touch there is no hover, so the chip just shows its full title.
+   */
+  .cert-pop {
+    display: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cert-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .cert-card {
+      transition: border-color 0.2s ease;
+    }
+
+    .cert-card:hover,
+    .cert-card:focus-visible {
+      z-index: 20;
+      border-color: var(--ink-faint);
+    }
+
+    .cert-pop {
+      display: block;
+      position: absolute;
+      inset: -0.5rem -0.5rem auto -0.5rem;
+      z-index: 20;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.96);
+      transform-origin: top left;
+      transition:
+        opacity 0.18s ease,
+        transform 0.18s ease,
+        visibility 0s linear 0.18s;
+    }
+
+    .cert-pop-card {
+      display: block;
+      padding: 0.875rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: 0.875rem;
+      background-color: var(--surface);
+      box-shadow: 0 18px 40px -16px color-mix(in oklab, var(--ink) 35%, transparent);
+    }
+
+    .cert-card:hover .cert-pop,
+    .cert-card:focus-visible .cert-pop {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition:
+        opacity 0.18s ease 0.08s,
+        transform 0.18s ease 0.08s,
+        visibility 0s linear 0.08s;
+    }
   }
 
   .hairline {
@@ -334,6 +423,23 @@
     opacity: 0.42;
   }
 
+  /* A soft pulse and an arrow nudge on the Hero's About Me link, so it isn't walked past.
+     Rose is the petals' colour; hovering or focusing the link settles both. */
+  .about-pulse {
+    animation: about-pulse 4.2s ease-out 1.6s infinite;
+  }
+
+  .about-nudge {
+    animation: about-nudge 4.2s ease-in-out 1.6s infinite;
+  }
+
+  .about-pulse:hover,
+  .about-pulse:focus-visible,
+  .about-pulse:hover .about-nudge,
+  .about-pulse:focus-visible .about-nudge {
+    animation: none;
+  }
+
   .haikei-drift {
     animation: haikei-drift var(--drift-duration, 20s) ease-in-out infinite;
     animation-delay: var(--drift-delay, 0s);
@@ -400,9 +506,37 @@
   animation: pin-ping 1.8s ease-out infinite;
 }
 
+@keyframes about-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent-rose) 45%, transparent);
+  }
+  38%,
+  100% {
+    box-shadow: 0 0 0 13px color-mix(in oklab, var(--accent-rose) 0%, transparent);
+  }
+}
+
+@keyframes about-nudge {
+  0%,
+  8%,
+  24%,
+  100% {
+    transform: translateX(0);
+  }
+  16%,
+  32% {
+    transform: translateX(3px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .about-pulse,
+  .about-nudge {
+    animation: none;
   }
 
   body,

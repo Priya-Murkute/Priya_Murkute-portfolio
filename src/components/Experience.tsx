@@ -5,7 +5,7 @@ export default function Experience() {
   return (
     <section id="experience" className="section">
       <div className="shell">
-        <p className="eyebrow">Experience</p>
+        <p className="eyebrow eyebrow-section">Experience</p>
 
         <div className="mt-10 space-y-px">
           {experience.map((role, index) => (

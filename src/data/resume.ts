@@ -3,7 +3,6 @@ import type {
   EducationItem,
   ExperienceItem,
   Profile,
-  ShowcaseProject,
   SkillGroup,
   Stat,
   ThinkingStep,
@@ -134,47 +133,31 @@ export const thinkingSteps: ThinkingStep[] = [
   { verb: "Improve", line: "Turn findings into better solutions." },
 ];
 
-/** Curated, unlike the live GitHub feed in Projects.tsx. */
-export const showcaseProjects: ShowcaseProject[] = [
-  {
-    id: "web-api-automation",
-    title: "Web & API Test Automation",
-    organisation: "Wipro Technologies · Testing Info",
-    kind: "Professional work",
-    summary:
-      "Designed test cases, automated web testing and tested REST APIs while working with Agile teams.",
-    tools: ["Selenium", "Java", "Postman", "Rest Assured"],
-    track: "qa",
-  },
-  {
-    id: "deloitte-data-analytics",
-    title: "Deloitte Australia — Data Analytics Job Simulation",
-    organisation: "Deloitte Australia",
-    kind: "Job simulation",
-    summary: "Analysed business data and created a Tableau dashboard to communicate findings.",
-    tools: ["Excel", "Tableau", "Data Analysis"],
-    track: "data",
-  },
-  {
-    id: "tata-genai-analytics",
-    title: "Tata Group — GenAI-Powered Data Analytics",
-    organisation: "Tata Group",
-    kind: "Job simulation",
-    summary:
-      "Explored data quality and risk indicators and developed a proposed predictive approach.",
-    tools: ["EDA", "GenAI", "Predictive Modelling"],
-    track: "data",
-  },
-];
-
 /** From the LinkedIn profile. */
 export const certifications: Certification[] = [
   { name: "Programming Foundations: Software Testing/QA", track: "qa" },
   { name: "Test Automation Foundations", track: "qa" },
   { name: "Postman Essential Training", track: "qa" },
-  { name: "Skyscanner — Front-End Software Engineering Job Simulation", track: "qa" },
-  { name: "Y Combinator — Working as a Software Engineer at a Start-Up Job Simulation", track: "qa" },
-  { name: "Tata — GenAI Powered Data Analytics Job Simulation", track: "data" },
+  {
+    name: "Tata — GenAI Powered Data Analytics Job Simulation",
+    track: "data",
+    url: "https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/gMTdCXwDdLYoXZ3wG_ifobHAoMjQs9s6bKS_68cc5a9323fff83d6df1616c_1789668503034_completion_certificate.pdf",
+  },
+  {
+    name: "Deloitte Australia — Data Analytics Job Simulation",
+    track: "data",
+    url: "https://www.theforage.com/completion-certificates/9PBTqmSxAf6zZTseP/io9DzWKe3PTsiS6GG_9PBTqmSxAf6zZTseP_68cc5a9323fff83d6df1616c_1789425113978_completion_certificate.pdf",
+  },
+  {
+    name: "Skyscanner — Front-End Software Engineering Job Simulation",
+    track: "other",
+    url: "https://www.theforage.com/completion-certificates/skoQmxqhtgWmKv2pm/km4rw7dihDr3etqom_skoQmxqhtgWmKv2pm_68cc5a9323fff83d6df1616c_1789687389437_completion_certificate.pdf",
+  },
+  {
+    name: "Y Combinator — Working as a Software Engineer at a Start-Up Job Simulation",
+    track: "other",
+    url: "https://www.theforage.com/completion-certificates/3rjEZnibAFydi6noa/oRMogWRHeewqHzA7u_3rjEZnibAFydi6noa_68cc5a9323fff83d6df1616c_1789598462794_completion_certificate.pdf",
+  },
 ];
 
 /** Kept separate from `experience` so it never reads as a paid role. */

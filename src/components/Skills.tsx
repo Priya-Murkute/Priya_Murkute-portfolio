@@ -77,7 +77,7 @@ export default function Skills() {
       <div className="shell">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <p className="eyebrow">Toolkit</p>
+            <p className="eyebrow eyebrow-section">Toolkit</p>
             <h2 className="mt-3 max-w-[22ch] font-display text-2xl font-semibold tracking-tight">
               What I reach for.
             </h2>

@@ -8,7 +8,7 @@ export default function Volunteering() {
   return (
     <section className="section">
       <div className="shell">
-        <p className="eyebrow">Volunteering</p>
+        <p className="eyebrow eyebrow-section">Volunteering</p>
 
         <div className="mt-10 space-y-px">
           {volunteering.map((item, index) => (

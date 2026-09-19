@@ -28,7 +28,7 @@ export default function Contact() {
           }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
-          <p className="eyebrow" style={{ color: "var(--flaky)" }}>
+          <p className="eyebrow eyebrow-section" style={{ color: "var(--flaky)" }}>
             Contact
           </p>
 
@@ -37,9 +37,11 @@ export default function Contact() {
             per="word"
             preset="fade-in-blur"
             speedReveal={1.8}
-            className="text-display mt-4 max-w-[16ch] font-display font-semibold"
+            accent="excellent test cases"
+            accentClassName="quote-accent"
+            className="quote-text mt-4"
           >
-            Got a release coming that you would rather were boring?
+            “Curiosity? Check. Caffeine? Always. Trust issues? Absolutely — they make excellent test cases.”
           </TextEffect>
 
           <a

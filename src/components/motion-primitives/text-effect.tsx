@@ -20,6 +20,9 @@ export type TextEffectProps = {
   onAnimationComplete?: () => void;
   onAnimationStart?: () => void;
   segmentWrapperClassName?: string;
+  /** A phrase inside `children` to style with `accentClassName`. */
+  accent?: string;
+  accentClassName?: string;
   containerTransition?: Transition;
   segmentTransition?: Transition;
   style?: React.CSSProperties;
@@ -85,14 +88,20 @@ const AnimationComponent: React.FC<{
   variants: Variants;
   per: PerType;
   segmentWrapperClassName?: string;
-}> = React.memo(({ segment, variants, per, segmentWrapperClassName }) => {
+  accentClassName?: string;
+}> = React.memo(({ segment, variants, per, segmentWrapperClassName, accentClassName }) => {
+  const accented = (base: string) => (accentClassName ? `${base} ${accentClassName}` : base);
   const content =
     per === "line" ? (
-      <motion.span variants={variants} className="block">
+      <motion.span variants={variants} className={accented("block")}>
         {segment}
       </motion.span>
     ) : per === "word" ? (
-      <motion.span aria-hidden="true" variants={variants} className="inline-block whitespace-pre">
+      <motion.span
+        aria-hidden="true"
+        variants={variants}
+        className={accented("inline-block whitespace-pre")}
+      >
         {segment}
       </motion.span>
     ) : (
@@ -102,7 +111,7 @@ const AnimationComponent: React.FC<{
             key={`char-${index}`}
             aria-hidden="true"
             variants={variants}
-            className="inline-block whitespace-pre"
+            className={accented("inline-block whitespace-pre")}
           >
             {char}
           </motion.span>
@@ -169,11 +178,21 @@ export function TextEffect({
   onAnimationComplete,
   onAnimationStart,
   segmentWrapperClassName,
+  accent,
+  accentClassName,
   containerTransition,
   segmentTransition,
   style,
 }: TextEffectProps) {
   const segments = splitText(children, per);
+  const accentStart = accent ? children.indexOf(accent) : -1;
+  const accentEnd = accentStart + (accent?.length ?? 0);
+  const segmentStarts: number[] = [];
+  let cursor = 0;
+  for (const segment of segments) {
+    segmentStarts.push(cursor);
+    cursor += segment.length + (per === "line" ? 1 : 0);
+  }
   const MotionTag = React.useMemo(() => motion.create(as), [as]);
   const baseVariants = presetVariants[preset];
   const stagger = defaultStaggerTimes[per] / speedReveal;
@@ -215,15 +234,21 @@ export function TextEffect({
           style={style}
         >
           {per !== "line" ? <span className="sr-only">{children}</span> : null}
-          {segments.map((segment, index) => (
-            <AnimationComponent
-              key={`${per}-${index}-${segment}`}
-              segment={segment}
-              variants={computedVariants.item}
-              per={per}
-              segmentWrapperClassName={segmentWrapperClassName}
-            />
-          ))}
+          {segments.map((segment, index) => {
+            const start = segmentStarts[index];
+            const isAccent =
+              accentStart >= 0 && segment.trim() !== "" && start >= accentStart && start < accentEnd;
+            return (
+              <AnimationComponent
+                key={`${per}-${index}-${segment}`}
+                segment={segment}
+                variants={computedVariants.item}
+                per={per}
+                segmentWrapperClassName={segmentWrapperClassName}
+                accentClassName={isAccent ? accentClassName : undefined}
+              />
+            );
+          })}
         </MotionTag>
       )}
     </AnimatePresence>

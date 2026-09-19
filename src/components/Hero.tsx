@@ -66,9 +66,9 @@ export default function Hero() {
               </TextEffect>
             </Link>
 
-            <p className="text-title text-xl font-display font-semibold">
-              {headlineStart}{" "}
-              {headlineEnd ? <span className="text-pass">{headlineEnd}</span> : null}
+            <p className="quote-text text-[clamp(1.3rem,2.2vw,1.6rem)]">
+              “{headlineStart}{" "}
+              {headlineEnd ? <em>{headlineEnd}</em> : null}”
             </p>
 
             <p className="measure text x1 text-muted">{profile.tagline}</p>
@@ -98,7 +98,7 @@ export default function Hero() {
         </div>
 
         <motion.div
-          className="mt-6 w-full max-w-sm sm:mt-12 lg:col-span-5 lg:ml-auto"
+          className="mt-6 w-full max-w-sm sm:mt-12 lg:col-span-5 lg:ml-auto lg:mt-0"
           initial={{ opacity: 0, y: 46, scale: 0.95, filter: "blur(14px)" }}
           animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
           transition={{ type: "spring", bounce: 0.22, duration: 1.1, delay: 0.42 }}
