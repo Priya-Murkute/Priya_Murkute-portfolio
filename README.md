@@ -61,7 +61,15 @@ build (`playwright.config.ts` builds and serves it), across Chromium, a Pixel
   covers the mobile drawer, the 404 route and the CV download resolving.
 - **github feed** — renders, filters forks, degrades to a profile link when
   rate-limited, answers a second visit from the session cache, and exposes
-  each repo once despite the drifting row painting it several times.
+  each repo once despite the drifting row painting it several times. It also
+  feeds the row hostile data — a `javascript:` link, a look-alike host, a
+  reply that isn't a list, a tampered session cache — and expects none of it
+  to reach the page.
+- **security guards** (`tests/security.spec.ts`, no browser) — the CSP's
+  inline-script hash matches `index.html`, the response headers are all in
+  `vercel.json`, every workflow sets its token permissions and pins each
+  action to a commit, outbound links go through `ExternalLink`, and nothing in
+  `src` writes raw HTML or evaluates a string.
 
 On Windows, WebKit crashes its worker at full concurrency, so the config caps
 workers at 2 there. CI (Linux) is unaffected.
@@ -100,10 +108,21 @@ subpath handling and deploys are simpler to reason about.
 
 ### Security headers
 
-`vercel.json` sends a `Content-Security-Policy`, `X-Frame-Options: DENY`,
+`vercel.json` sends a `Content-Security-Policy` (including
+`upgrade-insecure-requests`), `Strict-Transport-Security` (two years),
+`Cross-Origin-Opener-Policy: same-origin`, `X-Frame-Options: DENY`,
 `X-Content-Type-Options: nosniff`, `Referrer-Policy` and a `Permissions-Policy`
 on every route — Vercel only; GitHub Pages has no mechanism for custom
-response headers, so that deploy target ships without them regardless.
+response headers, so that deploy target ships without them regardless. (That
+is also why the GitHub feed validates what it receives, rather than leaning on
+the CSP.)
+
+The CSP still needs `style-src 'unsafe-inline'`, because React and motion set
+inline styles; removing it would take a per-request nonce, which a static host
+can't provide. Fonts come from Google's CDN, so `fonts.googleapis.com` and
+`fonts.gstatic.com` are in the policy too; self-hosting them (via
+`@fontsource-variable/*`) would remove both and stop visitors' IP addresses
+going to Google.
 
 The CSP allows exactly one inline script by SHA-256 hash — the
 before-first-paint theme script in `index.html` — rather than the much
@@ -112,10 +131,24 @@ the CSP silently blocks it in production**, which reintroduces the dark-mode
 white-flash bug with no visible error. Recompute it with:
 
 ```bash
-node -e 'const c=require("fs").readFileSync("index.html","utf8").match(/<script(?![^>]*type=)[^>]*>([\s\S]*?)<\/script>/)[1];console.log("sha256-"+require("crypto").createHash("sha256").update(c,"utf8").digest("base64"))'
+node -e 'const c=require("fs").readFileSync("index.html","utf8").replace(/\r\n/g,"\n").match(/<script(?![^>]*type=)[^>]*>([\s\S]*?)<\/script>/)[1];console.log("sha256-"+require("crypto").createHash("sha256").update(c,"utf8").digest("base64"))'
 ```
 
 and paste the result into `vercel.json`'s `script-src` directive.
+
+A hash is over the exact bytes served, so line endings count: `index.html` is
+pinned to LF in `.gitattributes`, and the command above normalises to LF too.
+(This once bit for real: the hash on record had been computed from a Windows
+checkout's CRLF copy, so the live site's script never matched it.)
+`tests/security.spec.ts` fails if the two ever disagree.
+
+### CI
+
+`.github/workflows` pins every action to a commit rather than a tag (a tag can
+be moved after the fact), gives the CI token read-only access, and audits
+production dependencies for high-severity advisories. `.github/dependabot.yml`
+opens weekly PRs for npm packages and for those action pins, which don't update
+themselves.
 
 ## Where the content lives
 
@@ -140,10 +173,15 @@ src/
 ├── styles.css                 # the whole design system (see below)
 ├── types.ts
 ├── context/
-│   └── ThemeContext.tsx       # theme state + localStorage; index.html's inline
-│                              # script does the before-first-paint part
+│   ├── ThemeContext.tsx       # ThemeProvider: theme state + localStorage; index.html's
+│   │                          # inline script does the before-first-paint part
+│   └── useTheme.ts            # the context and its hook (apart, so fast refresh works)
 ├── lib/
-│   ├── utils.ts               # cn() = twMerge(clsx(...))
+│   ├── utils.ts               # cn() = twMerge(clsx(...)); clamp()
+│   ├── motion.ts              # EASE_CALM, and revealItem / revealBlock: the scroll-in reveal every section shares
+│   ├── storage.ts             # readStorage / writeStorage: localStorage & sessionStorage that never throw
+│   ├── iconPaths.ts           # glyphs shared by more than one Icon
+│   ├── mapLabels.ts           # where each place's name goes on the map, so crowded pins stay legible
 │   ├── links.ts               # sectionHref/publicHref — base-path-aware URLs
 │   ├── gallery.ts             # shared filename grammar for both galleries
 │   ├── cherryBlossom.ts       # one sakura gradient + a seeded PRNG
@@ -156,6 +194,7 @@ src/
 │   └── useMapCamera.ts        # the map's camera: set it at once (dragging) or fly it (tabs, bucket list)
 ├── data/
 │   ├── resume.ts              # all résumé content
+│   ├── nav.ts                 # the section links in the header and the phone menu
 │   ├── offHours.ts            # About Me content: the ticker, the Hobbies / Interests tiles, and captions
 │   ├── hobbyPictures.ts       # each tile's pictures = the files in src/assets/hobbies_interest/<hobby id>/
 │   ├── places.ts              # Places I've wandered: every visited place and bucket-list place, the stats' source, and
@@ -180,10 +219,16 @@ src/
     ├── AboutMeLink.tsx        # Hero's link into /about-me
     ├── PullQuote.tsx          # the full-bleed editorial line between sections
     ├── MobileNav.tsx          # the small-viewport nav drawer
+    ├── Icon.tsx               # the 16×16 line-icon wrapper every inline icon goes through
+    ├── ExternalLink.tsx       # a link to another site: new tab, rel="noopener noreferrer", not overridable
+    ├── SectionHeader.tsx      # eyebrow + title + something on the right; Hobbies, Places, Showcase
+    ├── ThemeStatus.tsx        # the dot-and-word theme readout, in the header and the phone menu
+    ├── Timeline.tsx           # a run of dated roles; Experience and Volunteering are both this
     ├── Education.tsx, Stats.tsx, Experience.tsx, Volunteering.tsx,
     │   Skills.tsx, Contact.tsx, Footer.tsx
     │                          # one straightforward renderer per résumé section
-    ├── off-hours/             # HobbiesInterests (tiles + expanding-card gallery on a sliding track, any number of photos)
+    ├── off-hours/             # HobbiesInterests (the tiles); HobbyGallery (the expanding-card gallery on a sliding
+    │                          # track, any number of photos) and hobbyIcons, split out of it
     │                          # PlacesWandered = WorldMap + BucketList: two cards on one grid, each spanning
     │                          # its three rows with a subgrid, which is what keeps them aligned.
     │                          # JourneyRoute draws the route leg by leg when the map scrolls into view; for the
@@ -230,7 +275,7 @@ components layer, a one-off `pt-32` on a section still works.
 
 ## motion-primitives
 
-`src/components/motion-primitives/` holds local copies of TextEffect, InView,
+`src/components/motion-primitives/` holds local copies of TextEffect,
 AnimatedGroup, Spotlight, Magnetic, AnimatedNumber, ScrollProgress and
 MorphingDialog. The prop APIs match the upstream site, and
 the three things upstream code expects are all in place — `motion/react`, a
