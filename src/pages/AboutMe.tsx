@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import HeroSceneBackdrop from "@/components/HeroSceneBackdrop";
 import PetalScatter from "@/components/PetalScatter";
 import HobbiesInterests from "@/components/off-hours/HobbiesInterests";
+import PlacesWandered from "@/components/off-hours/PlacesWandered";
 import { nowItems } from "@/data/offHours";
 import { sectionHref } from "@/lib/links";
 
@@ -11,7 +12,8 @@ const NOW_ITEMS_LOOP = [...nowItems, ...nowItems];
 /**
  * Being rebuilt section by section from the approved mockup. Done so far:
  * Hobbies / Interests, which absorbed the old photo columns, sketch
- * carousel and "Things I love" grid.
+ * carousel and "Things I love" grid, and Places I've wandered (the map and
+ * bucket list).
  */
 export default function AboutMe() {
   return (
@@ -21,6 +23,8 @@ export default function AboutMe() {
       <CurrentlyTicker />
 
       <HobbiesInterests />
+
+      <PlacesWandered />
 
       <Closing />
     </main>

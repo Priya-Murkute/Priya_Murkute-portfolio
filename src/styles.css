@@ -382,6 +382,24 @@
   }
 }
 
+/* The ring that pulses under the bucket-list place being looked at. */
+@keyframes pin-ping {
+  from {
+    transform: scale(0.35);
+    opacity: 0.45;
+  }
+  to {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.pin-ping {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pin-ping 1.8s ease-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

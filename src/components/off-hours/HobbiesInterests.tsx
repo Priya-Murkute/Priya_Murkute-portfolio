@@ -2,6 +2,7 @@ import { AnimatePresence, animate, motion, useMotionValue, useMotionValueEvent }
 import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { hobbies } from "@/data/offHours";
 import { picturesFor, type ResolvedPicture } from "@/data/hobbyPictures";
+import { useElementSize } from "@/lib/useElementSize";
 import { InView } from "@/components/motion-primitives/in-view";
 import {
   MorphingDialog,
@@ -243,22 +244,6 @@ const EDGE_FADE = 44;
 const DRAG_THRESHOLD = 6;
 
 const clamp = (value: number, low: number, high: number) => Math.min(Math.max(value, low), high);
-
-/** The gallery's size, tracked so the cards can be laid out to fit it exactly. */
-function useElementSize<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
-  const [size, setSize] = useState({ width: 0, height: 0 });
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-    const observer = new ResizeObserver(([entry]) => {
-      setSize({ width: entry.contentRect.width, height: entry.contentRect.height });
-    });
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-  return { ref, ...size };
-}
 
 interface GalleryLayout {
   stacked: boolean;
