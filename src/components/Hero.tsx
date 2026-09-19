@@ -66,12 +66,12 @@ export default function Hero() {
               </TextEffect>
             </Link>
 
-            <p className="text-title max-w-[20ch] font-display font-semibold">
+            <p className="text-title text-xl font-display font-semibold">
               {headlineStart}{" "}
               {headlineEnd ? <span className="text-pass">{headlineEnd}</span> : null}
             </p>
 
-            <p className="measure text-lead text-muted">{profile.tagline}</p>
+            <p className="measure text x1 text-muted">{profile.tagline}</p>
 
             <div className="flex flex-wrap items-center gap-2 font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-faint">
               <span className="text-ink">{profile.keywords.join("  ·  ")}</span>

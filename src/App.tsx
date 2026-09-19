@@ -17,6 +17,7 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import AboutMe from "@/pages/AboutMe";
 import NotFound from "@/pages/NotFound";
+import { Analytics } from "@vercel/analytics/react";
 import ErrorBoundary, { PageErrorFallback } from "@/components/ErrorBoundary";
 
 function HomePage() {
@@ -98,6 +99,7 @@ export default function App() {
           <Footer />
         </>
       )}
+      <Analytics />
     </>
   );
 }

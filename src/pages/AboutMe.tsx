@@ -1,35 +1,26 @@
-import { Fragment, type ReactNode } from "react";
+import { Fragment } from "react";
 import { motion } from "motion/react";
 import HeroSceneBackdrop from "@/components/HeroSceneBackdrop";
 import PetalScatter from "@/components/PetalScatter";
-import MyInterests from "@/components/off-hours/MyInterests";
-import Carousel3D from "@/components/off-hours/Carousel3D";
-import { hobbies, nowItems } from "@/data/offHours";
-import { cn } from "@/lib/utils";
+import HobbiesInterests from "@/components/off-hours/HobbiesInterests";
+import { nowItems } from "@/data/offHours";
 import { sectionHref } from "@/lib/links";
 
 const NOW_ITEMS_LOOP = [...nowItems, ...nowItems];
 
+/**
+ * Being rebuilt section by section from the approved mockup. Done so far:
+ * Hobbies / Interests, which absorbed the old photo columns, sketch
+ * carousel and "Things I love" grid.
+ */
 export default function AboutMe() {
   return (
     <main id="main-content">
       <AboutMeHero />
 
-      <AboutSection title="My Interests" bordered={false}>
-        <div className="mx-auto w-full md:max-w-[65%]">
-          <MyInterests />
-        </div>
-      </AboutSection>
-
       <CurrentlyTicker />
 
-      <AboutSection title="Sketches & Art" chip="Studio" amber>
-        <Carousel3D />
-      </AboutSection>
-
-      <AboutSection title="Things I love" chip="Hobbies">
-        <HobbiesGrid />
-      </AboutSection>
+      <HobbiesInterests />
 
       <Closing />
     </main>
@@ -89,48 +80,6 @@ function AboutMeHero() {
   );
 }
 
-/** Heading + optional chip, optionally bordered from the section above. */
-function AboutSection({
-  title,
-  chip,
-  amber,
-  bordered = true,
-  children,
-}: {
-  title: string;
-  chip?: string;
-  amber?: boolean;
-  bordered?: boolean;
-  children: ReactNode;
-}) {
-  return (
-    <section className={cn("section", bordered && "border-t border-line")}>
-      <div className="shell">
-        <SectionHead title={title} chip={chip} amber={amber} />
-        {children}
-      </div>
-    </section>
-  );
-}
-
-function SectionHead({ title, chip, amber }: { title: string; chip?: string; amber?: boolean }) {
-  return (
-    <div className="mb-10 flex items-baseline gap-5">
-      <h2 className="text-title font-display font-normal">{title}</h2>
-      {chip && (
-        <span
-          className={cn(
-            "inline-flex shrink-0 items-center rounded-full border px-2.5 py-0.5 font-mono text-[0.6rem] tracking-[0.1em] whitespace-nowrap uppercase",
-            amber ? "border-flaky-tint bg-flaky-tint text-flaky" : "border-pass-tint bg-pass-tint text-pass",
-          )}
-        >
-          {chip}
-        </span>
-      )}
-    </div>
-  );
-}
-
 function CurrentlyTicker() {
   return (
     <div className="group mt-20 overflow-hidden border-y border-line bg-sunk">
@@ -147,25 +96,6 @@ function CurrentlyTicker() {
           </Fragment>
         ))}
       </div>
-    </div>
-  );
-}
-
-function HobbiesGrid() {
-  return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-px overflow-hidden rounded border border-line bg-line">
-      {hobbies.map((hobby) => (
-        <div key={hobby.name} className="group relative bg-surface p-8">
-          <div className="pointer-events-none absolute inset-0 bg-sunk opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-          <span className="relative mb-3.5 block w-fit text-[1.9rem] leading-none transition-transform duration-300 group-hover:-rotate-[4deg] group-hover:scale-110">
-            {hobby.icon}
-          </span>
-          <p className="relative mb-1.5 font-display text-[1.05rem] font-medium tracking-[-0.02em] text-ink">
-            {hobby.name}
-          </p>
-          <p className="relative text-[0.8rem] leading-relaxed text-muted">{hobby.desc}</p>
-        </div>
-      ))}
     </div>
   );
 }

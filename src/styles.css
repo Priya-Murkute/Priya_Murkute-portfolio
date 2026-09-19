@@ -373,16 +373,6 @@
   }
 }
 
-/* The "up" column reuses this with animation-direction: reverse. */
-@keyframes interests-down {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-50%);
-  }
-}
-
 @keyframes ticker {
   from {
     transform: translateX(0);

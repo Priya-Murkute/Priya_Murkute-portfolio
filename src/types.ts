@@ -82,36 +82,28 @@ export interface Profile {
   phone: string;
 }
 
-/** `column` and `height` drive the masonry layout; `gradient` is a URL or a CSS value. */
-export interface InterestPhoto {
-  id: string;
-  title: string;
-  year: string;
-  gradient: string;
-  height: "tall" | "med" | "short";
-  column: "left" | "right";
-  /** Real photos only, from the optimize-images manifest — lets the <img>
-   * reserve its aspect ratio before it loads instead of shifting layout. */
-  width?: number;
-  imageHeight?: number;
-}
-
-export interface Artwork {
-  id: string;
-  title: string;
-  /** Only set when the filename encodes one. */
-  medium?: string;
-  year: string;
-  gradient: string;
-}
-
 export interface NowItem {
   label: string;
   value: string;
 }
 
+export type HobbyIcon =
+  | "pencil"
+  | "camera"
+  | "globe"
+  | "note"
+  | "racket"
+  | "ticket"
+  | "dining"
+  | "flower"
+  | "sparkle";
+
 export interface Hobby {
-  icon: string;
+  /** Also the name of its picture folder: src/assets/hobbies_interest/<id>/. */
+  id: string;
+  icon: HobbyIcon;
   name: string;
   desc: string;
+  /** What the pictures are called in the count: "8 sketches". Defaults to photo/photos. */
+  noun?: { one: string; many: string };
 }

@@ -146,10 +146,8 @@ src/
 │   └── useOnScreen.ts         # pauses ambient animation off-screen
 ├── data/
 │   ├── resume.ts              # all résumé content
-│   ├── offHours.ts            # About Me content
-│   ├── artGallery.ts          # auto-discovers src/assets/art/
-│   ├── interestsGallery.ts    # auto-discovers src/assets/interests/
-│   └── galleryPlaceholders.ts # fallback gradients while those folders are empty
+│   ├── offHours.ts            # About Me content: the ticker, the Hobbies / Interests tiles, and captions
+│   └── hobbyPictures.ts       # each tile's pictures = the files in src/assets/hobbies_interest/<hobby id>/
 ├── pages/                     # AboutMe (also served at /off-hours), NotFound
 └── components/
     ├── NavBar.tsx             # border appears past 24px, scroll progress, theme switch
@@ -170,7 +168,7 @@ src/
     ├── Education.tsx, Stats.tsx, Experience.tsx, Volunteering.tsx,
     │   Skills.tsx, Contact.tsx, Footer.tsx
     │                          # one straightforward renderer per résumé section
-    ├── off-hours/             # Carousel3D, MyInterests
+    ├── off-hours/             # HobbiesInterests (tiles + expanding-card gallery on a sliding track, any number of photos)
     └── motion-primitives/     # local copies, APIs matching motion-primitives.com
 
 scripts/                       # generators for the committed artefacts
