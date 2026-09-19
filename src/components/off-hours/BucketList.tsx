@@ -78,7 +78,9 @@ export default function BucketList({
         })}
       </div>
 
-      <p className="font-mono text-[0.6875rem] leading-relaxed tracking-[0.03em] text-faint">{note}</p>
+      {note ? (
+        <p className="font-mono text-[0.6875rem] leading-relaxed tracking-[0.03em] text-faint">{note}</p>
+      ) : null}
     </motion.aside>
   );
 }

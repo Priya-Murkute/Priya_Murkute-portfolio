@@ -8,37 +8,40 @@ export interface Leg {
   d: string;
   /** Seconds to draw it. */
   duration: number;
-  /** Short enough to be a hop out and back, rather than a flight. The map zooms in for these. */
+  /** Short enough to be a hop, rather than a flight. The map zooms in for these. */
   hop: boolean;
   /**
-   * For a hop, every stop of the run of hops it belongs to (out to the
-   * Cotswolds and back, out to Dover and back are one run): what the camera
-   * closes in on. The same array for the whole run. Null for a flight.
+   * For a hop, every stop of the run of hops it belongs to (the trips out
+   * from London are one run): what the camera closes in on. The same array
+   * for the whole run. Null for a flight.
    */
   focus: Point[] | null;
   /** Seconds to hold at the stop before setting off: a beat, or long enough for the camera to arrive. */
   wait: number;
+  /** One of the trips out from the last stop: they all draw at once, in step, rather than one after another. */
+  fan: boolean;
 }
 
 /** A leg shorter than this (in degrees) is a hop, not a flight. */
 const HOP = 12;
 const FLIGHT_SECONDS = 2.6;
 const HOP_SECONDS = 0.75;
+/** The trips out from a stop all draw together, so they're given a little longer. */
+const FAN_SECONDS = 1.6;
 /** The pause at each stop, and the longer one when the view is about to change: in for hops, out again for a flight. */
 const STOP_BEAT = 0.12;
 const ZOOM_BEAT = 0.9;
 
 /**
  * Each leg curves to the right of the way it's heading. A long flight arches
- * over the top of the map, as a flight path does, and a hop out and back
- * (London to the Cotswolds and home again) becomes a loop rather than
- * doubling back over its own line. Hops bow further, being short.
+ * over the top of the map, as a flight path does; a hop bows only a little, so
+ * the trips fanning out from one stop stay apart without wandering.
  */
 function legBetween(from: Point, to: Point): Leg {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
   const hop = Math.hypot(dx, dy) < HOP;
-  const bow = hop ? 0.9 : 0.28;
+  const bow = hop ? 0.18 : 0.28;
   const cx = (from.x + to.x) / 2 - dy * bow;
   const cy = (from.y + to.y) / 2 + dx * bow;
   return {
@@ -49,12 +52,25 @@ function legBetween(from: Point, to: Point): Leg {
     hop,
     focus: null,
     wait: 0,
+    fan: false,
   };
 }
 
-/** The legs that join a list of stops, in order. */
-export function buildLegs(stops: Point[]): Leg[] {
+/**
+ * The legs that join a list of stops, in order, then one out from the last stop to each of
+ * the trips: a fan of single lines from that stop, none of them coming back, drawn all at once.
+ */
+export function buildLegs(stops: Point[], trips: Point[] = []): Leg[] {
   const legs = stops.slice(1).map((stop, i) => legBetween(stops[i], stop));
+  const hub = stops[stops.length - 1];
+  if (hub) {
+    trips.forEach((trip) => {
+      const leg = legBetween(hub, trip);
+      leg.duration = FAN_SECONDS;
+      leg.fan = true;
+      legs.push(leg);
+    });
+  }
 
   // A run of hops in a row is one place to look at.
   for (let start = 0; start < legs.length; ) {
@@ -76,18 +92,24 @@ export function buildLegs(stops: Point[]): Leg[] {
   legs.forEach((leg, i) => {
     const viewChanges = leg.hop !== (legs[i - 1]?.hop ?? false);
     leg.wait = viewChanges ? ZOOM_BEAT : i === 0 ? 0 : STOP_BEAT;
+    // The fan sets off together: every line waits as long as the first one does.
+    if (leg.fan && legs[i - 1]?.fan) leg.wait = legs[i - 1].wait;
   });
   return legs;
 }
 
-/** When each leg's turn begins, in seconds from the start, and when the whole journey ends. */
+/**
+ * When each leg's turn begins, in seconds from the start, and when the whole journey ends. A
+ * leg's turn begins when the ones before it end, except that the legs of the fan share a turn.
+ */
 export function schedule(legs: Leg[]) {
   const turns: number[] = [];
   let end = 0;
-  for (const leg of legs) {
-    turns.push(end);
-    end += leg.wait + leg.duration;
-  }
+  legs.forEach((leg, i) => {
+    const turn = leg.fan && legs[i - 1]?.fan ? turns[i - 1] : end;
+    turns.push(turn);
+    end = Math.max(end, turn + leg.wait + leg.duration);
+  });
   return { turns, end };
 }
 

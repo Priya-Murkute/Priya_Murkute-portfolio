@@ -27,7 +27,8 @@ const arrowVariants = {
 /**
  * The Hero's secondary call to action, beside "View My Work". One shared
  * variant state propagates from the wrapping motion.div, so the whole thing
- * animates together on hover.
+ * animates together on hover. At rest it gives a soft rose pulse and an arrow
+ * nudge every few seconds (styles.css), so it isn't skipped; hovering stops both.
  */
 export default function AboutMeLink() {
   return (
@@ -35,7 +36,7 @@ export default function AboutMeLink() {
       <motion.div initial="rest" whileHover="hover" whileTap={{ scale: 0.97 }} className="w-fit">
         <Link
           to="/about-me"
-          className="inline-flex items-center gap-2.5 rounded-full border border-line-strong bg-surface px-5 py-2.5 text-sm font-medium text-ink transition-transform hover:-translate-y-px"
+          className="about-pulse inline-flex items-center gap-2.5 rounded-full border border-line-strong bg-surface px-5 py-2.5 text-sm font-medium text-ink transition-transform hover:-translate-y-px"
         >
           <motion.span variants={textVariants} transition={SPRING} className="relative">
             About Me
@@ -52,22 +53,24 @@ export default function AboutMeLink() {
             transition={SPRING}
             className="flex size-5 flex-none items-center justify-center rounded-full bg-ink text-paper"
           >
-            <motion.svg
-              variants={arrowVariants}
-              transition={SPRING}
-              viewBox="0 0 16 16"
-              className="size-3"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M3 8h9m0 0-3.2-3.2M12 8l-3.2 3.2"
-                stroke="currentColor"
-                strokeWidth={1.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </motion.svg>
+            <span className="about-nudge flex">
+              <motion.svg
+                variants={arrowVariants}
+                transition={SPRING}
+                viewBox="0 0 16 16"
+                className="size-3"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 8h9m0 0-3.2-3.2M12 8l-3.2 3.2"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </motion.svg>
+            </span>
           </motion.span>
         </Link>
       </motion.div>

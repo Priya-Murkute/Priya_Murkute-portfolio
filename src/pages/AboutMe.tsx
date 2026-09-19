@@ -110,8 +110,8 @@ function Closing() {
       <PetalScatter />
 
       <div className="shell relative flex flex-col items-center gap-6 text-center">
-        <blockquote className="max-w-[22ch] font-display text-[clamp(1.5rem,3.5vw,2.6rem)] leading-[1.25] font-light tracking-[-0.025em] text-ink">
-          "I'm most <em className="text-pass">myself</em> between a sketch and a new city."
+        <blockquote className="quote-text max-w-[22ch]">
+          “I’m most <em>myself</em> between a sketch and a new city.”
         </blockquote>
         <small className="text-[0.85rem] text-muted">— Priya, probably on a train</small>
         <a

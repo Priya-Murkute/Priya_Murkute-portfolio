@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { journeyRoute, places } from "../src/data/places";
+import { journeyRoute, journeyTrips, places } from "../src/data/places";
 
 const bucket = places.filter((place) => place.status === "bucket");
 const visited = places.filter((place) => place.status === "visited");
@@ -92,13 +92,10 @@ test.describe("about me · places I've wandered", () => {
       const [a, b] = [await box(eyebrows.nth(0)), await box(eyebrows.nth(1))];
       expect(Math.abs(a.y - b.y), `eyebrows at ${width}px`).toBeLessThan(1);
 
-      // The map's legend and the list's small print share the last row: they start level.
+      // The map's legend sits below the map, in the last row, under the list's last item.
       const legend = await box(section.getByText("Been there", { exact: true }));
-      const note = await box(section.getByText(/^Examples for now/));
       expect(legend.y, `legend below the map at ${width}px`).toBeGreaterThan(stageBox.y + stageBox.height);
-      expect(note.y, `small print below the list at ${width}px`).toBeGreaterThan(last.y + last.height);
-      // (Tops, not centres: the small print may wrap to more lines than the legend at a narrow width.)
-      expect(Math.abs(legend.y - note.y), `footers level at ${width}px`).toBeLessThan(6);
+      expect(legend.y, `legend below the list at ${width}px`).toBeGreaterThan(last.y + last.height);
     }
   });
 
@@ -289,6 +286,8 @@ test.describe("about me · places I've wandered", () => {
     }
     const stops = journeyRoute.map((id) => places.find((place) => place.id === id)!.name);
     await expect(section.getByText(`Route: ${stops.join(", then ")}.`)).toBeAttached();
+    const trips = journeyTrips.map((id) => places.find((place) => place.id === id)!.name);
+    await expect(section.getByText(`Trips from ${stops[stops.length - 1]}: ${trips.join(", ")}.`)).toBeAttached();
     await expect(section.locator("svg[aria-hidden='true']").first()).toBeAttached();
   });
 });
@@ -303,9 +302,10 @@ const drawn = (left: number[]) => left.every((value) => value === 0);
 
 /**
  * The journey draws itself when the map comes into view: Pune to Nashik, on
- * to London, then out to the Cotswolds and back, out to the white cliffs and
- * back. The map closes in on each run of short hops (Pune to Nashik; the trips
- * out from London) and pulls out again for the long flight between them.
+ * to London, then one line out from London to each place visited from there,
+ * all drawn together, none looping back. The map closes in on each run of short hops (Pune to
+ * Nashik; the trips out from London) and pulls out again for the long flight
+ * between them.
  * The whole thing takes about ten seconds, hence the longer timeout.
  */
 test.describe("about me · the journey animation", () => {
@@ -324,11 +324,14 @@ test.describe("about me · the journey animation", () => {
     await page.locator("#places").scrollIntoViewIfNeeded();
   });
 
-  test("draws one leg for each stop after the first, each only once the one before is done", async ({ page }) => {
+  test("draws one leg for each stop after the first, in turn, then every trip out from London at once", async ({
+    page,
+  }) => {
     const { stage } = parts(page);
-    await expect(stage.locator("[data-leg]")).toHaveCount(journeyRoute.length - 1);
+    await expect(stage.locator("[data-leg]")).toHaveCount(journeyRoute.length - 1 + journeyTrips.length);
+    const trunk = journeyRoute.length - 1;
 
-    // Watch it play: at every sample, a leg has begun only if the one before it is complete.
+    // Watch it play.
     const samples: number[][] = [];
     await expect
       .poll(
@@ -342,14 +345,23 @@ test.describe("about me · the journey animation", () => {
       .toBe(true);
 
     for (const left of samples) {
-      left.forEach((value, i) => {
+      // The stops in turn: a leg has begun only if the one before it is complete...
+      left.slice(0, trunk).forEach((value, i) => {
         if (i > 0 && value < 1) expect(left[i - 1], `leg ${i} began before leg ${i - 1} finished: ${left}`).toBe(0);
       });
+      // ...and the trips set off only once the way to London is done.
+      if (left.slice(trunk).some((value) => value < 1)) {
+        expect(left[trunk - 1], `a trip began before the way to London finished: ${left}`).toBe(0);
+      }
     }
     // It really was drawn as it went: some sample caught the long flight (Nashik to London, the
     // second leg) part-way, with the hop before it done and nothing after it started.
     expect(
       samples.some((left) => left[0] === 0 && left[1] > 0.05 && left[1] < 0.95 && left.slice(2).every((value) => value === 1)),
+    ).toBe(true);
+    // And the trips really were together: some sample caught several of them part-way at once.
+    expect(
+      samples.some((left) => left.slice(trunk).filter((value) => value > 0.05 && value < 0.95).length >= journeyTrips.length - 1),
     ).toBe(true);
   });
 
@@ -434,7 +446,7 @@ test.describe("about me · the journey animation", () => {
     test("the whole route is simply there, and there's nothing to replay", async ({ page }) => {
       const { section, stage, zoom } = parts(page);
       await expect(stage.locator(":scope > svg")).toBeVisible();
-      await expect(stage.locator("[data-leg]")).toHaveCount(journeyRoute.length - 1);
+      await expect(stage.locator("[data-leg]")).toHaveCount(journeyRoute.length - 1 + journeyTrips.length);
       expect(drawn(await offsets(page))).toBe(true);
       await expect(section.getByRole("button", { name: "Replay journey" })).toHaveCount(0);
 

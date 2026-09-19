@@ -39,23 +39,14 @@ export interface SkillGroup {
   items: string[];
 }
 
-/** The two halves of the profile — each project and certificate belongs to one. */
-export type Track = "qa" | "data";
-
-export interface ShowcaseProject {
-  id: string;
-  title: string;
-  organisation: string;
-  /** "Job simulation", "Professional work" — sets expectations about scope. */
-  kind: string;
-  summary: string;
-  tools: string[];
-  track: Track;
-}
+/** The two halves of the profile, plus "other" for anything outside QA and data. */
+export type Track = "qa" | "data" | "other";
 
 export interface Certification {
   name: string;
   track: Track;
+  /** Link to the completion certificate, when there is one. */
+  url?: string;
 }
 
 /** One step of the Test → Analyse → Improve loop. */

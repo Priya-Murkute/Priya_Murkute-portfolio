@@ -127,7 +127,7 @@ export default function HobbiesInterests() {
       <div className="shell">
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
           <div>
-            <p className="eyebrow">Off hours</p>
+            <p className="eyebrow eyebrow-section">Off hours</p>
             <h2 id="hobbies-title" className="text-title mt-3 font-display font-semibold">
               Hobbies / Interests
             </h2>

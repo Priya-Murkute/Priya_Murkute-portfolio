@@ -5,7 +5,7 @@ export default function Education() {
   return (
     <section id="education" className="section">
       <div className="shell">
-        <p className="eyebrow">Education</p>
+        <p className="eyebrow eyebrow-section">Education</p>
 
         <ol className="mt-10 grid gap-4 md:grid-cols-3">
           {education.map((item, index) => (

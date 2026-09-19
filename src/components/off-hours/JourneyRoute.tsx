@@ -8,7 +8,8 @@ const START_DELAY = 0.5;
 
 /**
  * The journey drawn across the map, leg by leg, with a bright head running
- * along the line. It plays when `playKey` becomes non-zero, and again each
+ * along the line (the fan of trips out from London draws all at once, with the head
+ * resting at London). It plays when `playKey` becomes non-zero, and again each
  * time it changes; at 0 nothing is drawn yet. For a visitor who prefers
  * reduced motion the whole route is simply there.
  *
@@ -72,7 +73,7 @@ export default function JourneyRoute({
           const line = lines.current[i];
           const drawn = easeInOut(clamp((time - turns[i] - leg.wait) / leg.duration, 0, 1));
           line?.style.setProperty("stroke-dashoffset", String(1 - drawn));
-          if (drawn > 0) riding = i;
+          if (drawn > 0 && !leg.fan) riding = i;
           if (time >= turns[i]) now = i;
         });
         const line = riding >= 0 ? lines.current[riding] : null;

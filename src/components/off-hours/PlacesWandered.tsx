@@ -1,7 +1,7 @@
 import { useState } from "react";
 import BucketList from "@/components/off-hours/BucketList";
 import WorldMap from "@/components/off-hours/WorldMap";
-import { bucketListNote, journeyRoute, places } from "@/data/places";
+import { bucketListNote, journeyRoute, journeyTrips, places } from "@/data/places";
 
 /**
  * Places I've wandered: a dotted world map of where I've been, beside the
@@ -22,7 +22,7 @@ export default function PlacesWandered() {
       <div className="shell">
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
           <div>
-            <p className="eyebrow">Travel</p>
+            <p className="eyebrow eyebrow-section">Travel</p>
             <h2 id="places-title" className="text-title mt-3 font-display font-semibold">
               Places I've wandered
             </h2>
@@ -33,7 +33,13 @@ export default function PlacesWandered() {
         </div>
 
         <div className="mt-10 grid items-stretch gap-x-5 gap-y-4 lg:grid-cols-[minmax(0,1fr)_18.5rem] lg:grid-rows-[auto_1fr_auto]">
-          <WorldMap places={places} route={journeyRoute} selectedId={selectedId} onSelect={setSelectedId} />
+          <WorldMap
+            places={places}
+            route={journeyRoute}
+            trips={journeyTrips}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+          />
           <BucketList
             places={places.filter((place) => place.status === "bucket")}
             selectedId={selectedId}

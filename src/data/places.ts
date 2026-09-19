@@ -67,12 +67,29 @@ export const places: Place[] = [
 ];
 
 /**
- * The route the map draws and then retraces, stop by stop, by place id: from
- * Pune to Nashik, on to London, out to the Cotswolds and back, out to Dover's
- * white cliffs and back. A place can come up more than once; a place left out
- * is still pinned.
+ * The route the map draws, stop by stop, by place id: from Pune to Nashik, on to London. A
+ * place left out is still pinned.
  */
-export const journeyRoute: string[] = ["pune", "nashik", "london", "cotswolds", "london", "white-cliffs", "london"];
+export const journeyRoute: string[] = ["pune", "nashik", "london"];
+
+/**
+ * Trips out from the last stop of the route (London): each place gets its own line straight
+ * from there, and none loops back. They all draw at once, fanning out together; add a new
+ * place you've been to from London here to connect it.
+ */
+export const journeyTrips: string[] = [
+  "bath",
+  "cotswolds",
+  "oxford",
+  "milton-keynes",
+  "liverpool",
+  "edinburgh",
+  "cambridge",
+  "colchester",
+  "canterbury",
+  "white-cliffs",
+  "brighton",
+];
 
 /** Small print under the bucket list. Leave empty to drop it. */
-export const bucketListNote = "Examples for now, to swap for your own list.";
+export const bucketListNote = "";
