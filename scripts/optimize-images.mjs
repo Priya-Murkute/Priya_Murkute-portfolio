@@ -14,11 +14,18 @@ import sharp from "sharp";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-/** Max width per folder, matched to how large each is ever displayed. */
-const TARGETS = [
-  { dir: "src/assets/interests", maxWidth: 900, quality: 78 },
-  { dir: "src/assets/art", maxWidth: 820, quality: 80 },
-];
+/**
+ * Every Hobbies / Interests folder (src/assets/hobbies_interest/<hobby>/).
+ * 900px wide covers the largest the gallery ever shows a picture.
+ */
+const HOBBY_ROOT = "src/assets/hobbies_interest";
+const hobbyFolders = existsSync(path.join(ROOT, HOBBY_ROOT))
+  ? (await readdir(path.join(ROOT, HOBBY_ROOT), { withFileTypes: true }))
+      .filter((entry) => entry.isDirectory() && !entry.name.startsWith("_"))
+      .map((entry) => ({ dir: `${HOBBY_ROOT}/${entry.name}`, maxWidth: 900, quality: 80 }))
+  : [];
+
+const TARGETS = hobbyFolders;
 
 const SOURCE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp"]);
 
