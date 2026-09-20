@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { githubHandle, profile } from "@/data/resume";
 import { LayeredWaves } from "@/components/Backgrounds";
+import Quoted from "@/components/Quoted";
 import { useOnScreen } from "@/lib/useOnScreen";
 import { cn } from "@/lib/utils";
 
@@ -104,7 +105,9 @@ export default function Projects() {
             From GitHub
           </p>
           <h2 className="quote-text mx-auto mt-3 max-w-[24ch]">
-            “Whatever’s live on the repo <em>right now.</em>”
+            <Quoted>
+              Whatever’s live on the repo <em>right now.</em>
+            </Quoted>
           </h2>
           <p className="measure mx-auto mt-4 text-sm text-muted">
             Pulled straight from{" "}

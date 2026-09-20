@@ -23,6 +23,8 @@ export type TextEffectProps = {
   /** A phrase inside `children` to style with `accentClassName`. */
   accent?: string;
   accentClassName?: string;
+  /** Class for a leading “ and trailing ” on a word, so quote marks can be coloured on their own. */
+  markClassName?: string;
   containerTransition?: Transition;
   segmentTransition?: Transition;
   style?: React.CSSProperties;
@@ -83,13 +85,30 @@ const presetVariants: Record<PresetType, { container: Variants; item: Variants }
   },
 };
 
+const QUOTE_EDGES = /^(“?)(.*?)(”?)$/s;
+
+/** A word with its opening and closing quote marks (if any) wrapped in `className`. */
+function withMarks(segment: string, className?: string) {
+  if (!className) return segment;
+  const [, lead, body, tail] = QUOTE_EDGES.exec(segment) ?? [];
+  if (!lead && !tail) return segment;
+  return (
+    <>
+      {lead ? <span className={className}>{lead}</span> : null}
+      {body}
+      {tail ? <span className={className}>{tail}</span> : null}
+    </>
+  );
+}
+
 const AnimationComponent: React.FC<{
   segment: string;
   variants: Variants;
   per: PerType;
   segmentWrapperClassName?: string;
   accentClassName?: string;
-}> = React.memo(({ segment, variants, per, segmentWrapperClassName, accentClassName }) => {
+  markClassName?: string;
+}> = React.memo(({ segment, variants, per, segmentWrapperClassName, accentClassName, markClassName }) => {
   const accented = (base: string) => (accentClassName ? `${base} ${accentClassName}` : base);
   const content =
     per === "line" ? (
@@ -102,7 +121,7 @@ const AnimationComponent: React.FC<{
         variants={variants}
         className={accented("inline-block whitespace-pre")}
       >
-        {segment}
+        {withMarks(segment, markClassName)}
       </motion.span>
     ) : (
       <motion.span className="inline-block whitespace-pre">
@@ -180,6 +199,7 @@ export function TextEffect({
   segmentWrapperClassName,
   accent,
   accentClassName,
+  markClassName,
   containerTransition,
   segmentTransition,
   style,
@@ -246,6 +266,7 @@ export function TextEffect({
                 per={per}
                 segmentWrapperClassName={segmentWrapperClassName}
                 accentClassName={isAccent ? accentClassName : undefined}
+                markClassName={markClassName}
               />
             );
           })}
