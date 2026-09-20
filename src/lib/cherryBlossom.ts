@@ -32,3 +32,11 @@ export function seededRandom(seed: number) {
     return state / 0x7fffffff;
   };
 }
+
+/**
+ * The hero scene's petal, traced point for point from createPetalGeometry in
+ * HeroSceneCanvas (its Shape, scaled ×24 and flipped to SVG's downward y), so
+ * a fallen petal is the same obovate, notched shape as a falling one.
+ */
+export const PETAL_PATH =
+  "M12 23C13.2 17.72 22.56 15.32 23.04 8.12C23.28 4.28 19.68 2.12 15.84 3.08Q13.92 1.4 12 3.8Q10.08 1.4 8.16 3.08C4.32 2.12 0.72 4.28 0.96 8.12C1.44 15.32 10.8 17.72 12 23Z";

@@ -4,6 +4,7 @@ import HeroSceneBackdrop from "@/components/HeroSceneBackdrop";
 import PetalScatter from "@/components/PetalScatter";
 import HobbiesInterests from "@/components/off-hours/HobbiesInterests";
 import PlacesWandered from "@/components/off-hours/PlacesWandered";
+import VisionBoard from "@/components/off-hours/VisionBoard";
 import { nowItems } from "@/data/offHours";
 import { sectionHref } from "@/lib/links";
 
@@ -12,8 +13,8 @@ const NOW_ITEMS_LOOP = [...nowItems, ...nowItems];
 /**
  * Being rebuilt section by section from the approved mockup. Done so far:
  * Hobbies / Interests, which absorbed the old photo columns, sketch
- * carousel and "Things I love" grid, and Places I've wandered (the map and
- * bucket list).
+ * carousel and "Things I love" grid, Places I've wandered (the map and
+ * bucket list), and the Vision board.
  */
 export default function AboutMe() {
   return (
@@ -25,6 +26,8 @@ export default function AboutMe() {
       <HobbiesInterests />
 
       <PlacesWandered />
+
+      <VisionBoard />
 
       <Closing />
     </main>
