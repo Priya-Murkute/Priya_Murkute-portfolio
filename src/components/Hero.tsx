@@ -4,6 +4,7 @@ import { profile } from "@/data/resume";
 import { BlurryGradient } from "@/components/Backgrounds";
 import HeroSceneBackdrop from "@/components/HeroSceneBackdrop";
 import HowIThink from "@/components/HowIThink";
+import Quoted from "@/components/Quoted";
 import AboutMeLink from "@/components/AboutMeLink";
 import { TextEffect } from "@/components/motion-primitives/text-effect";
 import { AnimatedGroup } from "@/components/motion-primitives/animated-group";
@@ -67,8 +68,10 @@ export default function Hero() {
             </Link>
 
             <p className="quote-text text-[clamp(1.3rem,2.2vw,1.6rem)]">
-              “{headlineStart}{" "}
-              {headlineEnd ? <em>{headlineEnd}</em> : null}”
+              <Quoted>
+                {headlineStart}{" "}
+                {headlineEnd ? <em>{headlineEnd}</em> : null}
+              </Quoted>
             </p>
 
             <p className="measure text x1 text-muted">{profile.tagline}</p>

@@ -110,3 +110,24 @@ export interface Hobby {
   /** What the pictures are called in the count: "8 sketches". Defaults to photo/photos. */
   noun?: { one: string; many: string };
 }
+
+export type VisionArea = "career" | "creativity" | "travel" | "growth" | "life";
+export type VisionHorizonId = "now" | "next" | "someday";
+
+export interface VisionHorizon {
+  id: VisionHorizonId;
+  title: string;
+  /** The stretch of time it covers: "2026", "No rush". */
+  when: string;
+}
+
+export interface VisionGoal {
+  id: string;
+  text: string;
+  area: VisionArea;
+  horizon: VisionHorizonId;
+  /** Present once it has come true: the month it happened, or what it was ("Sep 2022"). */
+  done?: string;
+  /** A placeholder to swap for a real goal; the board marks it "example". */
+  example?: boolean;
+}

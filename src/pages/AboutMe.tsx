@@ -2,8 +2,10 @@ import { Fragment } from "react";
 import { motion } from "motion/react";
 import HeroSceneBackdrop from "@/components/HeroSceneBackdrop";
 import PetalScatter from "@/components/PetalScatter";
+import Quoted from "@/components/Quoted";
 import HobbiesInterests from "@/components/off-hours/HobbiesInterests";
 import PlacesWandered from "@/components/off-hours/PlacesWandered";
+import VisionBoard from "@/components/off-hours/VisionBoard";
 import { nowItems } from "@/data/offHours";
 import { sectionHref } from "@/lib/links";
 
@@ -12,8 +14,8 @@ const NOW_ITEMS_LOOP = [...nowItems, ...nowItems];
 /**
  * Being rebuilt section by section from the approved mockup. Done so far:
  * Hobbies / Interests, which absorbed the old photo columns, sketch
- * carousel and "Things I love" grid, and Places I've wandered (the map and
- * bucket list).
+ * carousel and "Things I love" grid, Places I've wandered (the map and
+ * bucket list), and the Vision board.
  */
 export default function AboutMe() {
   return (
@@ -25,6 +27,8 @@ export default function AboutMe() {
       <HobbiesInterests />
 
       <PlacesWandered />
+
+      <VisionBoard />
 
       <Closing />
     </main>
@@ -111,7 +115,9 @@ function Closing() {
 
       <div className="shell relative flex flex-col items-center gap-6 text-center">
         <blockquote className="quote-text max-w-[22ch]">
-          “I’m most <em>myself</em> between a sketch and a new city.”
+          <Quoted>
+            I’m most <em>myself</em> between a sketch and a new city.
+          </Quoted>
         </blockquote>
         <small className="text-[0.85rem] text-muted">— Priya, probably on a train</small>
         <a

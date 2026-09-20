@@ -12,6 +12,7 @@ export default function PullQuote() {
           speedReveal={1.6}
           accent="proof, not promises"
           accentClassName="quote-accent"
+          markClassName="quote-mark"
           className="quote-text mx-auto max-w-[22ch] text-center"
         >
           “Every line of code earns the same thing a release does — proof, not promises.”

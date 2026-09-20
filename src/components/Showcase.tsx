@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { certifications } from "@/data/resume";
 import type { Track } from "@/types";
 import { LayeredWaves } from "@/components/Backgrounds";
+import Quoted from "@/components/Quoted";
 import { cn } from "@/lib/utils";
 
 const tabs: { track: Track; label: string; color: string }[] = [
@@ -47,7 +48,9 @@ export default function Showcase() {
           <div>
             <p className="eyebrow eyebrow-section">Certifications</p>
             <h2 className="quote-text mt-3 max-w-[22ch]">
-              “Two tracks, <em>one habit.</em>”
+              <Quoted>
+                Two tracks, <em>one habit.</em>
+              </Quoted>
             </h2>
           </div>
 

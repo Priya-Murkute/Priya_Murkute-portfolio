@@ -39,6 +39,7 @@ export default function Contact() {
             speedReveal={1.8}
             accent="excellent test cases"
             accentClassName="quote-accent"
+            markClassName="quote-mark"
             className="quote-text mt-4"
           >
             “Curiosity? Check. Caffeine? Always. Trust issues? Absolutely — they make excellent test cases.”
