@@ -121,12 +121,15 @@ function Closing() {
           </Quoted>
         </blockquote>
         <small className="text-[0.85rem] text-muted">— Priya, probably on a train</small>
-        <a
-          href={sectionHref("top")}
-          className="mt-3 inline-flex items-center gap-2 font-mono text-[0.65rem] tracking-[0.09em] text-muted uppercase transition-colors hover:text-ink"
-        >
-          ← back to work
-        </a>
+        <div className="mt-1 flex flex-wrap justify-center gap-2.5">
+          {/* Both are pills with a 1px border, so they stand the same height side by side. */}
+          <a href={sectionHref("top")} className="btn-primary glow-cta border border-ink">
+            <span aria-hidden="true">←</span> Back to my work
+          </a>
+          <a href={sectionHref("contact")} className="btn-ghost">
+            Get in touch
+          </a>
+        </div>
       </div>
     </div>
   );

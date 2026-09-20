@@ -20,8 +20,11 @@ import NotFound from "@/pages/NotFound";
 import { Analytics } from "@vercel/analytics/react";
 import ErrorBoundary, { PageErrorFallback } from "@/components/ErrorBoundary";
 import { readStorage, writeStorage } from "@/lib/storage";
+import { useScrollToHash } from "@/lib/useScrollToHash";
 
 function HomePage() {
+  useScrollToHash();
+
   return (
     <main id="main-content">
       <Hero />

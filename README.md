@@ -188,6 +188,7 @@ src/
 │   ├── petalRelease.ts        # page → 3D scene channel: "release a petal here"
 │   ├── useNamePetals.ts       # the hero name sheds petals on hover, and once per visit
 │   ├── useOnScreen.ts         # pauses ambient animation off-screen
+│   ├── useScrollToHash.ts     # on the home page, scrolls to the #section in the URL once it has mounted (About Me's “Get in touch”)
 │   ├── useElementSize.ts      # an element's size, kept current — the gallery and the map both fit themselves to it
 │   ├── worldMap.ts            # the dotted map's geometry: projection, camera, zoom-about-a-point, fit-to-places
 │   ├── journey.ts             # the journey's legs: curve, flight or hop, and the schedule they're drawn on

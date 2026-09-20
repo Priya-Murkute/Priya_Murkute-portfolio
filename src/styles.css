@@ -264,6 +264,11 @@
     @apply inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-px;
   }
 
+  /* The quieter partner to .btn-primary: an outlined pill on the surface colour. */
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-5 py-2.5 text-sm font-medium text-ink transition-transform hover:-translate-y-px;
+  }
+
   .built-with {
     color: color-mix(in srgb, var(--ink) 40%, transparent);
     transition: color 200ms ease;
