@@ -1,4 +1,5 @@
 import { useState } from "react";
+import SectionHeader from "@/components/SectionHeader";
 import BucketList from "@/components/off-hours/BucketList";
 import WorldMap from "@/components/off-hours/WorldMap";
 import { bucketListNote, journeyRoute, journeyTrips, places } from "@/data/places";
@@ -20,17 +21,12 @@ export default function PlacesWandered() {
   return (
     <section id="places" className="section" aria-labelledby="places-title">
       <div className="shell">
-        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-          <div>
-            <p className="eyebrow eyebrow-section">Travel</p>
-            <h2 id="places-title" className="text-title mt-3 font-display font-semibold">
-              Places I've wandered
-            </h2>
-          </div>
-          <p className="max-w-[46ch] text-sm text-muted">
-            From Nashik to London, with a few day trips in between, and the places still on my list.
-          </p>
-        </div>
+        <SectionHeader
+          eyebrow="Travel"
+          title="Places I've wandered"
+          titleId="places-title"
+          note="From Nashik to London, with a few day trips in between, and the places still on my list."
+        />
 
         <div className="mt-10 grid items-stretch gap-x-5 gap-y-4 lg:grid-cols-[minmax(0,1fr)_18.5rem] lg:grid-rows-[auto_1fr_auto]">
           <WorldMap

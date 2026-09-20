@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { LayeredWaves } from "@/components/Backgrounds";
+import { Icon } from "@/components/Icon";
+import { iconPaths } from "@/lib/iconPaths";
 
 export default function NotFound() {
   return (
@@ -44,20 +46,9 @@ export default function NotFound() {
             this one
           </p>
 
-          <Link
-            to="/"
-            className="glow-cta mt-7 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-px"
-          >
+          <Link to="/" className="btn-primary glow-cta mt-7">
             Back to the suite
-            <svg viewBox="0 0 16 16" className="size-3.5" fill="none" aria-hidden="true">
-              <path
-                d="M3 8h9m0 0-3.2-3.2M12 8l-3.2 3.2"
-                stroke="currentColor"
-                strokeWidth={1.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <Icon d={iconPaths.arrowRight} />
           </Link>
         </div>
       </div>

@@ -19,6 +19,7 @@ import AboutMe from "@/pages/AboutMe";
 import NotFound from "@/pages/NotFound";
 import { Analytics } from "@vercel/analytics/react";
 import ErrorBoundary, { PageErrorFallback } from "@/components/ErrorBoundary";
+import { readStorage, writeStorage } from "@/lib/storage";
 
 function HomePage() {
   return (
@@ -40,21 +41,8 @@ function HomePage() {
 /** Shown once per session — it's the LCP, and returning visitors shouldn't pay for it. */
 const PRELOADER_SESSION_KEY = "pm-preloaded";
 
-function hasSeenPreloader(): boolean {
-  try {
-    return sessionStorage.getItem(PRELOADER_SESSION_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function markPreloaderSeen() {
-  try {
-    sessionStorage.setItem(PRELOADER_SESSION_KEY, "1");
-  } catch {
-    // storage unavailable
-  }
-}
+const hasSeenPreloader = () => readStorage("session", PRELOADER_SESSION_KEY) === "1";
+const markPreloaderSeen = () => writeStorage("session", PRELOADER_SESSION_KEY, "1");
 
 export default function App() {
   const prefersReducedMotion = useReducedMotion() ?? false;

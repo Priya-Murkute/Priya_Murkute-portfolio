@@ -1,8 +1,10 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect } from "react";
-import { navLinks } from "@/components/NavBar";
-import { useTheme } from "@/context/ThemeContext";
-import { cn } from "@/lib/utils";
+import { Icon } from "@/components/Icon";
+import ThemeStatus from "@/components/ThemeStatus";
+import { useTheme } from "@/context/useTheme";
+import { navLinks } from "@/data/nav";
+import { EASE_CALM } from "@/lib/motion";
 
 /** Stands in for the header links, which are hidden below `sm`. */
 export default function MobileNav({
@@ -53,26 +55,17 @@ export default function MobileNav({
             initial={{ opacity: 0, y: -16, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -12, scale: 0.98 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.25, ease: EASE_CALM }}
           >
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
-              <span className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-faint">
-                Menu
-              </span>
+              <span className="mono-label text-faint">Menu</span>
               <button
                 type="button"
                 onClick={onClose}
                 aria-label="Close menu"
                 className="flex size-7 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-line-strong hover:text-ink"
               >
-                <svg viewBox="0 0 16 16" className="size-3" fill="none" aria-hidden="true">
-                  <path
-                    d="M3 3l10 10M13 3 3 13"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                    strokeLinecap="round"
-                  />
-                </svg>
+                <Icon d="M3 3l10 10M13 3 3 13" className="size-3" />
               </button>
             </div>
 
@@ -97,14 +90,8 @@ export default function MobileNav({
                 className="flex w-full items-center justify-between rounded-xl px-3 py-3 text-left text-sm text-muted transition-colors hover:bg-sunk hover:text-ink"
               >
                 <span>Theme</span>
-                <span className="flex items-center gap-2 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-faint">
-                  <span
-                    className={cn(
-                      "status-dot border border-line-strong",
-                      isDark ? "bg-ink" : "bg-transparent",
-                    )}
-                  />
-                  {isDark ? "dark" : "light"}
+                <span className="mono-label flex items-center gap-2 text-faint">
+                  <ThemeStatus isDark={isDark} />
                 </span>
               </button>
             </div>

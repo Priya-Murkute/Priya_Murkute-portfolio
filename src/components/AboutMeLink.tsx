@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { Magnetic } from "@/components/motion-primitives/magnetic";
+import { iconPaths } from "@/lib/iconPaths";
 
 const SPRING = { type: "spring" as const, stiffness: 320, damping: 22 };
 
@@ -63,7 +64,7 @@ export default function AboutMeLink() {
                 aria-hidden="true"
               >
                 <path
-                  d="M3 8h9m0 0-3.2-3.2M12 8l-3.2 3.2"
+                  d={iconPaths.arrowRight}
                   stroke="currentColor"
                   strokeWidth={1.5}
                   strokeLinecap="round"

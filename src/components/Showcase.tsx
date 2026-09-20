@@ -3,7 +3,10 @@ import { AnimatePresence, motion } from "motion/react";
 import { certifications } from "@/data/resume";
 import type { Track } from "@/types";
 import { LayeredWaves } from "@/components/Backgrounds";
+import { ExternalLink } from "@/components/ExternalLink";
 import Quoted from "@/components/Quoted";
+import SectionHeader from "@/components/SectionHeader";
+import { EASE_CALM } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 const tabs: { track: Track; label: string; color: string }[] = [
@@ -44,16 +47,16 @@ export default function Showcase() {
       <LayeredWaves className="absolute inset-x-0 top-0 h-24 opacity-50" />
 
       <div className="shell relative">
-        <header className="flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <p className="eyebrow eyebrow-section">Certifications</p>
-            <h2 className="quote-text mt-3 max-w-[22ch]">
-              <Quoted>
-                Two tracks, <em>one habit.</em>
-              </Quoted>
-            </h2>
-          </div>
-
+        <SectionHeader
+          eyebrow="Certifications"
+          title={
+            <Quoted>
+              Two tracks, <em>one habit.</em>
+            </Quoted>
+          }
+          titleClassName="quote-text max-w-[22ch]"
+          className="gap-y-6"
+        >
           <div
             role="tablist"
             aria-label="Certification track"
@@ -92,7 +95,7 @@ export default function Showcase() {
               );
             })}
           </div>
-        </header>
+        </SectionHeader>
 
         <div
           role="tabpanel"
@@ -106,7 +109,7 @@ export default function Showcase() {
               initial={{ opacity: 0, y: 14, filter: "blur(6px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.35, ease: EASE_CALM }}
             >
               {certs.length === 0 ? (
                 <p className="rounded-[1.125rem] border border-dashed border-line px-6 py-10 text-center text-sm text-muted">
@@ -150,14 +153,9 @@ export default function Showcase() {
                     return (
                       <li key={cert.name}>
                         {cert.url ? (
-                          <a
-                            href={cert.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={chipClass}
-                          >
+                          <ExternalLink href={cert.url} className={chipClass}>
                             {inner}
-                          </a>
+                          </ExternalLink>
                         ) : (
                           <div className={chipClass} title={cert.name}>
                             {inner}

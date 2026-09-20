@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { PETAL_PATH } from "@/lib/cherryBlossom";
 import { makePetalFall, type PetalFall } from "@/lib/petalFall";
-import { useTheme } from "@/context/ThemeContext";
+import { useTheme } from "@/context/useTheme";
 
 /** How long a landed petal rests in the pile, then how long it takes to fade. */
 const REST_SECONDS = 6;

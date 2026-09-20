@@ -1,12 +1,6 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { ThemeContext } from "@/context/useTheme";
+import { readStorage, writeStorage } from "@/lib/storage";
 
 type Theme = "light" | "dark";
 
@@ -16,24 +10,11 @@ const THEME_STORAGE_KEY = "pm-theme";
 /** Matches the 240ms in `.theme-transition` (styles.css). */
 const TRANSITION_MS = 260;
 
-interface ThemeContextValue {
-  isDark: boolean;
-  toggle: () => void;
-}
-
-const ThemeContext = createContext<ThemeContextValue>({
-  isDark: false,
-  toggle: () => {},
-});
-
 function getStoredTheme(): Theme {
-  try {
-    return localStorage.getItem(THEME_STORAGE_KEY) === "dark" ? "dark" : "light";
-  } catch {
-    return "light";
-  }
+  return readStorage("local", THEME_STORAGE_KEY) === "dark" ? "dark" : "light";
 }
 
+/** Holds the theme, and applies it to the page. Read it with `useTheme` (useTheme.ts). */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(getStoredTheme);
 
@@ -51,16 +32,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     document
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute("content", theme === "dark" ? "#0e1113" : "#fffcfd");
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, theme);
-    } catch {
-      // storage unavailable
-    }
+    writeStorage("local", THEME_STORAGE_KEY, theme);
   }, [theme]);
 
   const value = useMemo(() => ({ isDark: theme === "dark", toggle }), [theme, toggle]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
-
-export const useTheme = () => useContext(ThemeContext);

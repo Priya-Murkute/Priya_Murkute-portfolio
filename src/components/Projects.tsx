@@ -3,6 +3,8 @@ import { useReducedMotion } from "motion/react";
 import { githubHandle, profile } from "@/data/resume";
 import { LayeredWaves } from "@/components/Backgrounds";
 import Quoted from "@/components/Quoted";
+import { ExternalLink } from "@/components/ExternalLink";
+import { readStorage, writeStorage } from "@/lib/storage";
 import { useOnScreen } from "@/lib/useOnScreen";
 import { cn } from "@/lib/utils";
 
@@ -26,24 +28,63 @@ const CACHE_TTL_MS = 30 * 60 * 1000;
 
 type FetchState = { status: "loading" } | { status: "error" } | { status: "ready"; repos: Repo[] };
 
-function readCachedRepos(): Repo[] | null {
+/** A card links out to its repo, so the link must really be a github.com one, whatever the data claims. */
+function isGithubUrl(value: string): boolean {
   try {
-    const raw = sessionStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const cached = JSON.parse(raw) as { at: number; repos: Repo[] };
-    if (!Array.isArray(cached.repos) || Date.now() - cached.at > CACHE_TTL_MS) return null;
-    return cached.repos;
+    const url = new URL(value);
+    return url.protocol === "https:" && url.hostname === "github.com";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * True only for an entry with every field the cards use, of the right type, and
+ * a github.com link. The list comes from the network and, on a later visit,
+ * from session storage: neither is trusted to be what it was when we wrote it.
+ */
+function isRepo(value: unknown): value is Repo {
+  if (typeof value !== "object" || value === null) return false;
+  const repo = value as Record<string, unknown>;
+  return (
+    typeof repo.id === "number" &&
+    typeof repo.name === "string" &&
+    (repo.description === null || typeof repo.description === "string") &&
+    typeof repo.html_url === "string" &&
+    isGithubUrl(repo.html_url) &&
+    (repo.language === null || typeof repo.language === "string") &&
+    typeof repo.stargazers_count === "number" &&
+    typeof repo.pushed_at === "string" &&
+    typeof repo.fork === "boolean"
+  );
+}
+
+/** The valid repos in a list of unknown things, or null if it isn't a list at all. */
+function parseRepos(value: unknown): Repo[] | null {
+  return Array.isArray(value) ? value.filter(isRepo) : null;
+}
+
+/**
+ * What an earlier visit left in session storage, if it's still fresh and intact.
+ * Every entry was valid when it was written, so if any now isn't, the cache has
+ * been altered or corrupted: throw all of it away and fetch again, rather than
+ * serve what's left.
+ */
+function readCachedRepos(): Repo[] | null {
+  const raw = readStorage("session", CACHE_KEY);
+  if (!raw) return null;
+  try {
+    const cached = JSON.parse(raw) as { at?: unknown; repos?: unknown };
+    if (typeof cached.at !== "number" || Date.now() - cached.at > CACHE_TTL_MS) return null;
+    const repos = parseRepos(cached.repos);
+    return repos && repos.length === (cached.repos as unknown[]).length ? repos : null;
   } catch {
     return null;
   }
 }
 
 function writeCachedRepos(repos: Repo[]) {
-  try {
-    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), repos }));
-  } catch {
-    // storage unavailable — the feed just refetches next time
-  }
+  writeStorage("session", CACHE_KEY, JSON.stringify({ at: Date.now(), repos }));
 }
 
 function formatRepoName(name: string) {
@@ -75,11 +116,13 @@ export default function Projects() {
     )
       .then((response) => {
         if (!response.ok) throw new Error(`GitHub responded ${response.status}`);
-        return response.json() as Promise<Repo[]>;
+        return response.json() as Promise<unknown>;
       })
       .then((data) => {
         if (cancelled) return;
-        const repos = data
+        const valid = parseRepos(data);
+        if (!valid) throw new Error("GitHub sent something other than a list of repositories");
+        const repos = valid
           .filter((repo) => !repo.fork && repo.name.toLowerCase() !== githubHandle.toLowerCase())
           .slice(0, MAX_REPOS);
         writeCachedRepos(repos);
@@ -111,14 +154,9 @@ export default function Projects() {
           </h2>
           <p className="measure mx-auto mt-4 text-sm text-muted">
             Pulled straight from{" "}
-            <a
-              href={profile.github}
-              target="_blank"
-              rel="noreferrer"
-              className="underline decoration-line-strong underline-offset-4 hover:text-ink"
-            >
+            <ExternalLink href={profile.github} underlined>
               github.com/{githubHandle}
-            </a>{" "}
+            </ExternalLink>{" "}
             — this list changes as the repos do.
           </p>
         </header>
@@ -215,17 +253,13 @@ function ProjectsMarquee({ repos }: { repos: Repo[] }) {
 
 function RepoCard({ repo, isCopy = false }: { repo: Repo; isCopy?: boolean }) {
   return (
-    <a
+    <ExternalLink
       href={repo.html_url}
-      target="_blank"
-      rel="noreferrer"
       tabIndex={isCopy ? -1 : undefined}
       className="card group/card flex h-full flex-col gap-4 p-6 transition-colors hover:border-line-strong"
     >
       <div className="flex items-center justify-between gap-4">
-        <span className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-muted">
-          {repo.language ?? "misc"}
-        </span>
+        <span className="mono-label text-muted">{repo.language ?? "misc"}</span>
         {repo.stargazers_count > 0 ? (
           <span className="font-mono text-[0.6875rem] text-faint">★ {repo.stargazers_count}</span>
         ) : null}
@@ -245,7 +279,7 @@ function RepoCard({ repo, isCopy = false }: { repo: Repo; isCopy?: boolean }) {
           open ↗
         </span>
       </div>
-    </a>
+    </ExternalLink>
   );
 }
 
@@ -255,10 +289,10 @@ function ProjectsSkeleton() {
       {Array.from({ length: 5 }).map((_, index) => (
         <div key={index} className={CARD_WIDTH}>
           <div className="card h-44 animate-pulse p-6">
-          <div className="h-3 w-16 rounded-full bg-sunk" />
-          <div className="mt-5 h-4 w-2/3 rounded-full bg-sunk" />
-          <div className="mt-3 h-3 w-full rounded-full bg-sunk" />
-          <div className="mt-2 h-3 w-4/5 rounded-full bg-sunk" />
+            <div className="h-3 w-16 rounded-full bg-sunk" />
+            <div className="mt-5 h-4 w-2/3 rounded-full bg-sunk" />
+            <div className="mt-3 h-3 w-full rounded-full bg-sunk" />
+            <div className="mt-2 h-3 w-4/5 rounded-full bg-sunk" />
           </div>
         </div>
       ))}
@@ -270,14 +304,9 @@ function ProjectsMessage() {
   return (
     <p className="text-sm text-muted">
       Couldn't load repositories just now.{" "}
-      <a
-        href={profile.github}
-        target="_blank"
-        rel="noreferrer"
-        className="underline decoration-line-strong underline-offset-4 hover:text-ink"
-      >
+      <ExternalLink href={profile.github} underlined>
         View the profile directly
-      </a>
+      </ExternalLink>
       .
     </p>
   );

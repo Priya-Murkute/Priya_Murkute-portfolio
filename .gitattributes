@@ -1,0 +1,6 @@
+# index.html's inline theme script is allowed by a SHA-256 hash in vercel.json's
+# Content-Security-Policy, and a hash is over the exact bytes served. Every checkout
+# must therefore have the same line endings as the deployed file (LF): a Windows
+# checkout converting to CRLF gave a different hash, so the hash on record was one
+# the live site never matched and the browser blocked the script.
+index.html text eol=lf

@@ -1,9 +1,9 @@
 import { animate, useReducedMotion, type AnimationPlaybackControls } from "motion/react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { EASE_CALM } from "@/lib/motion";
 import { clampCamera, lerpCamera, type Camera } from "@/lib/worldMap";
 
 const FLY_SECONDS = 0.8;
-const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
 /**
  * The world map's camera. `set` moves it at once (dragging, pinching), while
@@ -45,7 +45,7 @@ export function useMapCamera(aspect: number, initial: Camera) {
       const from = current.current;
       flight.current = animate(0, 1, {
         duration: FLY_SECONDS,
-        ease: EASE_OUT,
+        ease: EASE_CALM,
         onUpdate: (t) => {
           const next = lerpCamera(from, to, t);
           current.current = next;

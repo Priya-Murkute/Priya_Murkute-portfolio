@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import FallingPetals from "@/components/FallingPetals";
 import { PETAL_PATH, cherryBlossomColor, seededRandom } from "@/lib/cherryBlossom";
 import { useOnScreen } from "@/lib/useOnScreen";
-import { useTheme } from "@/context/ThemeContext";
+import { useTheme } from "@/context/useTheme";
 
 /** Fewer than the old 42: at the hero's size, 42 would bury the section's bottom edge. */
 const PETAL_COUNT = 30;

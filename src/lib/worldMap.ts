@@ -1,4 +1,5 @@
 import { DOT_GRID, DOT_ROWS } from "@/data/worldDots";
+import { clamp } from "@/lib/utils";
 
 /*
  * The dotted world map's geometry. The map is drawn in "map units": one unit
@@ -25,8 +26,6 @@ export interface Point {
 export interface Camera extends Point {
   k: number;
 }
-
-export const clamp = (value: number, low: number, high: number) => Math.min(Math.max(value, low), high);
 
 export function project(lat: number, lon: number): Point {
   return { x: lon - DOT_GRID.west, y: DOT_GRID.north - lat };

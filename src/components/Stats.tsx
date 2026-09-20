@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { stats } from "@/data/resume";
 import type { Signal } from "@/types";
 import { AnimatedNumber } from "@/components/motion-primitives/animated-number";
-import { InView } from "@/components/motion-primitives/in-view";
+import { EASE_CALM, revealItem } from "@/lib/motion";
 
 const signalText: Record<Signal, string> = {
   pass: "text-pass",
@@ -25,15 +25,7 @@ export default function Stats() {
     <section aria-label="Results" className="relative bg-sunk/50">
       <div className="shell">
         <hr className="hairline" />
-        <InView
-          once
-          viewOptions={{ margin: "-15% 0px" }}
-          variants={{
-            hidden: { opacity: 0, y: 22, filter: "blur(6px)" },
-            visible: { opacity: 1, y: 0, filter: "blur(0px)" },
-          }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        >
+        <motion.div {...revealItem()}>
           <dl className="grid gap-px sm:grid-cols-3">
             {stats.map((stat, index) => (
               <div key={stat.label} className="py-10 sm:px-8 sm:first:pl-0 sm:last:pr-0">
@@ -53,7 +45,7 @@ export default function Stats() {
               </div>
             ))}
           </dl>
-        </InView>
+        </motion.div>
         <hr className="hairline" />
       </div>
     </section>
@@ -71,7 +63,7 @@ function StatBar({ value, color, delay }: { value: number; color: string; delay:
         initial={{ width: "0%" }}
         whileInView={{ width: `${fraction * 100}%` }}
         viewport={{ once: true, margin: "-15% 0px" }}
-        transition={{ duration: 0.9, delay, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.9, delay, ease: EASE_CALM }}
       />
     </div>
   );

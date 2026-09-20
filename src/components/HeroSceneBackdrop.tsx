@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import HeroScene from "@/components/HeroScene";
+import { EASE_CALM } from "@/lib/motion";
 
 /** Fades in the falling-petals scene behind a hero section. */
 export default function HeroSceneBackdrop() {
@@ -8,7 +9,7 @@ export default function HeroSceneBackdrop() {
       className="absolute inset-0"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 1.6, delay: 0.2, ease: EASE_CALM }}
     >
       <HeroScene />
     </motion.div>

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, type PointerEvent } from "react";
 import { useReducedMotion } from "motion/react";
 import { releasePetal, whenPetalSceneReady } from "@/lib/petalRelease";
+import { readStorage, writeStorage } from "@/lib/storage";
+import { clamp } from "@/lib/utils";
 
 /** "Some": about four petals a second while the cursor moves along the name. */
 const MOVE_INTERVAL_MS = 250;
@@ -11,21 +13,9 @@ const WELCOME_COUNT = 9;
 const WELCOME_DELAY_MS = 400;
 const WELCOME_KEY = "pm-name-petals";
 
-function hasWelcomed(): boolean {
-  try {
-    return sessionStorage.getItem(WELCOME_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function markWelcomed() {
-  try {
-    sessionStorage.setItem(WELCOME_KEY, "1");
-  } catch {
-    // storage unavailable — the welcome may repeat, which is harmless
-  }
-}
+// If storage is unavailable the welcome may repeat, which is harmless.
+const hasWelcomed = () => readStorage("session", WELCOME_KEY) === "1";
+const markWelcomed = () => writeStorage("session", WELCOME_KEY, "1");
 
 /**
  * Lets the element it's attached to shed petals into the hero's 3D scene:
@@ -44,7 +34,7 @@ export function useNamePetals<T extends HTMLElement>() {
     const x = clientX ?? rect.left + rect.width * (0.05 + Math.random() * 0.9);
     releasePetal({
       // Kept within the name, so no petal appears to come from beside it.
-      clientX: Math.min(Math.max(x, rect.left + 4), rect.right - 4),
+      clientX: clamp(x, rect.left + 4, rect.right - 4),
       // The middle band of the letters, so petals leave the glyphs, not the gaps above them.
       clientY: rect.top + rect.height * (0.3 + Math.random() * 0.4),
     });

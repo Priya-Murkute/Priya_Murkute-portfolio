@@ -2,8 +2,11 @@ import { motion, useInView, useReducedMotion } from "motion/react";
 import JourneyRoute from "@/components/off-hours/JourneyRoute";
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { buildLegs } from "@/lib/journey";
+import { PIN_H, placeLabels } from "@/lib/mapLabels";
+import { revealItem } from "@/lib/motion";
 import { useElementSize } from "@/lib/useElementSize";
 import { useMapCamera } from "@/lib/useMapCamera";
+import { clamp } from "@/lib/utils";
 import {
   DOTS_PATH,
   DOT_SIZE,
@@ -11,7 +14,6 @@ import {
   MIN_ZOOM,
   WORLD_H,
   WORLD_W,
-  clamp,
   fitPoints,
   panBy,
   project,
@@ -58,107 +60,6 @@ function cameraFor(located: Located[], selectedId: string | null, view: View, as
 
 const plural = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`;
 
-/*
- * Pins and labels are sized in screen pixels, not map units, so they stay the
- * same size however far in the map is zoomed. A pin's tip is its origin.
- */
-const PIN_W = 12;
-const PIN_H = 17;
-const PIN_PATH = "M0 0C-1.6-4.6-6-7.4-6-11.4a6 6 0 1 1 12 0C6-7.4 1.6-4.6 0 0Z";
-const LABEL_H = 14;
-const LABEL_CHAR_W = 6.3;
-/** Pins closer than this to a named pin are left unnamed: they are part of the same cluster. */
-const CLUSTER = 14;
-
-interface Box {
-  left: number;
-  top: number;
-  right: number;
-  bottom: number;
-}
-
-interface Label {
-  /** Where the name's text starts (its left edge, on its baseline), relative to the pin's tip. */
-  x: number;
-  y: number;
-  /** For a name set apart from its pin: where a thin line from the pin should end, likewise relative. */
-  leader: Point | null;
-}
-
-const overlaps = (a: Box, b: Box) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
-
-/**
- * How far from its pin (px) to try a name: right up against it first, then
- * further out. Anything past the first is joined to its pin by a thin line.
- */
-const LABEL_GAPS = [0, 18, 36];
-
-/** Every place a name of this width could go around a pin, nearest and most natural first. */
-function labelSpots(sx: number, sy: number, width: number) {
-  const spots: { left: number; top: number; gap: number }[] = [];
-  for (const gap of LABEL_GAPS) {
-    const side = PIN_W / 2 + 3 + gap;
-    // Above: a few pixels clear of the pin, as its neighbours may stand a little higher.
-    const rise = PIN_H + 5 + gap;
-    const slant = 6 + gap * 0.7;
-    spots.push(
-      { gap, left: sx + side, top: sy - PIN_H + 1 }, // right
-      { gap, left: sx - width / 2, top: sy - rise - LABEL_H }, // above
-      { gap, left: sx - side - width, top: sy - PIN_H + 1 }, // left
-      { gap, left: sx - width / 2, top: sy + 7 + gap }, // below
-    );
-    if (gap > 0) {
-      spots.push(
-        { gap, left: sx + slant, top: sy - PIN_H - LABEL_H - slant + 6 },
-        { gap, left: sx - slant - width, top: sy - PIN_H - LABEL_H - slant + 6 },
-        { gap, left: sx + slant, top: sy + 4 + slant },
-        { gap, left: sx - slant - width, top: sy + 4 + slant },
-      );
-    }
-  }
-  return spots;
-}
-
-/**
- * Where each visible place's name is written: beside its pin if there's room,
- * else above, below or across from it, else further out on a thin line.
- * Places are offered in priority order, so when pins crowd, the ones that
- * matter most get the room. A name is left off if its pin is off the stage,
- * if the pin is crowded in with one already named (the pins around London
- * show just "London" until you zoom in and they part), or if there's no clear
- * spot for it anywhere.
- */
-function placeLabels(items: { id: string; name: string; sx: number; sy: number }[], stage: { width: number; height: number }) {
-  const pins = items.map(({ sx, sy }) => ({ left: sx - PIN_W / 2, right: sx + PIN_W / 2, top: sy - PIN_H, bottom: sy }));
-  const placed = new Map<string, Label>();
-  const named: typeof items = [];
-  const taken: Box[] = [];
-
-  items.forEach((item, i) => {
-    const { sx, sy } = item;
-    if (sx < 0 || sy < 0 || sx > stage.width || sy > stage.height) return;
-    if (named.some((other) => Math.hypot(other.sx - sx, other.sy - sy) < CLUSTER)) return;
-
-    const width = item.name.length * LABEL_CHAR_W + 4;
-    const obstacles = [...pins.filter((_, j) => j !== i), ...taken];
-    for (const { left, top, gap } of labelSpots(sx, sy, width)) {
-      const box = { left, top, right: left + width, bottom: top + LABEL_H };
-      const inside = box.left >= 0 && box.right <= stage.width && box.top >= 0 && box.bottom <= stage.height;
-      if (!inside || obstacles.some((other) => overlaps(box, other))) continue;
-
-      placed.set(item.id, {
-        x: left - sx,
-        y: top - sy + LABEL_H - 3,
-        leader: gap > 0 ? { x: clamp(0, left - sx, box.right - sx), y: clamp(-PIN_H / 2, top - sy, box.bottom - sy) } : null,
-      });
-      named.push(item);
-      taken.push(box);
-      return;
-    }
-  });
-  return placed;
-}
-
 /** The land, as dots. Memoised: it never changes, and the camera moves every frame. */
 const Dots = memo(function Dots({ width, className }: { width: number; className: string }) {
   return <path d={DOTS_PATH} strokeWidth={width} strokeLinecap="round" fill="none" className={className} />;
@@ -171,6 +72,9 @@ const KEY_PANS: Record<string, [number, number]> = {
   ArrowUp: [0, -0.2],
   ArrowDown: [0, 0.2],
 };
+
+/** A teardrop, its tip at the origin, on the same scale as PIN_W and PIN_H. */
+const PIN_PATH = "M0 0C-1.6-4.6-6-7.4-6-11.4a6 6 0 1 1 12 0C6-7.4 1.6-4.6 0 0Z";
 
 function Pin({ status, selected }: { status: Place["status"]; selected: boolean }) {
   if (status === "visited") {
@@ -433,10 +337,7 @@ export default function WorldMap({
     <motion.div
       ref={cardRef}
       className="card row-span-3 grid grid-rows-subgrid p-5"
-      initial={{ opacity: 0, y: 22 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-8% 0px" }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      {...revealItem({ blur: false })}
     >
       {/* Three lines, each level with its counterpart in the bucket list's heading: eyebrow, title, blurb. */}
       <div className="grid content-start justify-items-start gap-1.5">

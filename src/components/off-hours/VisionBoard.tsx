@@ -4,6 +4,7 @@ import FallingPetals from "@/components/FallingPetals";
 import Quoted from "@/components/Quoted";
 import { affirmations, visionAreas, visionGoals, visionHorizons } from "@/data/vision";
 import { PETAL_PATH } from "@/lib/cherryBlossom";
+import { EASE_CALM, revealItem } from "@/lib/motion";
 
 /** The board's petals: plenty of them, falling on through the section, and pink or pale. */
 const PETAL_FIRST_MS: [number, number] = [1100, 1100];
@@ -18,7 +19,6 @@ const AFFIRMATION_FADE_MS = 600;
 const METER_SECONDS = 1.1;
 const METER_START = 0.35;
 const METER_STAGGER = 0.17;
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** The washi tape pinning each column to the board: a colour and a tilt apiece. */
 const TAPES: CSSProperties[] = [
@@ -83,10 +83,7 @@ export default function VisionBoard() {
                 className="card vision-note grid content-start gap-3 px-[1.125rem] pt-[1.375rem] pb-3.5"
                 style={TAPES[index % TAPES.length]}
                 aria-labelledby={`vision-${horizon.id}`}
-                initial={{ opacity: 0, y: 22 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-8% 0px" }}
-                transition={{ duration: 0.55, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                {...revealItem({ delay: index * 0.08, blur: false })}
               >
                 <div className="flex items-baseline justify-between gap-2.5">
                   <h3 id={`vision-${horizon.id}`} className="font-display text-[1.1875rem] font-semibold tracking-tight">
@@ -126,10 +123,7 @@ export default function VisionBoard() {
         <motion.div
           className="mt-5 grid gap-3 rounded-[1.125rem] border border-line-strong p-[1.125rem]"
           style={{ backgroundImage: "linear-gradient(135deg, var(--surface) 0%, var(--surface-sunk) 100%)" }}
-          initial={{ opacity: 0, y: 22 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-8% 0px" }}
-          transition={{ duration: 0.55, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          {...revealItem({ delay: 0.1, blur: false })}
         >
           <div className="flex items-center gap-2.5">
             <svg viewBox="0 0 16 16" className="size-[1.125rem] text-[var(--accent-rose)]" fill="currentColor" aria-hidden="true">
@@ -176,7 +170,7 @@ function Meter({ done, total, delay }: { done: number; total: number; delay: num
     const climb = animate(0, done, {
       duration: METER_SECONDS,
       delay,
-      ease: EASE,
+      ease: EASE_CALM,
       onUpdate: (value) => setCount(Math.round(value)),
     });
     return () => climb.stop();
@@ -191,7 +185,7 @@ function Meter({ done, total, delay }: { done: number; total: number; delay: num
           style={{ backgroundImage: "linear-gradient(90deg, var(--accent-rose), var(--pass))" }}
           initial={{ width: reduced ? `${percent}%` : "0%" }}
           animate={{ width: reduced || seen ? `${percent}%` : "0%" }}
-          transition={{ duration: reduced ? 0 : METER_SECONDS, delay: reduced ? 0 : delay, ease: EASE }}
+          transition={{ duration: reduced ? 0 : METER_SECONDS, delay: reduced ? 0 : delay, ease: EASE_CALM }}
         />
       </div>
       <span className="sr-only">

@@ -52,7 +52,7 @@ export function PageErrorFallback() {
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="glow-cta mt-7 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-px"
+            className="btn-primary glow-cta mt-7"
           >
             Reload the page
           </button>

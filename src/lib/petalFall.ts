@@ -1,4 +1,5 @@
 import { cherryBlossomColor } from "@/lib/cherryBlossom";
+import { clamp } from "@/lib/utils";
 
 /** Keyframes per fall: enough that the linear steps between them read as one curve. */
 const STEPS = 28;
@@ -40,7 +41,7 @@ function settle(u: number) {
 }
 
 function smoothstep(u: number) {
-  const t = Math.min(Math.max(u, 0), 1);
+  const t = clamp(u, 0, 1);
   return t * t * (3 - 2 * t);
 }
 
