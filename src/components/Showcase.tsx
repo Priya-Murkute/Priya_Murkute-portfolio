@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { certifications } from "@/data/resume";
 import type { Track } from "@/types";
 import { LayeredWaves } from "@/components/Backgrounds";
+import { ExternalLink } from "@/components/ExternalLink";
 import Quoted from "@/components/Quoted";
 import SectionHeader from "@/components/SectionHeader";
 import { EASE_CALM } from "@/lib/motion";
@@ -152,14 +153,9 @@ export default function Showcase() {
                     return (
                       <li key={cert.name}>
                         {cert.url ? (
-                          <a
-                            href={cert.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={chipClass}
-                          >
+                          <ExternalLink href={cert.url} className={chipClass}>
                             {inner}
-                          </a>
+                          </ExternalLink>
                         ) : (
                           <div className={chipClass} title={cert.name}>
                             {inner}
