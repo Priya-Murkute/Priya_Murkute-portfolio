@@ -188,6 +188,7 @@ src/
 │   ├── petalRelease.ts        # page → 3D scene channel: "release a petal here"
 │   ├── useNamePetals.ts       # the hero name sheds petals on hover, and once per visit
 │   ├── useOnScreen.ts         # pauses ambient animation off-screen
+│   ├── useScrollToHash.ts     # on the home page, scrolls to the #section in the URL once it has mounted (About Me's “Get in touch”)
 │   ├── useElementSize.ts      # an element's size, kept current — the gallery and the map both fit themselves to it
 │   ├── worldMap.ts            # the dotted map's geometry: projection, camera, zoom-about-a-point, fit-to-places
 │   ├── journey.ts             # the journey's legs: curve, flight or hop, and the schedule they're drawn on
@@ -247,8 +248,13 @@ tests/                         # Playwright specs
 
 `public/Priya-Murkute-CV.pdf` is what the Download CV button serves, and it is
 **generated from `src/data/resume.ts`** by `npm run cv` — Playwright's Chromium
-prints an HTML template styled with the site's own type. Edit `resume.ts`, run
-`npm run cv`, commit the PDF.
+prints an HTML template set in Carlito (metric-compatible with Calibri) and laid
+out to fit one A4 page; the script counts the pages in the PDF and warns if it
+runs over. Edit `resume.ts`, run `npm run cv`, commit the PDF.
+
+A role can carry `cvBullets`, a shorter set used only by the CV, when the site's
+full bullets won't fit. The bold keywords are a list at the top of
+`scripts/generate-cv.ts`.
 
 It used to be a hand-made file, and it had drifted badly: different headline
 metrics from the site, one merged Wipro role instead of the two real ones, and

@@ -8,7 +8,7 @@ export default function Experience() {
       eyebrow="Experience"
       entries={experience.map(({ honors, ...role }) => ({
         ...role,
-        badge: honors ? { label: honors, tone: "flaky" as const } : undefined,
+        badges: honors?.map((label) => ({ label, tone: "flaky" as const })),
       }))}
     />
   );

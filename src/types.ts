@@ -15,8 +15,11 @@ export interface ExperienceItem {
   location: string;
   period: string;
   bullets: string[];
+  /** A shorter set for the CV, when a role needs less room there than on the site. */
+  cvBullets?: string[];
   note?: string;
-  honors?: string;
+  /** Awards for the role, one badge each. */
+  honors?: string[];
 }
 
 /** Structurally distinct from ExperienceItem so it can never render in the paid timeline. */
