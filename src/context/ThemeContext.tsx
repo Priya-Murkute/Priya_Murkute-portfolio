@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { flushSync } from "react-dom";
 import { ThemeContext } from "@/context/useTheme";
 import { readStorage, writeStorage } from "@/lib/storage";
 
@@ -14,24 +15,49 @@ function getStoredTheme(): Theme {
   return readStorage("local", THEME_STORAGE_KEY) === "dark" ? "dark" : "light";
 }
 
+function applyToDocument(theme: Theme) {
+  document.documentElement.classList.toggle("dark", theme === "dark");
+  document
+    .querySelector('meta[name="theme-color"]')
+    ?.setAttribute("content", theme === "dark" ? "#0e1113" : "#fffcfd");
+}
+
 /** Holds the theme, and applies it to the page. Read it with `useTheme` (useTheme.ts). */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(getStoredTheme);
+  // What the next toggle flips from, kept current even while a transition is still in flight.
+  const current = useRef(theme);
 
-  // Adds .theme-transition before the flip so the crossfade is in place when
-  // .dark lands, without every node carrying a transition all session.
   const toggle = useCallback(() => {
+    const next: Theme = current.current === "dark" ? "light" : "dark";
+    current.current = next;
+    // Saved now, not after the transition, so a navigation right after the click still sees it.
+    writeStorage("local", THEME_STORAGE_KEY, next);
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduced && "startViewTransition" in document) {
+      // The browser snapshots the page, flips the theme underneath, and fades between
+      // the two on the GPU. That covers everything that can't transition on its own
+      // (gradients, SVG, the 3D hero) in one smooth fade, instead of restyling every
+      // element on every frame. flushSync so React's half of the flip is in the new snapshot.
+      document.startViewTransition(() => {
+        applyToDocument(next);
+        flushSync(() => setTheme(next));
+      });
+      return;
+    }
+
+    // No View Transitions (older browsers): add .theme-transition before the flip so
+    // the crossfade is in place when .dark lands, without every node carrying a
+    // transition all session.
     const root = document.documentElement;
     root.classList.add("theme-transition");
     window.setTimeout(() => root.classList.remove("theme-transition"), TRANSITION_MS);
-    setTheme((current) => (current === "dark" ? "light" : "dark"));
+    setTheme(next);
   }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    document
-      .querySelector('meta[name="theme-color"]')
-      ?.setAttribute("content", theme === "dark" ? "#0e1113" : "#fffcfd");
+    applyToDocument(theme);
     writeStorage("local", THEME_STORAGE_KEY, theme);
   }, [theme]);
 
