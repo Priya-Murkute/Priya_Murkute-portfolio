@@ -198,6 +198,15 @@
       border-color 240ms var(--ease-calm),
       color 240ms var(--ease-calm) !important;
   }
+
+  /* Where the browser has View Transitions, the theme switch is one fade between
+     two snapshots of the page (ThemeProvider) and .theme-transition above is unused.
+     Slower than the default 250ms, and eased, so the change lands gently. */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 450ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
 }
 
 @layer components {
