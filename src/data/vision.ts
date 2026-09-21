@@ -31,18 +31,18 @@ export const visionGoals: VisionGoal[] = [
     done: "Inspiring Performance Award, Wipro",
   },
   { id: "sketch-weekly", text: "Sketch something every week", area: "creativity", horizon: "now" },
-  { id: "read-book", text: "Read a psychology book", area: "growth", horizon: "now" },
+  { id: "read-book", text: "Read Attached by Amir Levine and Rachel Heller", area: "growth", horizon: "now" },
+  { id: "powerbi", text: "Get certified in Power BI", area: "growth", horizon: "now" },
+  {
+    id: "cloud-cert",
+    text: "Get certified in Microsoft Azure or AWS, related to data and QA",
+    area: "growth",
+    horizon: "now",
+  },
 
   { id: "hybrid-role", text: "Grow into a role that mixes QA and data analytics", area: "career", horizon: "next" },
   { id: "london", text: "Move to London", area: "life", horizon: "next", done: "Sep 2022" },
   { id: "msc", text: "Finish my MSc in Computer Science", area: "growth", horizon: "next", done: "Jan 2024" },
-  { id: "powerbi", text: "Get certified in Power BI", area: "growth", horizon: "next" },
-  {
-    id: "cloud-cert",
-    text: "Get certified in Microsoft Azure or AWS, in something related to data and QA",
-    area: "growth",
-    horizon: "next",
-  },
   { id: "exhibition", text: "Show my sketches in a small exhibition", area: "creativity", horizon: "next" },
   { id: "kyoto", text: "See the cherry blossoms in Kyoto", area: "travel", horizon: "next" },
 
