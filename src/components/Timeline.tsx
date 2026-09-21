@@ -12,7 +12,7 @@ interface TimelineEntry {
   location: string;
   role: string;
   organisation: string;
-  badge?: { label: string; tone: keyof typeof BADGE_TONES };
+  badges?: { label: string; tone: keyof typeof BADGE_TONES }[];
   /** A line under the organisation, before the bullets. */
   note?: string;
   bullets?: string[];
@@ -56,13 +56,14 @@ export default function Timeline({
               <div className="lg:col-span-8">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
                   <h3 className="font-display text-xl font-semibold tracking-tight">{entry.role}</h3>
-                  {entry.badge ? (
+                  {entry.badges?.map((badge) => (
                     <span
-                      className={`rounded-full border px-2.5 py-0.5 font-mono text-[0.625rem] uppercase tracking-[0.1em] ${BADGE_TONES[entry.badge.tone]}`}
+                      key={badge.label}
+                      className={`rounded-full border px-2.5 py-0.5 font-mono text-[0.625rem] uppercase tracking-[0.1em] ${BADGE_TONES[badge.tone]}`}
                     >
-                      {entry.badge.label}
+                      {badge.label}
                     </span>
-                  ) : null}
+                  ))}
                 </div>
                 <p className="mt-1 text-sm text-muted">{entry.organisation}</p>
 

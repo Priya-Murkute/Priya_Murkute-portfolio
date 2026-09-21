@@ -26,9 +26,9 @@ export default function Stats() {
       <div className="shell">
         <hr className="hairline" />
         <motion.div {...revealItem()}>
-          <dl className="grid gap-px sm:grid-cols-3">
+          <dl className="grid sm:grid-cols-2 sm:gap-x-12 lg:grid-cols-4 lg:gap-x-10">
             {stats.map((stat, index) => (
-              <div key={stat.label} className="py-10 sm:px-8 sm:first:pl-0 sm:last:pr-0">
+              <div key={stat.label} className="py-10">
                 <dd className="flex items-baseline font-display text-[clamp(2.25rem,6vw,4rem)] font-semibold tracking-tight">
                   <span className={signalText[stat.signal]}>{stat.prefix}</span>
                   <AnimatedNumber value={stat.value} startOnView />

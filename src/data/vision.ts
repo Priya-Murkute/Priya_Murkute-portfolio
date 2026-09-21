@@ -22,7 +22,7 @@ export const visionHorizons: VisionHorizon[] = [
  */
 export const visionGoals: VisionGoal[] = [
   { id: "sdet-role", text: "Land a QA / SDET role in the UK", area: "career", horizon: "now" },
-  { id: "portfolio", text: "Launch my portfolio and share it", area: "career", horizon: "now" },
+  { id: "portfolio", text: "Launch my portfolio and share it", area: "career", horizon: "now", done: "Sep 2026" },
   {
     id: "award",
     text: "Be recognised for my work",
@@ -30,19 +30,26 @@ export const visionGoals: VisionGoal[] = [
     horizon: "now",
     done: "Inspiring Performance Award, Wipro",
   },
-  { id: "sketch-weekly", text: "Sketch something every week", area: "creativity", horizon: "now", example: true },
-  { id: "read-20", text: "Read 20 books", area: "growth", horizon: "now", example: true },
+  { id: "sketch-weekly", text: "Sketch something every week", area: "creativity", horizon: "now" },
+  { id: "read-book", text: "Read a psychology book", area: "growth", horizon: "now" },
 
   { id: "hybrid-role", text: "Grow into a role that mixes QA and data analytics", area: "career", horizon: "next" },
   { id: "london", text: "Move to London", area: "life", horizon: "next", done: "Sep 2022" },
   { id: "msc", text: "Finish my MSc in Computer Science", area: "growth", horizon: "next", done: "Jan 2024" },
-  { id: "powerbi", text: "Get certified in Power BI", area: "growth", horizon: "next", example: true },
-  { id: "exhibition", text: "Show my sketches in a small exhibition", area: "creativity", horizon: "next", example: true },
-  { id: "kyoto", text: "See the cherry blossoms in Kyoto", area: "travel", horizon: "next", example: true },
+  { id: "powerbi", text: "Get certified in Power BI", area: "growth", horizon: "next" },
+  {
+    id: "cloud-cert",
+    text: "Get certified in Microsoft Azure or AWS, in something related to data and QA",
+    area: "growth",
+    horizon: "next",
+  },
+  { id: "exhibition", text: "Show my sketches in a small exhibition", area: "creativity", horizon: "next" },
+  { id: "kyoto", text: "See the cherry blossoms in Kyoto", area: "travel", horizon: "next" },
 
-  { id: "countries", text: "Visit 30 countries", area: "travel", horizon: "someday", example: true },
-  { id: "mentor", text: "Mentor women starting out in tech", area: "life", horizon: "someday", example: true },
-  { id: "studio", text: "A home with a sunlit corner for drawing", area: "life", horizon: "someday", example: true },
+  { id: "countries", text: "Visit 30 countries", area: "travel", horizon: "someday" },
+  { id: "mentor", text: "Mentor women starting out in tech", area: "life", horizon: "someday" },
+  { id: "studio", text: "A home with a sunlit corner for drawing", area: "life", horizon: "someday" },
+  { id: "g-wagon", text: "Get my dream G-Wagon", area: "life", horizon: "someday" },
 ];
 
 /** One at a time above the board, changing every few seconds. Placeholders for now. */

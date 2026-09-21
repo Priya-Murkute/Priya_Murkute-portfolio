@@ -8,7 +8,7 @@ export default function Volunteering() {
   return (
     <Timeline
       eyebrow="Volunteering"
-      entries={volunteering.map((item) => ({ ...item, badge: { label: "Volunteer", tone: "pass" as const } }))}
+      entries={volunteering.map((item) => ({ ...item, badges: [{ label: "Volunteer", tone: "pass" as const }] }))}
     />
   );
 }
