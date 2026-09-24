@@ -19,13 +19,13 @@ function supportsWebGL() {
   }
 }
 
-/** `requestIdleCallback` with a timeout fallback for Safari < 16.4. */
+/** `requestIdleCallback` with a shorter timeout so the 3D scene loads during preloader, not after. */
 function onIdle(callback: () => void): () => void {
   if (typeof window.requestIdleCallback === "function") {
-    const handle = window.requestIdleCallback(callback, { timeout: 2000 });
+    const handle = window.requestIdleCallback(callback, { timeout: 600 });
     return () => window.cancelIdleCallback(handle);
   }
-  const handle = window.setTimeout(callback, 200);
+  const handle = window.setTimeout(callback, 150);
   return () => window.clearTimeout(handle);
 }
 
