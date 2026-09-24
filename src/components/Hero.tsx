@@ -29,7 +29,7 @@ export default function Hero() {
         className="absolute inset-x-0 -top-40 h-[38rem]"
         initial={{ opacity: 0, scale: 0.94 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.4, ease: EASE_CALM }}
+        transition={{ duration: 1.2, delay: 0.3, ease: EASE_CALM }}
       >
         <BlurryGradient />
       </motion.div>
@@ -43,7 +43,7 @@ export default function Hero() {
             className="space-y-7"
             transition={{
               staggerChildren: 0.12,
-              delayChildren: 0.1,
+              delayChildren: 0.7,
               duration: 0.7,
               ease: EASE_CALM,
             }}
