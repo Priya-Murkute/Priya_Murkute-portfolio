@@ -9,7 +9,7 @@ export default function HeroSceneBackdrop() {
       className="absolute inset-0"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1.6, delay: 0.2, ease: EASE_CALM }}
+      transition={{ duration: 1.6, delay: 0.4, ease: EASE_CALM }}
     >
       <HeroScene />
     </motion.div>

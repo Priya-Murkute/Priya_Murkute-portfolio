@@ -50,8 +50,8 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
   return (
     <motion.div
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-5 bg-paper"
-      exit={{ opacity: 0, filter: "blur(10px)" }}
-      transition={{ duration: 0.5, ease: EASE_CALM }}
+      exit={{ opacity: 0, filter: "blur(5px)" }}
+      transition={{ duration: 0.4, ease: EASE_CALM }}
     >
       <span className="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-faint">
         Running the suite before you arrive
