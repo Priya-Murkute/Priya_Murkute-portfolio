@@ -73,9 +73,9 @@ export const stats: Stat[] = [
 export const experience: ExperienceItem[] = [
   {
     role: "QA Automation Engineer (SDET)",
-    organisation: "Testing Info",
+    organisation: "Forever Voyage - freelancer",
     location: "London",
-    period: "Feb 2023 — Sept 2023",
+    period: "Feb 2023 — Sept 2024",
     note: "QA work in London, running alongside the MSc below — hands-on API automation for a UK client while studying full-time.",
     cvBullets: [
       "Designed and executed functional, regression and integration tests for web applications, turning requirements into test cases and automation scenarios",
