@@ -7,6 +7,12 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # eslint-plugin-jsx-a11y caps its peer at eslint ^9, so an eslint major bump
+    # fails `npm ci` on Vercel with ERESOLVE. Hold eslint at 9.x until the plugin
+    # declares support for the next major.
+    ignore:
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
     groups:
       # One PR for the routine dev-tool bumps rather than a dozen.
       dev-dependencies:
